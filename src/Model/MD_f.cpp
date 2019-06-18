@@ -40,9 +40,6 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
         }
     }
 #else
-    static double dt1 = 0., dt2 = 0., dt3=0.;
-    clock_t t0, t1;
-    t0 = clock();
     for (i = 0; i < NumEle; i++) {
         /*DO INFILTRATION FRIST, then do LATERAL FLOW.*/
         /*========ET Function==============*/
@@ -53,25 +50,16 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
         /*========surf/gw flow Function==============*/
         f_lateralFlux(i, t); // AFTER infiltration, do the lateral flux. ESP for overland flow.
     } //end of for loop.
-    t1 = clock();
-    dt1 += (double) (t1 - t0);
-    t0 = clock();
     for (i = 0; i < NumChannel; i++) {
         f_channel_surface(channel[i].iEle-1, channel[i].iRiv-1, i);
         f_channel_sub(channel[i].iEle-1, channel[i].iRiv-1, i);
     }
-    t1 = clock();
-    dt2 += (double) (t1 - t0);
-    t0 = clock();
     for (i = 0; i < NumRiv; i++) {
         Flux_RiverDown(t, i);
     }
 //    for (i = 0; i < NumEle; i++) {
 //        f_waterbalance(i);
 //    }
-//    t1 = clock();
-//    dt3 += (double) (t1 - t0);
-//    t0 = clock();
 #endif
 }
 void Model_Data::f_wb_updateQsurf(int i, int j){
