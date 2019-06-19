@@ -168,9 +168,9 @@ void Model_Data::f_applyDY(double *DY, double t){
         CheckNANi(DY[i + 3 * NumEle], i, "DY[i] of river (Model_Data::f_applyDY)");
 #endif
     }
-    FILE *fid = fopen("DY_debug.dat", "ab+");
-    fwrite(&t, sizeof(t), 1, fid);
-    fwrite(DY, sizeof(DY), NumY, fid);
-    fclose(fid);
-    printf("");
+//    FILE *fid = fopen("DY_debug.dat", "ab+");
+//    fwrite(&t, sizeof(t), 1, fid);
+//    fwrite(DY, sizeof(DY), NumY, fid);
+//    fclose(fid);
+//    printf("");
 }
