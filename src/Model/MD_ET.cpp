@@ -48,7 +48,8 @@ void Model_Data::tReadForcing(double t, int i){
 }
 
 void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
-    double  Rn=NA_VALUE, T=NA_VALUE, Vel=NA_VALUE, RH=NA_VALUE, LAI=NA_VALUE;
+//    double  Rn=NA_VALUE, Vel=NA_VALUE, RH=NA_VALUE, rl=NA_VALUE;
+    double  T=NA_VALUE,  LAI=NA_VALUE;
     double  isval = 0.;// etval = 0;
     double  DT_min = NA_VALUE;
     double  r_ISMax = 0.0;
@@ -56,7 +57,6 @@ void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
     snowRate=NA_VALUE,
     MeltRateGrnd=NA_VALUE,
     MeltRateCanopy=NA_VALUE,
-    rl=NA_VALUE,
     MF=NA_VALUE,
     ret=NA_VALUE;
     DT_min = dt ; /* dt [min] */
@@ -66,10 +66,10 @@ void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
         T = t_temp[i];
         LAI = t_lai[i];
         MF = t_mf[i];
-        Rn = t_rn[i];
-        Vel = t_wind[i];
-        RH = t_rh[i];
-        rl = t_rl[i];
+//        Rn = t_rn[i];
+//        Vel = t_wind[i];
+//        RH = t_rh[i];
+//        rl = t_rl[i];
         /* Snow Accumulation/Melt Calculation*/
         if( T < Ts){
             fracSnow = 1.;
@@ -200,7 +200,6 @@ void Model_Data::f_etFlux(int i, double t){
     
     if(LAI > 0.){
         if(uYgw[i] > Ele[i].RootReachLevel){
-            elemSatn = 1.;
             beta_s = 1.;
         }
         Et = gc.cEt2 * Ele[i].VegFrac * (1 - Ele[i].Landcover::ImpAF) * ETp * beta_s;

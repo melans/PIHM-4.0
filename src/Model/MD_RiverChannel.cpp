@@ -2,9 +2,9 @@
 void Model_Data::f_channel_surface(int iEle, int iRiv, int i){
     //Surface Flux from River Channel to Element;
     double Q = 0.;
-    double zbed, zbank;
-    zbed = Ele[iEle].zmax - Riv[iRiv].depth;
-    zbank = Ele[iEle].zmax;
+//    double zbed, zbank;
+//    zbed = Ele[iEle].zmax - Riv[iRiv].depth;
+//    zbank = Ele[iEle].zmax;
 //    Q = WeirFlow(Ele[iEle].zmax, uYsf[iEle],
 //                 Ele[iEle].zmax - Riv[iRiv].depth, uYriv[iRiv],
 //                 Ele[iEle].zmax, channel[i].Cwr, channel[i].length, Ele[iEle].depression);

@@ -155,15 +155,15 @@ void Model_Data::f_applyDY(double *DY, double t){
     for (int i = 0; i < NumRiv; i++) {
         DY[iRIV] = (- QrivUp[i] - QrivSurf[i] - QrivSub[i] - QrivDown[i]) / Riv[i].u_TopArea / UNIT_C;
 //        DY[iRIV] = 0.0;
-        if(DY[iRIV] + uYriv[i] < 0){
-            printf("debug: riv%d\t %f\t %f \t qup=%f\t qsf=%f\t qsub=%f\t qdown= %f\n",
-                   i+1, uYriv[i], Riv[i].depth,
-                   - QrivUp[i]/ Riv[i].u_TopArea,
-                   - QrivSurf[i]/ Riv[i].u_TopArea,
-                   - QrivSub[i]/ Riv[i].u_TopArea,
-                   - QrivDown[i] / Riv[i].u_TopArea);
-            i=i;
-        }
+//        if(DY[iRIV] + uYriv[i] < 0){
+//            printf("debug: riv%d\t %f\t %f \t qup=%f\t qsf=%f\t qsub=%f\t qdown= %f\n",
+//                   i+1, uYriv[i], Riv[i].depth,
+//                   - QrivUp[i]/ Riv[i].u_TopArea,
+//                   - QrivSurf[i]/ Riv[i].u_TopArea,
+//                   - QrivSub[i]/ Riv[i].u_TopArea,
+//                   - QrivDown[i] / Riv[i].u_TopArea);
+//            i=i;
+//        }
 #ifdef _DEBUG
         CheckNANi(DY[i + 3 * NumEle], i, "DY[i] of river (Model_Data::f_applyDY)");
 #endif
