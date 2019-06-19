@@ -84,7 +84,7 @@ void Soil_Layer::applyCalib(calib_soil *g){
     infD *= g->infD;
 }
 void Soil_Layer::checkValue(){
-    checkRange(Alpha, .5, 20., index - 1, "Alpha");
+    checkRange(Alpha, .05, 20., index - 1, "Alpha");
     checkRange(Beta, 1., 10., index - 1, "Beta");
     checkRange(infKsatV, 0., 1.0e3, index - 1, "infKsatV");
     checkRange(infD, 0., 10., index - 1, "Alpha");
