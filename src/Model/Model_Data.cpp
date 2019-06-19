@@ -182,12 +182,6 @@ double Model_Data::getArea(){
 }
 void Model_Data::rmSinks(){
     double zmin, z;
-    std::vector<double> vec;
-    int *flag = new int(NumEle);
-    for(int i = 0; i < NumEle; i++){
-        flag[i] = 1;
-    }
-        
     int inabr;
     for(int i = 0; i < NumEle; i++){
         z =  Ele[i].zmax;
