@@ -51,15 +51,15 @@ public:
     /* Geometry */
 //    int FromNode = NA_VALUE;    /* Upstream Node no. [-] */
 //    int ToNode = NA_VALUE;    /* Dnstream Node no. [-] */
-    int down = NA_VALUE;    /* down stream segment [-] */
+    int down = NA_VALUE;    /* down stream reach [-] */
     int type = NA_VALUE;    /* shape type [-] */
     int BC = NA_VALUE;    /* BC type [-] */
     int reservoir = NA_VALUE; /* [-] */
-//    double x = NA_VALUE;    /* Centroid x of river segment [m] */
-//    double y = NA_VALUE; /* Centroid y of river segment [m] */
+//    double x = NA_VALUE;    /* Centroid x of river reach [m] */
+//    double y = NA_VALUE; /* Centroid y of river reach [m] */
     double zbed = NA_VALUE;    /* bed elevation [m] */
     double zbank = NA_VALUE;    /* bank elevation [m] */
-    double Length = NA_VALUE;    /* Riv segment Length [m] */
+    double Length = NA_VALUE;    /* Riv reach Length [m] */
     double BedSlope = NA_VALUE; /* Slope of river bed [m/m] */
     /* relation to its downstream */
     double Dist2DownStream = NA_VALUE; /* */
@@ -86,7 +86,7 @@ private:
     void checkGeomtry(void);
 };
 
-class RiverChannel{
+class RiverSegement{
 public:
     int index;
     int iRiv = NA_VALUE;

@@ -26,9 +26,9 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
             f_lateralFlux(i, t); // AFTER infiltration, do the lateral flux. ESP for overland flow.
         } //end of for loop.
 #pragma omp for
-        for (i = 0; i < NumChannel; i++) {
-            f_channel_surface( channel[i].iEle-1, channel[i].iRiv-1, i);
-            f_channel_sub( channel[i].iEle-1, channel[i].iRiv-1, i);
+        for (i = 0; i < NumSegmt; i++) {
+            f_Segement_surface( RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
+            f_Segement_sub( RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
         }
 #pragma omp for
         for (i = 0; i < NumRiv; i++) {
@@ -50,9 +50,9 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
         /*========surf/gw flow Function==============*/
         f_lateralFlux(i, t); // AFTER infiltration, do the lateral flux. ESP for overland flow.
     } //end of for loop.
-    for (i = 0; i < NumChannel; i++) {
-        f_channel_surface(channel[i].iEle-1, channel[i].iRiv-1, i);
-        f_channel_sub(channel[i].iEle-1, channel[i].iRiv-1, i);
+    for (i = 0; i < NumSegmt; i++) {
+        f_Segement_surface(RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
+        f_Segement_sub(RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
     }
     for (i = 0; i < NumRiv; i++) {
         Flux_RiverDown(t, i);

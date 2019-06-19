@@ -38,7 +38,7 @@ public:
     int NumY;
     int NumBCRiv;      /* Number of Boundary Condition for Rivers */
     int NumBCEle;      /* Number of Boundary Condition for Elements */
-    int NumRiv;            /* Number of Rivere Segments */
+    int NumRiv;            /* Number of Rivere Reaches */
     
     
     int NumSoil;        /* Number of Soils */
@@ -64,7 +64,7 @@ public:
     Geol_Layer *Geol;            /* Store Geology Information */
     Landcover *LandC;        /* Store Land Cover Information */
     
-    _River *Riv;        /* Store River Segment Information */
+    _River *Riv;        /* Store River Reach Information */
     river_para *Riv_Type;    /* Store River Shape Information */
     _Node *rivNode;
     FloodAlert *flood;
@@ -78,7 +78,7 @@ public:
     
     double **QeleSurf;    /* Overland Flux */
     double **QeleSub;        /* Subsurface Flux */
-    //double ** FluxRiv;    /* River Segement Flux */
+    //double ** FluxRiv;    /* River Segment Flux */
     double *QrivSurf;        /* surface Flux between river and element */
     double *QrivSub;        /* gw Flux between river and element */
     double *QrivDown;
@@ -127,8 +127,8 @@ public:
 //    double *uYgw;
 //    double *uYriv;
     
-    int NumChannel;
-    RiverChannel *channel;
+    int NumSegmt;
+    RiverSegement *RivSeg;
     
     long ForcStartTime;
     
@@ -228,8 +228,8 @@ private:
     
     /* Physical processes */
     void Flux_RiverDown(double t, int i);
-    void f_channel_surface(int iEle, int iRiv, int i);
-    void f_channel_sub(int iEle, int iRiv, int i);
+    void f_Segement_surface(int iEle, int iRiv, int i);
+    void f_Segement_sub(int iEle, int iRiv, int i);
     
     /* Methods for element calculation */
     void f_lateralFlux(int i, double t);

@@ -8,20 +8,20 @@ void Model_Data::read_para(const char *fn){
 }
 void Model_Data::read_rivchn(const char *fn){
     TabularData tb;
-    NumChannel = tb.read(fn);
-    channel = new RiverChannel[NumChannel];
-    printf("Number of River Segments: %d\n", NumChannel);
+    NumSegmt = tb.read(fn);
+    RivSeg = new RiverSegement[NumSegmt];
+    printf("Number of River reaches: %d\n", NumSegmt);
     if(tb.ncol != 4){
         printf("The column of River Parameter should be: \n");
         printf("%s\t%s\t%s\t%s\n", "index", "iRiv", "iEle", "Length");
         printf("Actual column is:\n%s", tb.header);
         myexit(ERRFileIO);
     }
-    for (int i=0; i<NumChannel ; i++){
-        channel[i].index    = (int) tb.x[i][0];
-        channel[i].iRiv     = (int) tb.x[i][1];
-        channel[i].iEle     = (int) tb.x[i][2];
-        channel[i].length   = (double) tb.x[i][3];
+    for (int i=0; i<NumSegmt ; i++){
+        RivSeg[i].index    = (int) tb.x[i][0];
+        RivSeg[i].iRiv     = (int) tb.x[i][1];
+        RivSeg[i].iEle     = (int) tb.x[i][2];
+        RivSeg[i].length   = (double) tb.x[i][3];
     }
 }
 void Model_Data::read_riv(const char *fn){
@@ -425,7 +425,7 @@ void Model_Data::FreeData(){
     delete[]    t_rl;
     
     //read_rivchn()
-    delete[] channel;
+    delete[] RivSeg;
     
     /* free river, read_riv */
     delete[] Riv;

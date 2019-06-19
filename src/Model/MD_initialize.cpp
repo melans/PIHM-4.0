@@ -271,13 +271,13 @@ void Model_Data:: initialize(){
         // loop 2 for river. update the values for downstream.
         Riv[i].updateFrDownstream(Riv);
     }
-    for (int i = 0; i < NumChannel; i++){
-        channel[i].Cwr = Riv_Type[Riv[channel[i].iRiv - 1].type - 1 ].Cwr;
-        channel[i].KsatH = Riv_Type[Riv[channel[i].iRiv - 1].type - 1 ].KsatH;
-        channel[i].eqDistance = Ele[channel[i].iEle - 1].area / channel[i].length * .5;
-        Ele[channel[i].iEle - 1].RivID = channel[i].iRiv;
-        CheckNonZero(channel[i].Cwr, i, "River Channel Cwr");
-        CheckNonZero(channel[i].KsatH, i, "River Channel KsatH");
+    for (int i = 0; i < NumSegmt; i++){
+        RivSeg[i].Cwr = Riv_Type[Riv[RivSeg[i].iRiv - 1].type - 1 ].Cwr;
+        RivSeg[i].KsatH = Riv_Type[Riv[RivSeg[i].iRiv - 1].type - 1 ].KsatH;
+        RivSeg[i].eqDistance = Ele[RivSeg[i].iEle - 1].area / RivSeg[i].length * .5;
+        Ele[RivSeg[i].iEle - 1].RivID = RivSeg[i].iRiv;
+        CheckNonZero(RivSeg[i].Cwr, i, "River Segment Cwr");
+        CheckNonZero(RivSeg[i].KsatH, i, "River Segment KsatH");
     }
 #ifndef _CALIBMODE
     flood = new FloodAlert();
