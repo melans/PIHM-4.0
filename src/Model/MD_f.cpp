@@ -110,10 +110,10 @@ void Model_Data::f_applyDY(double *DY, double t){
             QeleSubTot[i] += QeleSub[i][j];
             CheckNANij(QeleSurf[i][j], i, "QeleSurf[i][j] (Model_Data::f_applyDY)");
         }
-        if(i==16){
-            printf("@%.1fmin--%d\t, %2em %3e, %3e\n",t, i, uYsf[i], QeleSurfTot[i] / Ele[i].area, Qe2r_Surf[i] / Ele[i].area);
-        }
-        
+//        if(i==16){
+//            printf("@%.1fmin--%d\t, %.2em %.3e, %.3e\n",t, i, uYsf[i], QeleSurfTot[i] / Ele[i].area, Qe2r_Surf[i] / Ele[i].area);
+//        }
+//
         QeleSurfTot[i] += Qe2r_Surf[i];
         QeleSubTot[i] += Qe2r_Sub[i];
         CheckNANi(QeleSurfTot[i] , i, "DY[i] (Model_Data::f_applyDY)");
