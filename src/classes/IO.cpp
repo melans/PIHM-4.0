@@ -142,6 +142,7 @@ void FileOut::updateFilePath(){
     sprintf(ele_Q_surfTot, "%s/%s%s.eleqsurf", outpath, projectname, suffix);
     
     sprintf(ele_q_ETP, "%s/%s%s.elevetp", outpath, projectname, suffix);
+    sprintf(ele_q_ETA, "%s/%s%s.eleveta", outpath, projectname, suffix);
     sprintf(ele_q_prcp, "%s/%s%s.elevprcp", outpath, projectname, suffix);
     sprintf(ele_q_netprcp, "%s/%s%s.elevnetprcp", outpath, projectname, suffix);
     sprintf(ele_q_infil, "%s/%s%s.elevinfil", outpath, projectname, suffix);
@@ -301,6 +302,7 @@ void FileOut::copy(FileOut *p){
         strcpy(   ele_q_ET[i], p->ele_q_ET[i] );
     }
     strcpy(   ele_q_ETP, p->ele_q_ETP );
+    strcpy(   ele_q_ETA, p->ele_q_ETA );
     strcpy(   ele_q_prcp, p->ele_q_prcp );
     strcpy(   ele_q_netprcp, p->ele_q_netprcp );
     strcpy(   ele_Q_surfTot, p->ele_Q_surfTot );

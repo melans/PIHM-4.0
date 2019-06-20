@@ -84,6 +84,7 @@ public:
     //cell-fluxes
     char ele_q_ET[3][MAXLEN];
     char ele_q_ETP[MAXLEN];
+    char ele_q_ETA[MAXLEN];
     char ele_q_prcp[MAXLEN];
     char ele_q_netprcp[MAXLEN];
 //    char ele_Q_surf[MAXLEN];

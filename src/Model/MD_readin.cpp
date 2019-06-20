@@ -374,6 +374,7 @@ void Model_Data::FreeData(){
     delete[]    qElePrep;
     delete[]    qEleTF;
     delete[]    qEleETP;
+    delete[]    qEleETA;
     delete[]    qEleETloss; //10
     
     delete[]    qEleNetPrep;

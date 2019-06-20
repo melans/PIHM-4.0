@@ -307,6 +307,8 @@ void Model_Data:: initialize_output (FileOut *fout){
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_q_netprcp, CS.dt_qe_prcp, qEleNetPrep, 1);
     if (CS.dt_qe_etp > 0)
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_q_ETP, CS.dt_qe_etp, qEleETP, 1);
+    if (CS.dt_qe_eta > 0)
+        CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_q_ETA, CS.dt_qe_eta, qEleETA, 1);
     if (CS.dt_qe_rech > 0)
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_q_rech, CS.dt_qe_rech, qEleRecharge, 1);
     if (CS.dt_Qe_sub > 0)

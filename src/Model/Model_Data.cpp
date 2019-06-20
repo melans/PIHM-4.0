@@ -81,6 +81,7 @@ void Model_Data::allocateMemory()
     qElePrep    = new double[NumEle];
     qEleTF      = new double[NumEle];
     qEleETP     = new double[NumEle];
+    qEleETA     = new double[NumEle];
     qEleETloss  = new double[NumEle]; //10
     
     qEleNetPrep = new double[NumEle];

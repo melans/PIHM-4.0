@@ -112,6 +112,7 @@ public:
     double *yEleSurf;   // debug may not necessary
     double *yEleUnsat;   // debug may not necessary
     double *qEleETP;
+    double *qEleETA;
     double *yRivStg;   // debug may not necessary
     /* Lake variables */
     double *yLakeStg;

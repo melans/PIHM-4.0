@@ -208,6 +208,7 @@ void Model_Data::f_etFlux(int i, double t){
     }
     qEleET[i][1] = Et;
     qEleET[i][2] = Ev;
+    qEleETA[i] = qEleET[i][0] + qEleET[i][1] + qEleET[i][2];
 #ifdef _DEBUG
     CheckNANi(ETp, i, "Potential ET (Model_Data::EvapoTranspiration)");
     CheckNANi(qEleET[i][1], i, "Transpiration (Model_Data::EvapoTranspiration)");

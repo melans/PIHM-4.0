@@ -58,6 +58,7 @@ public:
     int dt_qe_et[3] = {0,0,0};
     int dt_qe_rech = 0;
     int dt_qe_etp = 0;
+    int dt_qe_eta = 0;
     
     /* Element volume Fluxes */
     int dt_Qe_sub = 0;

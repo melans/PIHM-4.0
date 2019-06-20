@@ -25,6 +25,7 @@ void PrintOutDt::defaultmode(){
     
     dt_qe_rech = dt;
     dt_qe_etp = dt;
+    dt_qe_eta = dt;
     
     /* Element volume Fluxes */
     dt_Qe_sub = 0;
@@ -67,6 +68,7 @@ void PrintOutDt::calibmode(int dt ){
     
     dt_qe_rech = 0;
     dt_qe_etp = dt;
+    dt_qe_eta = dt;
     
     /* Element volume Fluxes */
     dt_Qe_sub = 0;
@@ -208,6 +210,7 @@ void Control_Data::read(const char *fn){
             dt_qe_et[1] =  val;
             dt_qe_et[2] =  val;
             dt_qe_etp =  val;
+            dt_qe_eta =  val;
         }
         else if (strcasecmp ("dt_qe_rech", optstr) == 0)
             dt_qe_rech =  val;
