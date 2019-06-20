@@ -121,7 +121,7 @@ double OverlandManning(double avg_y, double grad_y, double avg_sf, double A, dou
 //        }
     return Q;
 }
-double sat2Y(double elemSatn, double alpha, double n, double mpsi){
+double sat2psi(double elemSatn, double alpha, double n, double mpsi){
     double temp = -(pow(pow(elemSatn, n / (1 - n)) - 1, 1 / n) / alpha);
     double ret = (temp < mpsi) ? mpsi : temp;
     return ret;
@@ -135,6 +135,7 @@ double fun_recharge(double effk_us, double kgw, double Deficit, double ygw, doub
     }
     effk = meanHarmonic(kgw, effk_us, ygw, hus);
     q = effk * (1. + hus / (Deficit * 0.5));
+    CheckNANi(q, -1, "recharge:fun_recharge");
     return q;
 }
 double FieldCapacity (double Alpha, double Beta, double deficit ){

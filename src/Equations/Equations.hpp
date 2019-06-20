@@ -19,7 +19,7 @@ double effKVnew(double ksatFunc, double macKV, double KV, double areaF, double y
 
 double effKH(double tmpY, double aqDepth, double MacD, double MacKsatH, double areaF, double ksatH);
 double satKfun(double elemSatn, double beta);
-double sat2Y(double elemSatn, double alpha, double beta, double mpsi);
+double sat2psi(double elemSatn, double alpha, double beta, double mpsi);
 double fun_recharge(double effk_us, double kgw, double Deficit, double ygw, double yus);
 double effKRech(double ksatFunc,  double macKV, double KV, double areaF);
 double ManningEquation(double Area, double rough, double y, double S);

@@ -205,6 +205,7 @@ void _Element::Flux_InfiRech(double Ysurf, double Yunsat, double Ygw, double net
     }
 }
 void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
+    double minpsi = -1. * u_deficit;
     u_effKH = effKH(Ygw,  AquiferDepth,  macD,  macKsatH,  geo_vAreaF,  KsatH);
     u_deficit = AquiferDepth - Ygw;
     if(u_deficit <= 0. ){
@@ -217,15 +218,17 @@ void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
         u_satn = 1.0;
         u_satKr = 1.0;
         u_phius = 0.;
+    }else if(u_satn <= EPS_DOUBLE){
+        u_satKr = 0.;
+        u_phius = minpsi;
     }else{
         u_satKr = satKfun(u_satn, Beta);
-        u_phius = sat2Y(u_satn, Alpha, Beta, -1 * u_deficit);
+        u_phius = sat2psi(u_satn, Alpha, Beta, minpsi);
     }
-    //    u_ThetaFC = FieldCapacity(Alpha, Beta, u_deficit);
+//    u_ThetaFC = FieldCapacity(Alpha, Beta, u_deficit);
 //    u_Theta = u_satn * ThetaS;
     u_effkInfi = effKVnew(u_satKr, macKsatV, infKsatV, hAreaF, Ysurf);
 }
-
 
 void _Element::copyGeol(Geol_Layer *g){
     KsatH        = g[iGeol - 1].KsatH;
