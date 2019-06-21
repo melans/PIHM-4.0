@@ -28,17 +28,32 @@ double FieldCapacity (double Alpha, double Beta, double deficit );
 double GreenAmpt(double k, double ti, double ts, double phi, double hf, double prcp, double sy);
 
 
-inline double pow23(double x){
+inline
+double pow23(double x){
     double t = cbrt(x);
     return t * t;
 }
-inline double sqpow2(double x, double y){
+inline
+double sqpow2(double x, double y){
     return sqrt(x * x + y * y);
 }
-inline double meanHarmonic(double k1, double k2, double d1, double d2){
+inline
+double meanHarmonic(double k1, double k2, double d1, double d2){
     return (d1 + d2) / ( d1 / k1 + d2 / k2);
 }
-inline double meanArithmetic(double k1, double k2, double d1, double d2){
+inline
+double meanArithmetic(double k1, double k2, double d1, double d2){
     return (k1 * d1 + k2 * d2) / (d1 + d2);
+}
+inline
+double ManningEquation(double Area, double rough, double R, double S){
+    //    double Q = 0.;
+    if (S > 0) {
+        return sqrt(S) * Area * pow23(R) / rough;
+        //return sqrt(S) * Area * pow(Area / Perem, 2. / 3.) / rough;
+    } else {
+        return -1.0 * sqrt(-S) * Area * pow23(R) / rough;
+    }
+    //    return Q;
 }
 #endif /* Equations_hpp */

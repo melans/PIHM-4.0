@@ -5,13 +5,13 @@ void Model_Data::f_Segement_surface(int iEle, int iRiv, int i){
 //    double zbed, zbank;
 //    zbed = Ele[iEle].zmax - Riv[iRiv].depth;
 //    zbank = Ele[iEle].zmax;
-//    Q = WeirFlow(Ele[iEle].zmax, uYsf[iEle],
-//                 Ele[iEle].zmax - Riv[iRiv].depth, uYriv[iRiv],
-//                 Ele[iEle].zmax, RivSeg[i].Cwr, RivSeg[i].length, Ele[iEle].depression);
-    Q = flux_R2E_SF(uYriv[iRiv], Ele[iEle].zmax - Riv[iRiv].depth,
-                    uYsf[iEle], Ele[iEle].zmax, Ele[iEle].Rough,
-                    RivSeg[i].length,
-                    Ele[iEle].area / RivSeg[i].length * 0.25, Ele[iEle].depression);
+    Q = WeirFlow(Ele[iEle].zmax, uYsf[iEle],
+                 Ele[iEle].zmax - Riv[iRiv].depth, uYriv[iRiv],
+                 Ele[iEle].zmax, RivSeg[i].Cwr, RivSeg[i].length, Ele[iEle].depression);
+//    Q = flux_R2E_SF(uYriv[iRiv], Ele[iEle].zmax - Riv[iRiv].depth,
+//                    uYsf[iEle], Ele[iEle].zmax, Ele[iEle].Rough,
+//                    RivSeg[i].length,
+//                    Ele[iEle].area / RivSeg[i].length * 0.25, Ele[iEle].depression);
 //    if( Q < 0. ){
 //        if( -Q > uYsf[iEle] * Ele[iEle].area * UNIT_C){
 //            Q = max(Q , -1.0 * uYsf[iEle] * Ele[iEle].area * UNIT_C);
@@ -21,7 +21,7 @@ void Model_Data::f_Segement_surface(int iEle, int iRiv, int i){
 //            Q = 0.;
 //        }
 //    }
-    if(iEle == ID){
+    if(Q > 0 || Q < 0){
         i=i;
     }
     QrivSurf[iRiv] += Q; // Positive from River to Element

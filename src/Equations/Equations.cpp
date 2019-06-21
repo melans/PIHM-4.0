@@ -99,28 +99,13 @@ double satKfun(double elemSatn, double n){
     double ret = sqrt(elemSatn) * temp * temp;
     return ret;
 }
-double ManningEquation(double Area, double rough, double R, double S){
-    double Q = 0.;
-    if (S > 0) {
-        Q = sqrt(S) * Area * pow23(R) / rough;
-        //return sqrt(S) * Area * pow(Area / Perem, 2. / 3.) / rough;
-    } else {
-        Q = -1.0 * sqrt(-S) * Area * pow23(R) / rough;
-    }
-    return Q;
-}
+/*************Critical update.*******************
 double OverlandManning(double avg_y, double grad_y, double avg_sf, double A, double n){
     double Q;
     //flux[loci][locj] = crossA * pow23(avg_y) * grad_y / (sqrt(fabs(avg_sf)) * avg_rough);
-    Q = A * pow23(avg_y) * grad_y / ( sqrt(fabs(avg_sf)) * n );
-//    Q = A * pow23(avg_y) * grad_y / ( sqrt(fabs(avg_sf)) * n );
-//        if (grad_y >= 0.) {
-//            return A * pow23(avg_y) * sqrt(grad_y) / n;
-//        } else {
-//            return -1. * A * pow23(avg_y) * sqrt(-1. * grad_y) / n;
-//        }
     return Q;
-}
+} Critical update. The avg_sf of A->B differs from B->A. Which cause mass-balance issue.
+*************/
 double sat2psi(double elemSatn, double alpha, double n, double mpsi){
     double temp = -(pow(pow(elemSatn, n / (1 - n)) - 1, 1 / n) / alpha);
     double ret = (temp < mpsi) ? mpsi : temp;

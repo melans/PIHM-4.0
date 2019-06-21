@@ -10,7 +10,7 @@ void Model_Data::read_rivchn(const char *fn){
     TabularData tb;
     NumSegmt = tb.read(fn);
     RivSeg = new RiverSegement[NumSegmt];
-    printf("Number of River reaches: %d\n", NumSegmt);
+    printf("\tNumber of River reaches: %d\n", NumSegmt);
     if(tb.ncol != 4){
         printf("The column of River Parameter should be: \n");
         printf("%s\t%s\t%s\t%s\n", "index", "iRiv", "iEle", "Length");
@@ -47,7 +47,7 @@ void Model_Data::read_riv(const char *fn){
         Riv[i].BedSlope = (double) tb.x[i][3];
         Riv[i].Length   = (double) tb.x[i][4];
         if(Riv[i].down < 1){
-            printf("The downstream of RIV %d is negtive (Outlet )\n", i + 1 );
+            printf("\tThe downstream of RIV %d is negtive (Outlet )\n", i + 1 );
         }
 //        printf("debug%d\t%d\t%d\t%d\t%f\t%f\n", i, Riv[i].index, Riv[i].down, Riv[i].type, Riv[i].BedSlope, Riv[i].Length );
     }

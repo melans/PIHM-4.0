@@ -104,7 +104,24 @@ inline double fun_dAtodY(double dA, double w0, double s){
     return dy;
 }
 
-
+inline
+double dhdx(double *x, double *y, double *h){
+    return -1. * (y[2] * (h[1] - h[0]) +
+                  y[1] * (h[0] - h[2]) +
+                  y[0] * (h[2] - h[1])) /
+    (x[2] * (y[1] - y[0]) +
+     x[1] * (y[0] - y[2]) +
+     x[0] * (y[2] - y[1]));
+}
+inline
+double dhdy(double *x, double *y, double *h){
+    return -1. * (x[2] * (h[1] - h[0]) +
+                  x[1] * (h[0] - h[2]) +
+                  x[0] * (h[2] - h[1])) /
+    (y[2] * (x[1] - x[0]) +
+     y[1] * (x[0] - x[2]) +
+     y[0] * (x[2] - x[1]));
+}
 #endif /* functions_h */
 
 

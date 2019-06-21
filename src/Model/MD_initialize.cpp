@@ -259,6 +259,19 @@ void Model_Data:: initialize(){
     for (int i = 0; i < NumEle; i++) {
         Ele[i].applyNabor(Node, Ele);
     }
+#ifdef _DEBUG
+    /* Topological relationship between Elements*/
+    for (int i = 0; i < NumEle; i++) {
+        printf("%d: ", i+1);
+        for(int j = 0; j < 3; j++){
+            printf("%d\t", Ele[i].nabr[j]);
+        }
+        for(int j = 0; j < 3; j++){
+            printf("%d\t", Ele[i].nabrToMe[j]);
+        }
+        printf("\n");
+    }
+#endif
 //    rmSinks();
     /* Correct river bed elevation */
 //    CorrectRiver(0.05);

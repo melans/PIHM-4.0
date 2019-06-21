@@ -104,23 +104,20 @@ void Model_Data::f_waterbalance(int i){
     //    Ele[i].wf += qEleInfil[i] - (qEleRecharge[i] > 0. ? qEleRecharge[i] : 0.0) - qEleET[i][2];
 }
 void Model_Data::f_applyDY(double *DY, double t){
+    double area;
     for (int i = 0; i < NumEle; i++) {
+        area = Ele[i].area;
+        QeleSurfTot[i] = 0.;
+        QeleSubTot[i] = 0.;
         for (int j = 0; j < 3; j++) {
             QeleSurfTot[i] += QeleSurf[i][j];
             QeleSubTot[i] += QeleSub[i][j];
-            CheckNANij(QeleSurf[i][j], i, "QeleSurf[i][j] (Model_Data::f_applyDY)");
         }
-//        if(i==16){
-//            printf("@%.1fmin--%d\t, %.2em %.3e, %.3e\n",t, i, uYsf[i], QeleSurfTot[i] / Ele[i].area, Qe2r_Surf[i] / Ele[i].area);
-//        }
-//
         QeleSurfTot[i] += Qe2r_Surf[i];
         QeleSubTot[i] += Qe2r_Sub[i];
-        CheckNANi(QeleSurfTot[i] , i, "DY[i] (Model_Data::f_applyDY)");
-        CheckNANi(Qe2r_Surf[i] , i, "DY[i] (Model_Data::f_applyDY)");
-        DY[i] = qEleNetPrep[i] - qEleInfil[i] - QeleSurfTot[i] / Ele[i].area;
+        DY[i] = qEleNetPrep[i] - qEleInfil[i] - QeleSurfTot[i] / area;
         DY[iUS] = qEleInfil[i] - qEleRecharge[i];
-        DY[iGW] = qEleRecharge[i] - QeleSubTot[i] / Ele[i].area;
+        DY[iGW] = qEleRecharge[i] - QeleSubTot[i] / area;
         if(uYsf[i] < EPSILON){ /* NO ponding water*/
             if (uYgw[i] < Ele[i].WetlandLevel){
                 /*Evaporate from unsat soil*/
@@ -132,7 +129,6 @@ void Model_Data::f_applyDY(double *DY, double t){
         }else{ /*Ponding water*/
             DY[i] +=  - qEleET[i][2];
         }
-        
         if (uYgw[i] > Ele[i].RootReachLevel) {
             /*Vegetation sucks water from Ground water*/
             DY[iGW] += - qEleET[i][1];

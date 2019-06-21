@@ -1,8 +1,5 @@
 #include "Model_Data.hpp"
 void Model_Data::f_update(double  *Y, double *DY, double t){
-    //    for (int i = 0; i<NumForc; i++){
-    //        tsd_weather[i].movePointer(t);
-    //    }
     /* Initialization of temporary state variables */
     for (int i = 0; i < NumY; i++) {
         DY[i] = 0.;
@@ -21,33 +18,20 @@ void Model_Data::f_update(double  *Y, double *DY, double t){
             QeleSub[i][j] = 0.;
             QeleSurf[i][j] = 0.;
         }
-//        qEleET[i][1] = 0.; // cannot put them zero, otherwise water balance issue.
-//        qEleET[i][2] = 0.;
-        QeleSurfTot[i] = 0.;
-        QeleSubTot[i] = 0.;
         Qe2r_Surf[i] = 0.;
         Qe2r_Sub[i] = 0.;
-        for (int j = 0; j < 3; j++) {
-            if(Ele[i].nabr[j] > 0){
-                Ele[i].surfH[j] = (Ele[Ele[i].nabr[j] - 1].zmax + uYsf[Ele[i].nabr[j] - 1]);
-            }else{
-                Ele[i].surfH[j] = (Ele[i].zmax + uYsf[i]);
-            }
-            
-        }
-        Ele[i].dhBYdx = -1 * (Ele[i].surfY[2] * (Ele[i].surfH[1] - Ele[i].surfH[0]) +
-                              Ele[i].surfY[1] * (Ele[i].surfH[0] - Ele[i].surfH[2]) +
-                              Ele[i].surfY[0] * (Ele[i].surfH[2] - Ele[i].surfH[1])) /
-        (Ele[i].surfX[2] * (Ele[i].surfY[1] - Ele[i].surfY[0]) +
-         Ele[i].surfX[1] * (Ele[i].surfY[0] - Ele[i].surfY[2]) +
-         Ele[i].surfX[0] * (Ele[i].surfY[2] - Ele[i].surfY[1]));
-        Ele[i].dhBYdy = -1 * (Ele[i].surfX[2] * (Ele[i].surfH[1] - Ele[i].surfH[0]) +
-                              Ele[i].surfX[1] * (Ele[i].surfH[0] - Ele[i].surfH[2]) +
-                              Ele[i].surfX[0] * (Ele[i].surfH[2] - Ele[i].surfH[1])) /
-        (Ele[i].surfY[2] * (Ele[i].surfX[1] - Ele[i].surfX[0]) +
-         Ele[i].surfY[1] * (Ele[i].surfX[0] - Ele[i].surfX[2]) +
-         Ele[i].surfY[0] * (Ele[i].surfX[2] - Ele[i].surfX[1]));
-    }//end of for i=1:3
+/********* Below are remove becaue the bass-balance issue. **********/
+//        for (int j = 0; j < 3; j++) {
+//            if(Ele[i].nabr[j] > 0){
+//                Ele[i].surfH[j] = (Ele[Ele[i].nabr[j] - 1].zmax + uYsf[Ele[i].nabr[j] - 1]);
+//            }else{
+//                Ele[i].surfH[j] = (Ele[i].zmax + uYsf[i]);
+//            }
+//        }
+//        Ele[i].dhBYdx = dhdx(Ele[i].surfX, Ele[i].surfY, Ele[i].surfH);
+//        Ele[i].dhBYdy = dhdy(Ele[i].surfX, Ele[i].surfY, Ele[i].surfH);
+//        Ele[i].Avg_Sf = sqpow2(Ele[i].dhBYdx, Ele[i].dhBYdy);
+    }//end of for j=1:3
     
     for (int i = 0; i < NumRiv; i++ ){
         uYriv[i] = (Y[iRIV] >= 0.) ? Y[iRIV] : 0.;
