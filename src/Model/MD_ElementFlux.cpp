@@ -21,7 +21,7 @@ void Model_Data::f_InfilRecharge(int i, double t){
 
 void Model_Data::f_lateralFlux(int i, double t){
     int j, inabr, jnabr;
-    double  Avg_Y_Surf, Dif_Y_Surf, Grad_Y_Surf, Avg_Sf, CrossA;
+    double  Avg_Y_Surf, Dif_Y_Surf, Grad_Y_Surf, CrossA;
     double  Avg_Y_Sub, dy_sub, Avg_Ksat, Grad_Y_Sub, effK, effKnabr;
     double isf, nsf; // Available Y in Surface of this/nabor element
     isf = uYsf[i] - qEleInfil[i];
