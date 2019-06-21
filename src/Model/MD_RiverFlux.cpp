@@ -41,7 +41,7 @@ void Model_Data::Flux_RiverDown(double t, int i){
             case -3:
                 /* zero-depth-gradient boundary conditions */
                 Perem = Riv[i].u_CSperem;
-                Distance =  Riv[i].Dist2DownStream;
+//                Distance =  Riv[i].Dist2DownStream;
                 s = Riv[i].BedSlope;
                 CSarea = Riv[i].u_CSarea;
                 R = (Perem <= 0.) ? 0. : (CSarea / Perem);
