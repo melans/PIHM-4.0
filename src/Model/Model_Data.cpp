@@ -39,7 +39,7 @@ void Model_Data::modelSummary(FileIn * fileIn, int end){
     screeninfo("\tModel ends at: %.2f day\n", CS.EndTime / 1440);
     screeninfo("\tModel time step(max): %.2f minutes\n", CS.MaxStep);
     screeninfo("\tModel total number of steps(minimum): %d \n", CS.NumSteps);
-    sprintf(str,"\tSize of model: \tNcell = %d \tNriver = %d", NumEle, NumRiv);
+    sprintf(str,"\tSize of model: \tNcell = %d \tNriver = %d\t NSeg = %d", NumEle, NumRiv, NumSegmt);
     screeninfo(str);
 #ifdef _PIHMOMP
     screeninfo("\n\n\tOpenMP enable. No of threads = %d\n", CS.num_threads);
