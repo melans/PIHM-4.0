@@ -17,10 +17,12 @@ void Model_Data::f_update(double  *Y, double *DY, double t){
         for(int j = 0; j<3;j++){
             QeleSub[i][j] = 0.;
             QeleSurf[i][j] = 0.;
+            Ele[i].iupdSF[j] = 0;
+            Ele[i].iupdGW[j] = 0;
         }
         Qe2r_Surf[i] = 0.;
         Qe2r_Sub[i] = 0.;
-/********* Below are remove becaue the bass-balance issue. **********/
+/********* Below are remove because the bass-balance issue. **********/
 //        for (int j = 0; j < 3; j++) {
 //            if(Ele[i].nabr[j] > 0){
 //                Ele[i].surfH[j] = (Ele[Ele[i].nabr[j] - 1].zmax + uYsf[Ele[i].nabr[j] - 1]);
