@@ -111,30 +111,8 @@ void Control_Data::updateSimPeriod(double day0, double day1){
     DayStart = day0;
     DayEnd = day1;
     StartTime = DayStart  * 1440;
-    EndTime = (DayEnd) * 1440 + ETStep;
-    long    NumTout = (long) (EndTime - StartTime) / dt;
-    
-    NumSteps = (int) NumTout + 1;
-    
-//    if (a != 1.0)
-//        NumTout = (long int)(log (1. - (EndTime - 0) * (1. - a) / b) / log (a));
-//    else{
-//        if ((EndTime - StartTime) / b - ((long int)(EndTime - StartTime) / b) > 0)
-//            NumTout = (long int)((EndTime - StartTime) / b);
-//        else
-//            NumTout = (long int)((EndTime - StartTime) / b - 1);
-//    }
-//    NumSteps = (int) NumTout + 1;
-//    Tout = new double[NumSteps + 1];
-////    Tout = (double *) malloc ((NumSteps + 1) * sizeof (double));
-//    for (int i = 0; i < NumSteps + 1; i++){
-//        if (i == 0)
-//            Tout[i] = StartTime;
-//        else
-//            Tout[i] = Tout[i - 1] + pow (a, i) * b;
-//    }
-//    if (Tout[NumSteps] < EndTime)
-//        Tout[NumSteps] = EndTime;
+    EndTime = (DayEnd) * 1440;
+    NumSteps = (unsigned long) (EndTime - StartTime) / MaxStep;
 }
 
 
@@ -163,8 +141,8 @@ void Control_Data::read(const char *fn){
             Ascii=  val;
         else if (strcasecmp ("BINARY_OUTPUT", optstr) == 0)
             Binary =  val;
-        else if (strcasecmp ("DEBUG", optstr) == 0)
-            Debug =  val;
+//        else if (strcasecmp ("DEBUG", optstr) == 0)
+//            Debug =  val;
         else if (strcasecmp ("VERBOSE", optstr) == 0)
             Verbose =  val;
         else if (strcasecmp ("INIT_MODE", optstr) == 0)
@@ -185,10 +163,10 @@ void Control_Data::read(const char *fn){
             DayStart =  val;/* Convert days to Minutes */
         else if (strcasecmp ("END", optstr) == 0)
             DayEnd =  val;    /* Convert days to Minutes */
-        else if (strcasecmp ("STEPSIZE_FACTOR", optstr) == 0)
-            a =  val;
-        else if (strcasecmp ("MODEL_STEPSIZE", optstr) == 0)
-            b =  val;
+//        else if (strcasecmp ("STEPSIZE_FACTOR", optstr) == 0)
+//            a =  val;
+//        else if (strcasecmp ("MODEL_STEPSIZE", optstr) == 0)
+//            b =  val;
         
         /* Element print out control */
         // Y ele
@@ -256,7 +234,13 @@ void Control_Data::read(const char *fn){
             printf
             ("\n  Parameter:%s cannot be recognized. Please see User's Manual for more details!\n",
              optstr);
-            myexit(ERRFileIO);
+            printf("Continue? (y/N)\n");
+            char cc = getchar();
+            if(cc =='Y' || cc=='y' ){
+                /* Void */
+            }else{
+                myexit(ERRFileIO);
+            }
         }
     }
     fclose (fp);

@@ -120,48 +120,20 @@ void _Element::InitElement(){
     
 }
 void _Element::applyNabor(_Node *Node, _Element *Ele){
-    double        a_x, a_y, b_x, b_y, c_x, c_y, distX, distY;
-    int eNabor ;
-    a_x = Node[node[0] - 1].x;
-    b_x = Node[node[1] - 1].x;
-    c_x = Node[node[2] - 1].x;
-    a_y = Node[node[0] - 1].y;
-    b_y = Node[node[1] - 1].y;
-    c_y = Node[node[2] - 1].y;
+    int eNabor;
     for (int j = 0; j < 3; j++) {
-        /*
-         * Note: Assumption here is that the forumulation is
-         * circumcenter based
-         */
-        switch (j) {
-            case 0:
-                distX = (x - 0.5 * (b_x + c_x));
-                distY = (y - 0.5 * (b_y + c_y));
-                break;
-            case 1:
-                distX = (x - 0.5 * (c_x + a_x));
-                distY = (y - 0.5 * (c_y + a_y));
-                break;
-            case 2:
-                distX = (x - 0.5 * (a_x + b_x));
-                distY = (y - 0.5 * (a_y + b_y));
-                break;
-            default:
-                distX = 0.;
-                distY = 0.;
-                
+        if(nabr[j]>0){
+            for(int k = 0; k < 3; k++){
+                if(Ele[nabr[j] - 1].nabr[k] == this->index){
+                    this->nabrToMe[j] = k;
+                    /* Neighbor's K direction and My J direction shared a edge*/
+                }
+            }
+        }else{
+            /* VOID */
         }
-        surfH[j] = (nabr[j] > 0) ? (Ele[nabr[j] - 1].zmax) : (zmax);
-        surfX[j] = (nabr[j] > 0)
-        ? Ele[nabr[j] - 1].x
-        : (x - 2 * distX);
-        surfY[j] = nabr[j] > 0
-        ? Ele[nabr[j] - 1].y
-        : (y - 2 * distY);
     }
-    dhBYdx = -(surfY[2] * (surfH[1] - surfH[0]) + surfY[1] * (surfH[0] - surfH[2]) + surfY[0] * (surfH[2] - surfH[1])) / (surfX[2] * (surfY[1] - surfY[0]) + surfX[1] * (surfY[0] - surfY[2]) + surfX[0] * (surfY[2] - surfY[1]));
-    dhBYdy = -(surfX[2] * (surfH[1] - surfH[0]) + surfX[1] * (surfH[0] - surfH[2]) + surfX[0] * (surfH[2] - surfH[1])) / (surfY[2] * (surfX[1] - surfX[0]) + surfY[1] * (surfX[0] - surfX[2]) + surfY[0] * (surfX[2] - surfX[1]));
-    
+
     for(int j = 0; j < 3; j++){
         eNabor = nabr[j] - 1;
         Dist2Edge[j] = sqpow2(edge[0] * edge[1] * edge[2] / (4 * area), edge[j] / 2 );

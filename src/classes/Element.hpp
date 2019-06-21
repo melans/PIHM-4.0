@@ -25,7 +25,7 @@ class Triangle{
 public:
     int node[3];/* anti-clock-wise */
     int nabr[3];/* neighbor i shares edge i (0: on boundary) */
-    
+    int nabrToMe[3] = {-1, -1, -1}; /* The index j of my nabor */
     double edge[3];/* edge i is from node i to node i+1 */
     double area = NA_VALUE;    /* area of element */
     
@@ -62,11 +62,12 @@ public:
     int RivID = 0;
     double windH = NA_VALUE;    /* wind measurement height */
     /* for calculation of dh/ds */
-    double surfH[3];    /* Total head in neighboring cells */
-    double surfX[3];    /* Center X location of neighboring cells */
-    double surfY[3];   /* Center Y location of neighboring cells */
-    double dhBYdx = NA_VALUE;    /* Head gradient in x dirn. */
-    double dhBYdy = NA_VALUE;    /* Head gradient in y dirn. */
+//    double surfH[3];    /* Total head in neighboring cells */
+//    double surfX[3];    /* Center X location of neighboring cells */
+//    double surfY[3];   /* Center Y location of neighboring cells */
+//    double dhBYdx = NA_VALUE;    /* Head gradient in x dirn. */
+//    double dhBYdy = NA_VALUE;    /* Head gradient in y dirn. */
+//    double Avg_Sf = NA_VALUE;    /* Head gradient in normal */
     double Dist2Edge[3];
     double Dist2Nabor[3];
     double FixPressure = NA_VALUE;  /* Pressure [Pa]*/
@@ -78,6 +79,8 @@ public:
     double avgRough[3];
     double depression = 0.0002; //Depression value. No overland flow before filling the depression. Default = 0.2 mm.
     
+    int iupdGW[3] = {0,0,0}; /* whether the Groundwater Flux value on this J is update */
+    int iupdSF[3] = {0,0,0};  /* whether the Surface Flux value on this J is update */
     /* Value must be updated each loop */
     double u_qi; /* infiltration from surface to unsat zone */
     double u_qr; /* recharge into ground water */

@@ -89,38 +89,30 @@ public:
 };
 class Control_Data : public PrintOutDt{
 private:
-    double DayStart = 0;
-    double DayEnd = 10;
-    //    int outtype;
-    double a =1;    /* External time stepping controls */
-    double b = 1;
+    double DayStart = 0;    /* START Day [Day] */
+    double DayEnd = 10;     /* END Day [Day] */
 public:
     int Verbose = 0;
-    int Debug = 0;
-    int Ascii = 0;
-    int Binary = 1;
+    int Ascii = 0;      /* Whether export result as ASCII File [bool]*/
+    int Binary = 1;     /* Whether export result as Binary File [bool]*/
     
     //    int Solver;    /* Solver type */
-    int NumSteps;    /* Number of external time steps
+    unsigned long NumSteps;    /* Number of external time steps
                       * (when results can be printed) for
-                      * the whole simulation */
-    int num_threads;    /* Number of Threads in OPENmp only*/
-    int init_type = 3;    /* initialization mode */
+                      * the whole simulation [-]*/
+    int num_threads;    /* Number of Threads in OPENmp only [-]*/
+    int init_type = 3;    /* initialization mode [-]*/
     
-    double abstol = 1.0e-4;    /* absolute tolerance */
-    double reltol = 1.0e-3;    /* relative tolerance */
-    double InitStep = 1e-5;    /* initial step size */
-    double MaxStep = 300;/* Maximum step size */
-    double ETStep = 30;    /* Step for et from interception */
-    double StartTime = 0.;    /* Start time of simulation */
-    double EndTime = 14400;/* End time of simulation */
+    double abstol = 1.0e-4;    /* absolute tolerance [-]*/
+    double reltol = 1.0e-3;    /* relative tolerance [-]*/
+    double InitStep = 1.e-3;    /* initial step size [min]*/
+    double MaxStep = 60;       /* Maximum step size [min] */
+    double ETStep = 60;         /* Step for et from interception [min]*/
+    double StartTime = 0.;      /* Start time of simulation [min]*/
+    double EndTime = 14400;     /* End time of simulation [min]*/
     double dt = 1;
     double *Tout;
-    
-    //    globalCal Cal;    /* Convert this to pointer for localized  calibration */
-    
     int NumPrint = 0;;
-    
     Print_Ctrl PCtrl[100];
 #ifdef _CALIBMODE
     ObsnSim CV;
