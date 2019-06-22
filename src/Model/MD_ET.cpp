@@ -1,6 +1,6 @@
 //
 //  MD_ET.cpp
-//  PIHM++
+//  PIHM++ (v 4.0)
 //
 //  Created by Lele Shu on 10/26/18.
 //  Copyright © 2018 Lele Shu. All rights reserved.

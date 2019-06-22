@@ -1,6 +1,6 @@
 //
 //  Element.cpp
-//  PIHM++
+//  PIHM++ (v 4.0)
 //
 //  Created by Lele Shu on 7/17/18.
 //  Copyright © 2018 Lele Shu. All rights reserved.
@@ -256,7 +256,7 @@ void _Element::updateWF(double qi, double dt){
             }
             dh += -effk * grad;
         }
-        u_wf +=  dh * dt / UNIT_C;
+        u_wf +=  dh * dt;
         if(u_wf > 0.01){
             dh = dh;
         }

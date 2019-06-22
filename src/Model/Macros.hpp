@@ -1,10 +1,9 @@
 //
 //  Macros.h
-//  PIHM4.0
+//  PIHM++ (v 4.0)
 //
 //  Created by Lele Shu on 2/16/17.
 //  Copyright (c) 2017 Lele Shu. All rights reserved.
-//
 
 #ifndef PIHM3_0_Macros_h
 #define PIHM3_0_Macros_h
