@@ -73,7 +73,7 @@ double Model_Data::WeirFlow(double ze, double ye,
     dh = hr - he;
     if(dh > 0.){ // from River to Element. Q is Positive.
         y = dh;
-        Q = 2. / 3. * cwr * sqrt(2. * GRAV * y) * rivLen * y * UNIT_C * 60.;
+        Q = 2. / 3. * cwr * sqrt(2. * GRAV * y) * rivLen * y* 60.; /* 60 is for m3/s  to m3/min, because GRAV is m/s2*/
     }else{ // from Elevation to River. Q is Negative.
         if( ye > threshold){
             if( hr > ze){
@@ -81,7 +81,7 @@ double Model_Data::WeirFlow(double ze, double ye,
             }else{
                 y = ye;
             }
-            Q = -2./ 3. * cwr * sqrt(2. * GRAV * y) * rivLen * y * UNIT_C * 60.;
+            Q = -2./ 3. * cwr * sqrt(2. * GRAV * y) * rivLen * y* 60.;
         }else{
             Q = 0.;
         }

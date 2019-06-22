@@ -295,9 +295,9 @@ void Print_Ctrl::Init(long st, int n, const char *s, int dt, double *x, int iFlu
         buffer[i] = 0.0;
     }
     if(iFlux){
-        tau = 1440. / UNIT_C;
+        tau = 1440.;
     }else{
-        tau = 1;
+        tau = 1.;
     }
 }
 void Print_Ctrl::InitIJ(long st, int n, const char *s, int dt, double **x, int j, int iFlux){

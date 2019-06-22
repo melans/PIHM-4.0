@@ -11,11 +11,11 @@
 #include <math.h>
 #include <vector>
 /* SUNDIAL 3.0 and above*/
-#include "sundials_types.h" /* realtype, integertype, boolean type definition */
-#include "cvode.h" /* CVODE header file  */
-#include "sundials_spgmr.h" /* CVSPGMR linear header file  */
-#include "sundials_dense.h" /* use generic DENSE linear solver */
-#include "sundials_math.h" /* contains UnitRoundoff, RSqrt, SQR functions */
+//#include "sundials_types.h" /* realtype, integertype, boolean type definition */
+//#include "cvode.h" /* CVODE header file  */
+//#include "sundials_spgmr.h" /* CVSPGMR linear header file  */
+//#include "sundials_dense.h" /* use generic DENSE linear solver */
+//#include "sundials_math.h" /* contains UnitRoundoff, RSqrt, SQR functions */
 
 #ifdef _PIHMOMP
 #include "omp.h"
@@ -59,8 +59,7 @@
 #define C_air 1004.0
 #define MINpsi	-5.
 #define THRESH 0.0
-#define UNIT_C 1		/* Note 60*24 for calculation of yDot in*/
-                            /* m/min units while forcing is in m/day. */
+
 #define GRAV 9.8		/* m/s^2 Note the dependence on physical units */
 
 #define C_air 1004.0

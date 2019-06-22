@@ -20,7 +20,6 @@
 #include <fcntl.h>
 #include <signal.h>
 
-#define UNIT_C 1440          /* Unit Conversions */     
 #define DIM 12
 union 
 semun {        

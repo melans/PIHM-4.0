@@ -91,9 +91,8 @@ void Model_Data::f_applyDY(double *DY, double t){
             DY[iUS] += - qEleET[i][1];
         }
         
-        DY[iUS] /= Ele[i].Sy * UNIT_C;
-        DY[iGW] /= Ele[i].Sy * UNIT_C;
-        DY[i] /= UNIT_C;
+        DY[iUS] /= Ele[i].Sy;
+        DY[iGW] /= Ele[i].Sy ;
 //                DY[iSF] =0.0;  // debug only.
 //                DY[iUS] =0.0;
 //                DY[iGW] =0.0;
@@ -104,7 +103,7 @@ void Model_Data::f_applyDY(double *DY, double t){
 #endif
     }
     for (int i = 0; i < NumRiv; i++) {
-        DY[iRIV] = (- QrivUp[i] - QrivSurf[i] - QrivSub[i] - QrivDown[i]) / Riv[i].u_TopArea / UNIT_C;
+        DY[iRIV] = (- QrivUp[i] - QrivSurf[i] - QrivSub[i] - QrivDown[i]) / Riv[i].u_TopArea;
 //        DY[iRIV] = 0.0;
 #ifdef _DEBUG
         CheckNANi(DY[i + 3 * NumEle], i, "DY[i] of river (Model_Data::f_applyDY)");

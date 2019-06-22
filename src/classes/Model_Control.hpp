@@ -25,7 +25,7 @@ private:
     double  *buffer = NULL;
     int     Binary = 1;
     int     Ascii = 0;
-    double  tau = 1440. / UNIT_C;    // time unit in calculation. [min]
+    double  tau = 1440.;    // time unit in calculation. [min]
     FILE    *fid_bin = NULL;
     FILE    *fid_asc = NULL;
     char    filea[MAXLEN];

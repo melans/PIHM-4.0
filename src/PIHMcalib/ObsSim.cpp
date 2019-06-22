@@ -53,7 +53,7 @@ void ObsnSim::Pointer2Sim(double *x, double ct1, double ct2){
 }
 void ObsnSim::pushsim(double t){
 //    printf("%ld\n", ptr);
-    double tday = t / UNIT_C;
+    double tday = t;
     static int nr = 0;
     nr ++;
     sim[iNow] += *ptr * ctm + cta;
