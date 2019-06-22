@@ -34,10 +34,6 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
         for (i = 0; i < NumRiv; i++) {
             Flux_RiverDown(t, i);
         }
-#pragma omp for
-        for (i = 0; i < NumEle; i++) {
-            f_waterbalance(i);
-        }
     }
 #else
     for (i = 0; i < NumEle; i++) {
@@ -61,47 +57,6 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
 //        f_waterbalance(i);
 //    }
 #endif
-}
-void Model_Data::f_wb_updateQsurf(int i, int j){
-    int inab;
-    inab = Ele[i].nabr[j] - 1;
-    for(int k = 0; k < 3; k++){
-        if ( Ele[inab].nabr[k] == i + 1){
-            QeleSurf[inab][k] = - QeleSurf[i][j];
-        }
-    }
-}
-void Model_Data::f_waterbalance(int i){
-    double r = 1;
-    QoutSurf[i] = 0.;
-    if(qEleInfil[i] > 0.){
-        QoutSurf[i] += qEleInfil[i] * Ele[i].area;
-    }
-    for(int j = 0; j < 3; j++){
-        if (QeleSurf[i][j] > 0.){
-            QoutSurf[i] += QeleSurf[i][j];
-        }
-    }
-    if (qEleInfil[i] > 0.){
-        if( uYsf[i] + qEleNetPrep[i] < qEleInfil[i] ){
-            qEleInfil[i] = uYsf[i] + qEleNetPrep[i];
-        }
-    }
-    if (QoutSurf[i] > 0.){
-        r = (uYsf[i] + qEleNetPrep[i] - qEleInfil[i])* Ele[i].area / QoutSurf[i];
-        if(r < 0.){
-            r = r;
-        }else if (r < 1. && r >= 0.){
-            //        qEleInfil[i] *= r;
-            for(int j = 0; j < 3; j++){
-                if (QeleSurf[i][j] > 0.){
-                    QeleSurf[i][j] *= r;
-                    f_wb_updateQsurf(i, j);
-                }
-            }
-        }
-    }
-    //    Ele[i].wf += qEleInfil[i] - (qEleRecharge[i] > 0. ? qEleRecharge[i] : 0.0) - qEleET[i][2];
 }
 void Model_Data::f_applyDY(double *DY, double t){
     double area;
@@ -151,15 +106,6 @@ void Model_Data::f_applyDY(double *DY, double t){
     for (int i = 0; i < NumRiv; i++) {
         DY[iRIV] = (- QrivUp[i] - QrivSurf[i] - QrivSub[i] - QrivDown[i]) / Riv[i].u_TopArea / UNIT_C;
 //        DY[iRIV] = 0.0;
-//        if(DY[iRIV] + uYriv[i] < 0){
-//            printf("debug: riv%d\t %f\t %f \t qup=%f\t qsf=%f\t qsub=%f\t qdown= %f\n",
-//                   i+1, uYriv[i], Riv[i].depth,
-//                   - QrivUp[i]/ Riv[i].u_TopArea,
-//                   - QrivSurf[i]/ Riv[i].u_TopArea,
-//                   - QrivSub[i]/ Riv[i].u_TopArea,
-//                   - QrivDown[i] / Riv[i].u_TopArea);
-//            i=i;
-//        }
 #ifdef _DEBUG
         CheckNANi(DY[i + 3 * NumEle], i, "DY[i] of river (Model_Data::f_applyDY)");
 #endif

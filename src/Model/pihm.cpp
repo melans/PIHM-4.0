@@ -45,6 +45,7 @@ double PIHM(FileIn *fin, FileOut *fout){
     omp_set_num_threads(MD->CS.num_threads);
     screeninfo("\nopenMP enabled. No of Threads = %d\n", MD->CS.num_threads);
     udata = N_VNew_OpenMP(NY, MD->CS.num_threads);
+    du = N_VNew_Serial(NY);
 #else
     screeninfo("\nopenMP disabled\n");
     udata = N_VNew_Serial(NY);

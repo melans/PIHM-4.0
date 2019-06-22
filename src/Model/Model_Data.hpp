@@ -234,12 +234,7 @@ private:
     
     /* Methods for element calculation */
     void f_lateralFlux(int i, double t);
-//    void f_verticalFlux(int i, double t);
-    
     void f_InfilRecharge(int i, double t);
-    void f_waterbalance(int i);
-    void f_wb_River(int i);
-    void f_wb_updateQsurf(int i, int j);
     /* Functions */
     void TimeSpent();
     double WeirFlow(double ze, double ye, double zr, double yr,
