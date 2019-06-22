@@ -254,19 +254,6 @@ void Control_Data::getValue(const char *varname){
 }
 Print_Ctrl::Print_Ctrl(){}
 
-void Print_Ctrl::fun_printASCII(double t, double dt){
-    fprintf(fid_asc, "%.1f\t", t);
-    for (int i = 0; i < NumVar; i++){
-        fprintf (fid_asc, "%e\t", buffer[i] * (dt / Interval ) * tau);
-        //        if ( Interval > dt)
-        //            fprintf (fid_asc, "%e\t", buffer[i] / (Interval / dt));
-        //        else
-        //            fprintf (fid_asc, "%e\t", buffer[i]);
-    }
-    fprintf (fid_asc, "\n");
-    fflush (fid_asc);
-    //    fclose (fid_asc);
-}
 void Print_Ctrl::open_file(int a, int b){
     Ascii = a;
     Binary = b;
@@ -338,19 +325,17 @@ Print_Ctrl::~Print_Ctrl(){
     }
 }
 void Print_Ctrl::fun_printBINARY(double t, double dt){
-    double        outval;
     fwrite (&t, sizeof (double), 1, fid_bin);
-    for (int i = 0; i < NumVar; i++){
-        outval = buffer[i];
-        fwrite (&outval, sizeof (double), 1, fid_bin);
-        //        if ( Interval > dt)
-        //            outval = buffer[i] / (Interval / dt);
-        //        else
-        //            outval = buffer[i];
-        buffer[i] = 0.0;
-    }
+    fwrite (buffer, sizeof (double), NumVar, fid_bin);
     fflush (fid_bin);
-    //    fclose (fid_bin);
+}
+void Print_Ctrl::fun_printASCII(double t, double dt){
+    fprintf(fid_asc, "%.1f\t", t);
+    for (int i = 0; i < NumVar; i++){
+        fprintf (fid_asc, "%e\t", buffer[i]);
+    }
+    fprintf (fid_asc, "\n");
+    fflush (fid_asc);
 }
 void Print_Ctrl::close_file(){
     if (Binary){
@@ -365,16 +350,24 @@ void Print_Ctrl::close_file(){
 }
 void Print_Ctrl::PrintData(double dt, double t){
     long    t_long;
+    NumUpdate++; /* Number of times to push data into the buffer*/
     for (int i = 0; i < NumVar; i++){
-        buffer[i] = *(PrintVar[i]);
+        buffer[i] += *(PrintVar[i]);
     }
     t_long = (long int)t;
     if ((t_long % Interval) == 0){
+        for (int i = 0; i < NumVar; i++){
+            buffer[i] /= NumUpdate ; /* Get the mean in the time-interval*/
+        }
+        NumUpdate = 0;
         if(Ascii){
             fun_printASCII(t, dt);
         }
         if(Binary){
             fun_printBINARY(t, dt);
+        }
+        for (int i = 0; i < NumVar; i++){
+            buffer[i] = 0.;  /* Reset the buffer */
         }
     }
 }

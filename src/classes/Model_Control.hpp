@@ -16,10 +16,11 @@
 #endif
 
 class Print_Ctrl{
-public:
+private:
     char    filename[MAXLEN];
     int     Interval = NA_VALUE;
     int     NumVar = NA_VALUE;
+    int     NumUpdate = 0;
     double  **PrintVar = NULL;
     double  *buffer = NULL;
     int     Binary = 1;
@@ -29,7 +30,8 @@ public:
     FILE    *fid_asc = NULL;
     char    filea[MAXLEN];
     char    fileb[MAXLEN];
-    
+    long   StartTime;
+public:
     Print_Ctrl();
     ~Print_Ctrl();
     void    open_file(int a, int b);
@@ -40,8 +42,6 @@ private:
     void    fun_printASCII(double t, double dt);
     void    fun_printBINARY(double t, double dt);
     void    close_file();
-private:
-    long   StartTime;
 };
 class PrintOutDt {
 public:
