@@ -24,7 +24,7 @@ public:
     int     c;
     int     iprj = 0;       /*boolean flag, iprj = 1 read from prj file. iprj = 0, read based on prjname */
     int     iout = 0;   /*User defined output folder*/
-    int     n_lambda = 8; /* Number of Threads in OpenMP or MPI */
+    int     n_lambda = 2; /* Number of Threads in OpenMP or MPI */
             CommandIn();
     void    parse(int argc, char **argv);
     void    setFileIO(FileIn *fin, FileOut *fout);

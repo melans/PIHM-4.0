@@ -325,6 +325,8 @@ void Model_Data::loadinput(FileIn *fin){
     //    read_forc_binary(fin->file_forc);
     if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_calib);
     read_calib(fin->file_calib);
+    
+    this->CS.num_threads = max(CS.num_threads,  fin->numthreads); /* Number of threads for OpenMP */
 }
 
 void Model_Data::read_rl(const char *fn){
