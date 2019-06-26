@@ -17,7 +17,7 @@ void CommandIn::PIHM_help(void ){
 void CommandIn::parse(int argc, char **argv){
     if(argc<=1){
         PIHM_help();
-        myexit(1);
+        myexit(ERRSUCCESS);
     }
     while ((c = getopt (argc, argv, "c:e:n:o:p:")) != -1){
         switch (c){

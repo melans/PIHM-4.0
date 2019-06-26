@@ -79,6 +79,7 @@
 #define VAPRATIO 0.622 /* ε ratio molecular weight of water vapour/dry air = 0.622. Allen(1998) eq(8) */
 
 /*========ERROR CODE===============*/
+#define ERRSUCCESS  0
 #define ERRFileIO   -2
 #define ERRCVODE    -3
 #define ERRNAN      -1
