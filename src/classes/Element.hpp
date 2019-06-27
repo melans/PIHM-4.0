@@ -91,7 +91,7 @@ public:
     double u_deficit; /* deficit. aquiferdepth - Ygw */
 private:
     /* Infiltration */
-    //    double u_Yus; /* Water head of the unsat zone from zmin*/
+    //    double u_Yus; /* Water hea\d of the unsat zone from zmin*/
     double u_phius; /* pressure head of the unsat zone from zmin*/
     //    double u_Hus; /* Water head of the unsat zone from z = 0*/
     double u_Ginfi; /* Gradient to infiltration*/

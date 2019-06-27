@@ -45,6 +45,8 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
         f_InfilRecharge(i, t); // step 2 calculate the infiltration and recharge.
         /*========surf/gw flow Function==============*/
         f_lateralFlux(i, t); // AFTER infiltration, do the lateral flux. ESP for overland flow.
+//        CheckNANi(qEleInfil[i], i, "qEleInfil[i]::f_recharge()");
+//        CheckNANi(qEleRecharge[i], i, "qEleRecharge[i]::f_recharge()");
     } //end of for loop.
     for (i = 0; i < NumSegmt; i++) {
         f_Segement_surface(RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
@@ -53,9 +55,6 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
     for (i = 0; i < NumRiv; i++) {
         Flux_RiverDown(t, i);
     }
-//    for (i = 0; i < NumEle; i++) {
-//        f_waterbalance(i);
-//    }
 #endif
 }
 void Model_Data::f_applyDY(double *DY, double t){
@@ -90,9 +89,8 @@ void Model_Data::f_applyDY(double *DY, double t){
         } else {
             DY[iUS] += - qEleET[i][1];
         }
-        
         DY[iUS] /= Ele[i].Sy;
-        DY[iGW] /= Ele[i].Sy ;
+        DY[iGW] /= Ele[i].Sy;
 //                DY[iSF] =0.0;  // debug only.
 //                DY[iUS] =0.0;
 //                DY[iGW] =0.0;
@@ -109,9 +107,4 @@ void Model_Data::f_applyDY(double *DY, double t){
         CheckNANi(DY[i + 3 * NumEle], i, "DY[i] of river (Model_Data::f_applyDY)");
 #endif
     }
-//    FILE *fid = fopen("DY_debug.dat", "ab+");
-//    fwrite(&t, sizeof(t), 1, fid);
-//    fwrite(DY, sizeof(DY), NumY, fid);
-//    fclose(fid);
-//    printf("");
 }

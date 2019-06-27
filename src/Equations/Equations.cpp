@@ -106,21 +106,15 @@ double OverlandManning(double avg_y, double grad_y, double avg_sf, double A, dou
     return Q;
 } Critical update. The avg_sf of A->B differs from B->A. Which cause mass-balance issue.
 *************/
-double sat2psi(double elemSatn, double alpha, double n, double mpsi){
-    double temp = -(pow(pow(elemSatn, n / (1 - n)) - 1, 1 / n) / alpha);
-    double ret = (temp < mpsi) ? mpsi : temp;
-    return ret;
-}
-double fun_recharge(double effk_us, double kgw, double Deficit, double ygw, double hus)
+double fun_recharge(double effk_us, double kgw, double Deficit, double ygw, double hus, double yus)
 {
     double effk;
     double q = 0.;
     if(effk_us < EPS_DOUBLE || kgw < EPS_DOUBLE){
         return 0.;
     }
-    effk = meanHarmonic(kgw, effk_us, ygw, hus);
+    effk = meanHarmonic(kgw, effk_us, ygw, yus);
     q = effk * (1. + hus / (Deficit * 0.5));
-    CheckNANi(q, -1, "recharge:fun_recharge");
     return q;
 }
 double FieldCapacity (double Alpha, double Beta, double deficit ){

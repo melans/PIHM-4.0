@@ -151,33 +151,31 @@ void _Element::applyNabor(_Node *Node, _Element *Ele){
     
 }
 void _Element::Flux_InfiRech(double Ysurf, double Yunsat, double Ygw, double netprcp){
-    double H_us =  u_phius + Yunsat * .5;
-    if(u_deficit <= infD){
-        /* gw reach surface -> Rechage is negative -- from gw to surface */
-//        u_qr = AquiferDepth - Ygw;
-//        u_qi = u_qr < 0. ? u_qr : u_qi;
-        u_qr = 0.;
-        u_qi = 0.;
-        if(u_qi < 0.){
-            u_qi = 0.;
-        }
+    double ke=0.;
+    if(Ygw > AquiferDepth){
+        u_qi = (AquiferDepth - Ygw) / 1. * u_effkInfi;
+        u_qr = u_qi;
     }else{
-        if(ImpAF < 1.){
-            u_qi = GreenAmpt(u_effkInfi, u_Theta, ThetaS, u_phius, u_wf, Ysurf + netprcp, Sy);
+        u_qi = (Ysurf + infD - u_phius) / infD * u_effkInfi;
+        if(u_qi > 0.){
+            if(Ysurf > EPSILON){
+                u_qi = min(Ysurf, u_qi);
+            }else{
+                u_qi = 0.;
+            }
         }else{
-            u_qi = 0.0;
+//            u_qi = u_qi;
         }
-        u_qr = fun_recharge(u_satKr * infKsatV, KsatV, u_deficit, Ygw, H_us);
-    }
-    if(u_qr > 0. && Yunsat <= EPS){
-        u_qr = 0.;
-    }
-    if(u_qr < 0. && Ygw <= EPS){
-        u_qr = 0.;
+        ke = meanHarmonic(infKsatV, KsatV, 1, 1);
+        u_qr = (1. + u_phius * 2. / AquiferDepth) * ke;
+        if(u_qr > 0.){
+            u_qr = min(Yunsat, u_qr);
+        }else{
+            u_qr = 0.;
+        }
     }
 }
 void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
-    double minpsi = -1. * u_deficit;
     u_effKH = effKH(Ygw,  AquiferDepth,  macD,  macKsatH,  geo_vAreaF,  KsatH);
     u_deficit = AquiferDepth - Ygw;
     if(u_deficit <= 0. ){
@@ -186,20 +184,21 @@ void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
     }else{
         u_satn = Yunsat / u_deficit;
     }
-    if(u_satn > 0.99 ){
+    if(u_satn > 0.9999 ){
         u_satn = 1.0;
         u_satKr = 1.0;
         u_phius = 0.;
     }else if(u_satn <= EPS_DOUBLE){
         u_satKr = 0.;
-        u_phius = minpsi;
+        u_phius = MINPSI;
     }else{
         u_satKr = satKfun(u_satn, Beta);
-        u_phius = sat2psi(u_satn, Alpha, Beta, minpsi);
+        u_phius = sat2psi(u_satn, Alpha, Beta);
+        u_phius = max(MINPSI, u_phius);
     }
 //    u_ThetaFC = FieldCapacity(Alpha, Beta, u_deficit);
-//    u_Theta = u_satn * ThetaS;
-    u_effkInfi = effKVnew(u_satKr, macKsatV, infKsatV, hAreaF, Ysurf);
+    u_Theta = u_satn * ThetaS;
+    u_effkInfi = infKsatV * (1 - hAreaF) + hAreaF * u_satn * macKsatV;
 }
 
 void _Element::copyGeol(Geol_Layer *g){
