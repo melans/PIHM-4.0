@@ -24,6 +24,9 @@ void myexit(int flag){
         case ERRDATAIN:
             fprintf(stderr, "\nEXIT with error code %d(Data validation)\n", flag);
             break;
+        case ERRSUCCESS:
+            fprintf(stderr, "\nEXIT without any error (%d)\n", flag);
+            break;
         default:
             fprintf(stderr, "\nEXIT with error code %d(Undefined error)\n", flag);
             break;
@@ -88,14 +91,6 @@ void CheckNANij(double x, int i, const char *s)
     if (isnan(x) || isinf(x)) {
         printf("\nERROR: NAN error for %s %d\n", s, i + 1);
         myexit(ERRNAN);
-    }
-}
-int atInterval(double x, int intv)
-{
-    if ((int)x % intv == 0) {
-        return 1;
-    } else {
-        return 0;
     }
 }
 double getSecond(void)

@@ -14,9 +14,16 @@ double timeInterp(double t, double t0, double t1, double x0, double x1);
 /*==========Screen print function===============*/
 int    ScreenPrint(double t, int dt, unsigned long it, unsigned long nt, unsigned long nfcall);
 //int ScreenPrint(double t, int dt, unsigned long it, unsigned long nt, unsigned long  nf1, unsigned long  nf2);
-int    atInterval(double x, int intv);
 double getSecond(void);
 
+inline
+int atInterval(double x, int intv){
+    if ((unsigned long )x % intv == 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
 /*==========Math function===============*/
 double Eudist(double x1, double y1, double x2, double y2);
 double min(double a, double b);
@@ -70,7 +77,8 @@ inline double Eudist(double x1, double y1, double x2, double y2){
 inline double min(double a, double b){
     return (a > b ? b : a);
 }
-inline double max(double a, double b){
+inline
+double max(double a, double b){
     return (a < b ? b : a);
 }
 
