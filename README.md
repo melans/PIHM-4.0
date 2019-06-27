@@ -6,9 +6,9 @@ Oct, 2018 (PIHM++ 4.0)
  ## PIHM leader: Chrhistopher Duffy 
  ## Major developers:
  * PIHM++ 4.0:      Lele Shu (lele.shu@gmail.com)                 
- * PIHM 3.0:        Gopal Bhatt (gopal.bhatt@psu.edu)             
- * PIHM 2.0:        Mukesh Kumar (muk139@psu.edu)                 
- * PIHM 1.0:        Yizhong Qu   (quyizhong@gmail.com)            
+ * PIHM 3.0:        Gopal Bhatt           
+ * PIHM 2.0:        Mukesh Kumar                 
+ * PIHM 1.0:        Yizhong Qu          
  
  
  ## ..............MODIFICATIONS/ADDITIONS in PIHM++ 4.0..........................
