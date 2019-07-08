@@ -71,6 +71,8 @@
 #define Tr  1.0
 #define To  0.0
 
+#define IC_MAX 0.0002  // Maximum Interception on caonpy.
+#define IC_MAX_SNOW  0.003
 
 #define CKconst  273.15 /* Kelvin Constant */
 #define VON_KARMAN     0.4        /* Von Karman's constant */
@@ -81,11 +83,11 @@
 
 /*========ERROR CODE===============*/
 #define ERRSUCCESS  0
-#define ERRFileIO   -2
-#define ERRCVODE    -3
-#define ERRNAN      -1
-#define ERRCONSIS   -5
-#define ERRDATAIN   -4
+#define ERRNAN      10
+#define ERRFileIO   12
+#define ERRDATAIN   13
+#define ERRCVODE    19
+#define ERRCONSIS   20
 #define NA_VALUE -9999
 /*=======================*/
 #define ID 94 // debug only.
