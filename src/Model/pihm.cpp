@@ -89,7 +89,7 @@ double PIHM(FileIn *fin, FileOut *fout){
             MD->updateforcing(t);
             /* calculate Interception Storage */
             MD->EvapoTranspiration(udata, t, dt);
-            MD->updateWF(dt);
+//            MD->updateWF(dt);
 //            fSolver(MD, udata, t, tout);
             flag = CVode(mem, tout, udata, &t, CV_NORMAL);
             check_flag(&flag, "CVode", 1);
