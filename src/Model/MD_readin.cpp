@@ -402,6 +402,8 @@ void Model_Data::FreeData(){
     
     delete[]    QrivDown;
     delete[]    QrivUp;  // 28
+    delete[]    QsegSurf;
+    delete[]    QsegSub;
     
     if(NumLake > 0){
         delete[]    yLakeStg;

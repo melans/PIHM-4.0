@@ -45,14 +45,18 @@ void Model_Data::f_update(double  *Y, double *DY, double t){
         QrivDown[i] = 0.;
         Riv[i].updateRiver(uYriv[i]);
     }
-}
-
-void Model_Data::updateWF(double dt){
-    for(int i = 0; i < NumEle; i++){
-        if( dt > 0.){
-            Ele[i].updateWF(max(0.0, qEleInfil[i]), dt);
-        }
-        yEleWetFront[i] = Ele[i].u_wf;
+    for (int i = 0; i < NumSegmt; i++ ){
+        QsegSurf[i] = 0.;
+        QsegSub[i] = 0.;
     }
 }
+
+//void Model_Data::updateWF(double dt){
+//    for(int i = 0; i < NumEle; i++){
+//        if( dt > 0.){
+//            Ele[i].updateWF(max(0.0, qEleInfil[i]), dt);
+//        }
+//        yEleWetFront[i] = Ele[i].u_wf;
+//    }
+//}
 

@@ -106,6 +106,8 @@ void Model_Data::allocateMemory()
     QrivSub     = new double[NumRiv];   //26
     QrivDown    = new double[NumRiv];
     QrivUp      = new double[NumRiv]; //28
+    QsegSurf    = new double[NumSegmt];
+    QsegSub     = new double[NumSegmt];
     
     if (NumLake > 0){
         yLakeStg    = new double[NumLake];

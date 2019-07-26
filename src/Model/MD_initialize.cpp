@@ -290,7 +290,7 @@ void Model_Data:: initialize(){
         RivSeg[i].eqDistance = Ele[RivSeg[i].iEle - 1].area / RivSeg[i].length * .5;
         Ele[RivSeg[i].iEle - 1].RivID = RivSeg[i].iRiv;
         CheckNonZero(RivSeg[i].Cwr, i, "River Segment Cwr");
-        CheckNonZero(RivSeg[i].KsatH, i, "River Segment KsatH");
+//        CheckNonZero(RivSeg[i].KsatH, i, "River Segment KsatH");
     }
 #ifndef _CALIBMODE
     flood = new FloodAlert();

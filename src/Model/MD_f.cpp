@@ -14,7 +14,7 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
 #ifdef _PIHMOMP
 #pragma omp parallel  default(shared) private(i) num_threads(CS.num_threads)
     {
-#pragma omp for schedule(static)
+#pragma omp for
         for (i = 0; i < NumEle; i++) {
             /*DO INFILTRATION FRIST, then do LATERAL FLOW.*/
             /*========ET Function==============*/
@@ -56,19 +56,20 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
         Flux_RiverDown(t, i);
     }
 #endif
+    
+    /* Shared for both OpenMP and Serial, to update */
+    PassValue();
 }
 void Model_Data::f_applyDY(double *DY, double t){
     double area;
     for (int i = 0; i < NumEle; i++) {
         area = Ele[i].area;
-        QeleSurfTot[i] = 0.;
-        QeleSubTot[i] = 0.;
+        QeleSurfTot[i] = Qe2r_Surf[i];
+        QeleSubTot[i] = Qe2r_Sub[i];
         for (int j = 0; j < 3; j++) {
             QeleSurfTot[i] += QeleSurf[i][j];
             QeleSubTot[i] += QeleSub[i][j];
         }
-        QeleSurfTot[i] += Qe2r_Surf[i];
-        QeleSubTot[i] += Qe2r_Sub[i];
         DY[i] = qEleNetPrep[i] - qEleInfil[i] - QeleSurfTot[i] / area;
         DY[iUS] = qEleInfil[i] - qEleRecharge[i];
         DY[iGW] = qEleRecharge[i] - QeleSubTot[i] / area;
@@ -106,5 +107,45 @@ void Model_Data::f_applyDY(double *DY, double t){
 #ifdef _DEBUG
         CheckNANi(DY[i + 3 * NumEle], i, "DY[i] of river (Model_Data::f_applyDY)");
 #endif
+    }
+}
+
+void Model_Data::f_Segement_update(int iEle, int iRiv, int i){
+    QrivSurf[iRiv] += QsegSurf[i]; // Positive from River to Element
+    QrivSub[iRiv] += QsegSub[i];
+    Qe2r_Surf[iEle] += -QsegSurf[i]; // Positive from Element to River
+    Qe2r_Sub[iEle] += -QsegSub[i];
+}
+void Model_Data::PassValue(){
+    int i, j, inabr, jnabr, ie, ir;
+    for (i = 0; i < NumEle; i++) { /*Check flux A->B  = Flux B->A*/
+        for (j = 0; j < 3; j++) {
+            inabr = Ele[i].nabr[j] - 1;
+            if (inabr >= 0) {
+                jnabr = Ele[i].nabrToMe[j];
+                if(Ele[inabr].iupdSF[jnabr]){
+                    //void
+                }else{
+                    QeleSurf[inabr][jnabr] = - QeleSurf[i][j];
+                    Ele[inabr].iupdSF[jnabr] = 1;
+                    QeleSub[inabr][jnabr] = - QeleSub[i][j];
+                    Ele[inabr].iupdGW[jnabr] = 1;
+                }
+            }
+        }
+    }
+    for (i = 0; i < NumSegmt; i++) {
+        ie = RivSeg[i].iEle-1;
+        ir = RivSeg[i].iRiv-1;
+//        f_Segement_update(RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
+        QrivSurf[ir] += QsegSurf[i]; // Positive from River to Element
+        QrivSub[ir] += QsegSub[i];
+        Qe2r_Surf[ie] += -QsegSurf[i]; // Positive from Element to River
+        Qe2r_Sub[ie] += -QsegSub[i];
+    }
+    for (i = 0; i < NumRiv; i++) {
+        if(iDownStrm >= 0){
+            QrivUp[iDownStrm] += - QrivDown[i];
+        }
     }
 }

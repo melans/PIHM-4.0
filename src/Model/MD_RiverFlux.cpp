@@ -29,8 +29,6 @@ void Model_Data::Flux_RiverDown(double t, int i){
                 QrivDown[i] = 0.;
             }
         }
-//        }
-        QrivUp[iDownStrm] += - QrivDown[i];
     } else {
         switch (Riv[i].down) {
             case -1:

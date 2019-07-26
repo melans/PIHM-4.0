@@ -83,6 +83,8 @@ public:
     double *QrivSub;        /* gw Flux between river and element */
     double *QrivDown;
     double *QrivUp;
+    double *QsegSurf;
+    double *QsegSub;    
     
     double *QeleSurfTot;
     double *QeleSubTot;
@@ -231,6 +233,8 @@ private:
     void Flux_RiverDown(double t, int i);
     void f_Segement_surface(int iEle, int iRiv, int i);
     void f_Segement_sub(int iEle, int iRiv, int i);
+    void f_Segement_update(int iEle, int iRiv, int i);
+    void PassValue();
     
     /* Methods for element calculation */
     void f_lateralFlux(int i, double t);
