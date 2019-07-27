@@ -1,9 +1,9 @@
-//  ForcingData.hpp
+//  TimeSeriesData.hpp
 //  Created by Lele Shu (lele.shu@gmail.com) on 2018.
 //  Copyright © 2018 Lele Shu. All rights reserved.
 //
-#ifndef ForcingData_hpp
-#define ForcingData_hpp
+#ifndef TimeSeriesData_hpp
+#define TimeSeriesData_hpp
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -13,12 +13,12 @@
 #include "IO.hpp"
 #include "functions.hpp"
 
-class _DataQueue {
+class _TimeSeriesData {
 public:
     std::string fn;
     
-    _DataQueue();
-    ~_DataQueue();
+    _TimeSeriesData();
+    ~_TimeSeriesData();
     void    readDimensions();
     void    read_csv();
     void    tsd_interpolation(double t);
@@ -43,6 +43,6 @@ private:
 };
 
 void CheckFile(std::ifstream * fp, const char *s);
-#endif                /* ForcingData_hpp */
+#endif                /* TimeSeriesData_hpp */
 
 

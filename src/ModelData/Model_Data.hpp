@@ -7,7 +7,7 @@
 #define Model_Data_hpp
 
 #include <stdio.h>
-#include "ForcingData.hpp"
+#include "TimeSeriesData.hpp"
 #include "ModelConfigure.hpp"
 #include "IO.hpp"
 #include "River.hpp"
@@ -48,12 +48,12 @@ public:
     int NumRivType;        /* Number of River Shape */
     int NumRivNode;
     
-    _DataQueue *tsd_weather;
-    _DataQueue tsd_LAI;
-    _DataQueue tsd_RL;
-    _DataQueue tsd_MF;
-    _DataQueue tsd_BCEle;
-    _DataQueue tsd_BCRiv;
+    _TimeSeriesData *tsd_weather;
+    _TimeSeriesData tsd_LAI;
+    _TimeSeriesData tsd_RL;
+    _TimeSeriesData tsd_MF;
+    _TimeSeriesData tsd_BCEle;
+    _TimeSeriesData tsd_BCRiv;
     
     globalCal gc;
     
