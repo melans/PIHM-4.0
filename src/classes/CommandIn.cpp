@@ -52,7 +52,11 @@ void CommandIn::parse(int argc, char **argv){
                 break;
         }
     }
-    strcpy(prjname, argv[optind]);
+    if(iprj){
+       // void
+    }else{
+        strcpy(prjname, argv[optind]);
+    }
 }
 CommandIn::CommandIn(){
     prjname[0] = '\0';
