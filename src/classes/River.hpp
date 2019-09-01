@@ -53,7 +53,12 @@ public:
 //    int ToNode = NA_VALUE;    /* Dnstream Node no. [-] */
     int down = NA_VALUE;    /* down stream reach [-] */
     int type = NA_VALUE;    /* shape type [-] */
-    int BC = NA_VALUE;    /* BC type [-] */
+    int BC = NA_VALUE;    /* BC type [-]
+                           BC > 0 = Neumann BC; Fix river stage
+                           BC < 0 = Dirichlet BC; Fix Flux in/out*/
+    double yBC = 0.;
+    double qBC = 0.;
+    
     int reservoir = NA_VALUE; /* [-] */
 //    double x = NA_VALUE;    /* Centroid x of river reach [m] */
 //    double y = NA_VALUE; /* Centroid y of river reach [m] */
