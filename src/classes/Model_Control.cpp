@@ -257,6 +257,7 @@ Print_Ctrl::Print_Ctrl(){}
 void Print_Ctrl::open_file(int a, int b){
     Ascii = a;
     Binary = b;
+    double tmp;
     if(strlen(filename) < 1){
         fprintf(stderr, "WARNING: filename (%s)is empty.\n;", filename);
     }
@@ -265,8 +266,10 @@ void Print_Ctrl::open_file(int a, int b){
     if (Binary){
         fid_bin = fopen (fileb, "wb");
         CheckFile(fid_bin, fileb);
-        fwrite( &NumVar, sizeof(NumVar), 1, fid_bin);
-        fwrite( &StartTime, sizeof(StartTime), 1, fid_bin);
+        tmp = (double) NumVar;
+        fwrite( &tmp, sizeof(tmp), 1, fid_bin);
+        tmp = (double) StartTime;
+        fwrite( &tmp, sizeof(tmp), 1, fid_bin);
     }
     if (Ascii){
         fid_asc = fopen (filea, "w");
@@ -357,7 +360,7 @@ void Print_Ctrl::PrintData(double dt, double t){
     t_long = (long int)t;
     if ((t_long % Interval) == 0){
         for (int i = 0; i < NumVar; i++){
-            buffer[i] /= NumUpdate ; /* Get the mean in the time-interval*/
+            buffer[i] *= tau / NumUpdate ; /* Get the mean in the time-interval*/
         }
         NumUpdate = 0;
         if(Ascii){
