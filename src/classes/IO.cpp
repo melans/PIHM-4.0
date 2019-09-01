@@ -24,27 +24,41 @@ void FileIn::saveProject(){
     sprintf(fn, "%s/%s.prj", outpath, projectname);
     fp = fopen(fn,"w");
     CheckFile(fp, fn);
+    /*  */
+    /*  */
+    /* Configure */
     fprintf(fp, "PRJ \t %s\n", projectname);
     fprintf(fp, "INPATH \t %s\n", inpath);
     fprintf(fp, "OUTPATH \t %s\n", outpath);
-//    if(ilog){
-//        fprintf(fp, "LOG \t %s\n", logfile);
-//    }
+    
+    /* spatial data */
     fprintf(fp, "MESH \t %s\n", file_mesh);
     fprintf(fp, "ATT \t %s\n", file_att);
-    fprintf(fp, "INIT \t %s\n", file_init);
-    fprintf(fp, "CALIB \t %s\n", file_calib);
+    fprintf(fp, "LAKE \t %s\n", file_lake);
     fprintf(fp, "RIV \t %s\n", file_riv);
-    fprintf(fp, "RIV \t %s\n", file_rivchn);
+    fprintf(fp, "RIVSEG \t %s\n", file_rivseg);
+    /* calibration & config */
+    fprintf(fp, "CALIB \t %s\n", file_calib);
+    fprintf(fp, "PARA \t %s\n", file_para);
+    fprintf(fp, "INIT \t %s\n", file_init);
+    /* Parameters */
     fprintf(fp, "LC \t %s\n", file_lc);
     fprintf(fp, "SOIL \t %s\n", file_soil);
     fprintf(fp, "GEOL \t %s\n", file_geol);
+    /* TSD */
     fprintf(fp, "FORC \t %s\n", file_forc);
     fprintf(fp, "LAI \t %s\n", file_lai);
     fprintf(fp, "MF \t %s\n", file_mf);
-    fprintf(fp, "IBC \t %s\n", file_bc);
-    fprintf(fp, "PARA \t %s\n", file_para);
+    fprintf(fp, "RL \t %s\n", file_rl);
     fprintf(fp, "LCM \t %s\n", file_lcm);
+    /* bc */
+    fprintf(fp, "EleBC1 \t %s\n", file_ebc1);
+    fprintf(fp, "EleBC2 \t %s\n", file_ebc2);
+    fprintf(fp, "RivBC1 \t %s\n", file_rbc1);
+    fprintf(fp, "RivBC2 \t %s\n", file_rbc2);
+    fprintf(fp, "LakeBC1 \t %s\n", file_lbc1);
+    fprintf(fp, "LakeBC2 \t %s\n", file_lbc2);
+    
     fclose(fp);
 }
 
@@ -63,7 +77,7 @@ void FileIn:: setInFilePath(char * indir, char *  pjrname){
     sprintf(file_mesh, "%s/%s.%s", inpath, projectname, "sp.mesh");
     sprintf(file_att, "%s/%s.%s", inpath, projectname, "sp.att");
     sprintf(file_riv, "%s/%s.%s", inpath, projectname, "sp.riv");
-    sprintf(file_rivchn, "%s/%s.%s", inpath, projectname, "sp.rivchn");
+    sprintf(file_rivseg, "%s/%s.%s", inpath, projectname, "sp.rivchn");
     sprintf(file_lake, "%s/%s.%s", inpath, projectname, "sp.lake");
     
     /* physical parameters */
@@ -81,9 +95,15 @@ void FileIn:: setInFilePath(char * indir, char *  pjrname){
     sprintf(file_lai, "%s/%s.%s", inpath, projectname, "tsd.lai");
     sprintf(file_mf, "%s/%s.%s", inpath, projectname, "tsd.mf");
     sprintf(file_rl, "%s/%s.%s", inpath, projectname, "tsd.rl");
-    sprintf(file_bc, "%s/%s.%s", inpath, projectname, "tsd.bc");
     sprintf(file_lcm, "%s/%s.%s", inpath, projectname, "tsd.lcm");
     sprintf(file_obs, "%s/%s.%s", inpath, projectname, "tsd.obs");
+    
+    sprintf(file_ebc1, "%s/%s.%s", inpath, projectname, "tsd.ebc1");
+    sprintf(file_ebc2, "%s/%s.%s", inpath, projectname, "tsd.ebc2");
+    sprintf(file_rbc1, "%s/%s.%s", inpath, projectname, "tsd.rbc1");
+    sprintf(file_rbc2, "%s/%s.%s", inpath, projectname, "tsd.rbc2");
+    sprintf(file_lbc1, "%s/%s.%s", inpath, projectname, "tsd.lbc1");
+    sprintf(file_lbc2, "%s/%s.%s", inpath, projectname, "tsd.lbc2");
 }
 
 FileOut::FileOut(){
@@ -129,24 +149,23 @@ void FileOut::updateFilePath(){
     sprintf(ele_y_ic, "%s/%s%s.eleyic", outpath, projectname, suffix);
     sprintf(ele_y_surf, "%s/%s%s.eleysurf", outpath, projectname, suffix);
     sprintf(ele_y_unsat, "%s/%s%s.eleyunsat", outpath, projectname, suffix);
-    sprintf(ele_y_wetfrount, "%s/%s%s.eleywf", outpath, projectname, suffix);
     sprintf(ele_y_gw, "%s/%s%s.eleygw", outpath, projectname, suffix);
     //cell-fluxes
     sprintf(ele_q_ET[0], "%s/%s%s.elevetic", outpath, projectname, suffix);
     sprintf(ele_q_ET[1], "%s/%s%s.elevettr", outpath, projectname, suffix);
     sprintf(ele_q_ET[2], "%s/%s%s.elevetev", outpath, projectname, suffix);
-    
-    //    sprintf(ele_Q_surf, "%s/%s%s.eleqsurf", outpath, projname);
-    //    sprintf(ele_Q_sub, "%s/%s%s.eleqsub", outpath, projname);
-    sprintf(ele_Q_subTot, "%s/%s%s.eleqsub", outpath, projectname, suffix);
-    sprintf(ele_Q_surfTot, "%s/%s%s.eleqsurf", outpath, projectname, suffix);
-    
     sprintf(ele_q_ETP, "%s/%s%s.elevetp", outpath, projectname, suffix);
     sprintf(ele_q_ETA, "%s/%s%s.eleveta", outpath, projectname, suffix);
     sprintf(ele_q_prcp, "%s/%s%s.elevprcp", outpath, projectname, suffix);
     sprintf(ele_q_netprcp, "%s/%s%s.elevnetprcp", outpath, projectname, suffix);
     sprintf(ele_q_infil, "%s/%s%s.elevinfil", outpath, projectname, suffix);
     sprintf(ele_q_rech, "%s/%s%s.elevrech", outpath, projectname, suffix);
+    
+    //    sprintf(ele_Q_surf, "%s/%s%s.eleqsurf", outpath, projname);
+    //    sprintf(ele_Q_sub, "%s/%s%s.eleqsub", outpath, projname);
+    sprintf(ele_Q_subTot, "%s/%s%s.eleqsub", outpath, projectname, suffix);
+    sprintf(ele_Q_surfTot, "%s/%s%s.eleqsurf", outpath, projectname, suffix);
+    
     //cell_wb
     sprintf(ewb_q_in, "%s/%s%s.ewbqin", outpath, projectname, suffix);
     sprintf(ewb_q_out, "%s/%s%s.ewbqout", outpath, projectname, suffix);
@@ -178,108 +197,99 @@ void FileIn::setCalibFile(const char *fn){
     strcpy(file_calib, fn);
 }
 void FileIn::readProject(const char *fn){
+    
+    char    str[MAXLEN];
+    char    optstr[MAXLEN];
+    char    val[MAXLEN];
     FILE *fp;
-    char *p;
-    int i, j;
-    int ip;
-    int num = 17;
-    char keywords[17][MAXLEN] = {"PRJ", "inpath", "outpath", "mesh", "att", "riv", "para", "calib", "lc",
-        "soil", "geol", "forc", "lai", "ibc", "init","lcm", "mf"};
-    char key[MAXLEN];
-    char value[MAXLEN];
-    char empty[MAXLEN];
-    char str[MAXLEN];
-    char prjname[MAXLEN];
-    char inpath[MAXLEN];
-    char outpath[MAXLEN];
-    fp = fopen(fn,"r");
+    fp = fopen(fn, "r");
     CheckFile(fp, fn);
-    strcpy(file_lcm, "");
-    ip = -1;
-    fgets(str,MAXLEN, fp);
-    for(i = 0; i < num && !feof(fp) ; i++){
-        
-        if (str[0] == '#' || str[0] == '\n' || str[0] == '\0')
+    /* Read through parameter file to find parameters */
+
+    while (fgets(str, MAXLEN, fp)) {
+        if (str[0] == '#' || str[0] == '\n' || str[0] == '\0' || str[0] == ' ')
         {
             continue;
         }
+        sscanf (str, "%s %s\n", optstr, val);
+        /* Get Model Parameters */
+        if (strcasecmp ("PRJ", optstr) == 0){
+            strcpy(projectname, val);
+            sprintf(inpath, "input/%s", projectname);
+            sprintf(outpath, "output/%s.out", projectname);
+            setInFilePath(inpath, projectname);
+        }
+        else if (strcasecmp ("INPATH", optstr) == 0)
+            strcpy(inpath, val);
+        else if (strcasecmp ("OUTPATH", optstr) == 0)
+            strcpy(outpath, val);
+        /* SPATIAL DATA */
+        else if (strcasecmp ("MESH", optstr) == 0)
+            strcpy(file_mesh, val);
+        else if (strcasecmp ("ATT", optstr) == 0)
+            strcpy(file_att, val);
+        else if (strcasecmp ("RIV", optstr) == 0)
+            strcpy(file_riv, val);
+        else if (strcasecmp ("RIVSEG", optstr) == 0)
+            strcpy(file_rivseg, val);
+        else if (strcasecmp ("LAKE", optstr) == 0)
+            strcpy(file_lake, val);
         
-        sscanf(str, "%s %s",key, value);
-        for(j = 0; j < num; j++) {
-            if(strcasecmp(key, keywords[j])==0){
-                ip = j;
-                break;
+        /* CALIB PARA DATA */
+        else if (strcasecmp ("CALIB", optstr) == 0)
+            strcpy(file_calib, val);
+        else if (strcasecmp ("PARA", optstr) == 0)
+            strcpy(file_para, val);
+        else if (strcasecmp ("INIT", optstr) == 0)
+            strcpy(file_init, val);
+        
+        /* PARAMETERS DATA */
+        else if (strcasecmp ("LC", optstr) == 0)
+            strcpy(file_lc, val);
+        else if (strcasecmp ("SOIL", optstr) == 0)
+            strcpy(file_soil, val);
+        else if (strcasecmp ("GEOL", optstr) == 0)
+            strcpy(file_geol, val);
+        
+        /* TSD DATA */
+        else if (strcasecmp ("FORC", optstr) == 0)
+            strcpy(file_forc, val);
+        else if (strcasecmp ("LAI", optstr) == 0)
+            strcpy(file_lai, val);
+        else if (strcasecmp ("RL", optstr) == 0)
+            strcpy(file_rl, val);
+        else if (strcasecmp ("MF", optstr) == 0)
+            strcpy(file_mf, val);
+        else if (strcasecmp ("LCM", optstr) == 0)
+            strcpy(file_lcm, val);
+        
+        /* init/bnd condition DATA */
+        else if (strcasecmp ("ELEBC1", optstr) == 0)
+            strcpy(file_ebc1, val);
+        else if (strcasecmp ("ELEBC2", optstr) == 0)
+            strcpy(file_ebc2, val);
+        else if (strcasecmp ("RivBC1", optstr) == 0)
+            strcpy(file_rbc1, val);
+        else if (strcasecmp ("RivBC2", optstr) == 0)
+            strcpy(file_rbc2, val);
+        else if (strcasecmp ("LakeBC1", optstr) == 0)
+            strcpy(file_lbc1, val);
+        else if (strcasecmp ("LakeBC2", optstr) == 0)
+            strcpy(file_lbc2, val);
+        else{
+            printf
+            ("\n  Parameter:%s cannot be recognized. Please see User's Manual for more details!\n",
+             optstr);
+            printf("Continue? (y/N)\n");
+            char cc = getchar();
+            if(cc =='Y' || cc=='y' ){
+                /* Void */
+            }else{
+                myexit(ERRFileIO);
             }
         }
-        switch (ip) {
-            case 0    :
-                p = projectname;
-                break;
-            case 1    :
-                p = inpath;
-                break;
-            case 2    :
-                p = outpath;
-                break;
-            case 3    :
-                p = file_mesh;
-                break;
-            case 4    :
-                p = file_att;
-                break;
-            case 5    :
-                p = file_riv;
-                sprintf(file_rivchn, "%schn", file_riv);
-                break;
-            case 6    :
-                p = file_para;
-                break;
-            case 7    :
-                p = file_calib;
-                break;
-            case 8    :
-                p = file_lc;
-                break;
-            case 9    :
-                p = file_soil;
-                break;
-            case 10   :
-                p = file_geol;
-                break;
-            case 11   :
-                p = file_forc;
-                break;
-            case 12   :
-                p = file_lai;
-                break;
-            case 13   :
-                p = file_bc;
-                break;
-            case 14   :
-                p = file_init;
-                break;
-            case 15   :
-                p = file_lcm;
-                break;
-            case 16   :
-                p = file_mf;
-                break;
-            default:
-                p = empty;
-                break;
-        }
-        if(ip ==  0){
-            strcpy(prjname, projectname);
-            sprintf(inpath, "input/%s", prjname);
-            sprintf(outpath, "output/%s.out", prjname);
-            setInFilePath(inpath, prjname);
-            strcpy(outpath, outpath);
-        }
-        strcpy(p, value);
-        fgets(str,MAXLEN, fp);
     }
-    
-    fclose(fp);
+    fclose (fp);
 }
 void FileOut::setOutpath(const char *fn){
     strcpy(outpath, fn);
@@ -297,7 +307,6 @@ void FileOut::copy(FileOut *p){
     strcpy(   ele_y_surf, p->ele_y_surf );
     strcpy(   ele_y_unsat, p->ele_y_unsat );
     strcpy(   ele_y_gw, p->ele_y_gw );
-    strcpy(   ele_y_wetfrount, p->ele_y_wetfrount );
     for(int i = 0; i < 3; i++){
         strcpy(   ele_q_ET[i], p->ele_q_ET[i] );
     }

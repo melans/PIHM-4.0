@@ -30,7 +30,7 @@ public:
     char file_mesh[MAXLEN];
     char file_att[MAXLEN];
     char file_riv[MAXLEN];
-    char file_rivchn[MAXLEN];
+    char file_rivseg[MAXLEN];
     char file_lake[MAXLEN];
     
     /* model configuration */
@@ -44,7 +44,13 @@ public:
     char file_geol[MAXLEN];
     
     /* Time-series data */
-    char file_bc[MAXLEN];
+    char file_ebc1[MAXLEN];
+    char file_ebc2[MAXLEN];
+    char file_rbc1[MAXLEN];
+    char file_rbc2[MAXLEN];
+    char file_lbc1[MAXLEN];
+    char file_lbc2[MAXLEN];
+    
     char file_forc[MAXLEN];
     char file_lai[MAXLEN];
     char file_rl[MAXLEN];
@@ -79,7 +85,6 @@ public:
     char ele_y_surf[MAXLEN];
     char ele_y_unsat[MAXLEN];
     char ele_y_gw[MAXLEN];
-    char ele_y_wetfrount[MAXLEN];
     
     //cell-fluxes
     char ele_q_ET[3][MAXLEN];
