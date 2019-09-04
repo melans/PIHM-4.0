@@ -62,12 +62,14 @@ CFLAGS   = -O3 -g  -std=c++11
 #STCFLAG     = -static
 LDFLAGS  = 
 LIBS     = -lm
-SRC    	= ${SRC_DIR}/Model/*.cpp \
-		  ${SRC_DIR}/classes/*.cpp \
+SRC    	= ${SRC_DIR}/classes/*.cpp \
+		  ${SRC_DIR}/ModelData/*.cpp \
+		  ${SRC_DIR}/Model/*.cpp \
 		  ${SRC_DIR}/Equations/*.cpp
 
-SRC_H	= ${SRC_DIR}/Model/*.hpp \
-		  ${SRC_DIR}/classes/*.hpp \
+SRC_H	= ${SRC_DIR}/classes/*.hpp \
+		  ${SRC_DIR}/ModelData/*.hpp \
+		  ${SRC_DIR}/Model/*.hpp \
 		  ${SRC_DIR}/Equations/*.hpp
 
 
@@ -77,6 +79,7 @@ INCLUDES = -I ${SUNDIALS_DIR}/include \
 		   -I ${SUNDIALS_DIR}/include/sundials \
 		   -I ${INC_OMP} \
 		   -I ${SRC_DIR}/Model \
+		   -I ${SRC_DIR}/ModelData \
 		   -I ${SRC_DIR}/classes \
 		   -I ${SRC_DIR}/Equations 
 
@@ -191,6 +194,7 @@ clean:
 	@echo
 	@echo "Done."
 	@echo
+
 
 
 
