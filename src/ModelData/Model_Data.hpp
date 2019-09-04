@@ -28,32 +28,49 @@ public:
     //int RivMode;        /* River Routing Mode */
 //    unsigned long nFCall1;
 //    unsigned long nFCall2;
-    unsigned long nFCall;
+    unsigned long nFCall = 0;
     double tic;
-    int NumForc;
-    int NumEle;            /* Number of Elements */
-    int NumNode;        /* Number of Nodes */
+    int NumForc = 0;
+    int NumEle = 0;            /* Number of Elements */
+    int NumNode = 0;        /* Number of Nodes */
 //    int NumY1;
 //    int NumY2;
-    int NumY;
-    int NumBCRiv;      /* Number of Boundary Condition for Rivers */
-    int NumBCEle;      /* Number of Boundary Condition for Elements */
-    int NumRiv;            /* Number of Rivere Reaches */
+    int NumY = 0;
+    int NumSSEle = 0;       /* Number of Souce/Sink for Elements */
+    int NumBCEle1 = 0;      /* Number of Boundary Condition for Elements */
+    int NumBCEle2 = 0;      /* Number of Boundary Condition for Elements */
+    int NumBCRiv1 = 0;      /* Number of Boundary Condition for Rivers */
+    int NumBCRiv2 = 0;      /* Number of Boundary Condition for Rivers */
+    int NumBCLake1 = 0;      /* Number of Boundary Condition for Lakes */
+    int NumBCLake2 = 0;      /* Number of Boundary Condition for Lakes */
+    int NumRiv = 0;            /* Number of Rivere Reaches */
     
     
-    int NumSoil;        /* Number of Soils */
-    int NumGeol;        /* Number of Geologies */
-    int NumLC;            /* Number of Land Cover Index Data */
-    int NumMeltF;        /* Number of Melt Factor Time series */
-    int NumRivType;        /* Number of River Shape */
-    int NumRivNode;
+    int NumSoil = 0;        /* Number of Soils */
+    int NumGeol = 0;        /* Number of Geologies */
+    int NumLC = 0;            /* Number of Land Cover Index Data */
+    int NumMeltF = 0;        /* Number of Melt Factor Time series */
+    int NumRivType = 0;        /* Number of River Shape */
+    int NumRivNode = 0;
     
     _TimeSeriesData *tsd_weather;
     _TimeSeriesData tsd_LAI;
     _TimeSeriesData tsd_RL;
     _TimeSeriesData tsd_MF;
-    _TimeSeriesData tsd_BCEle;
-    _TimeSeriesData tsd_BCRiv;
+    _TimeSeriesData tsd_eleSS; /* Element Source/Sink Term [L3/T] */
+    _TimeSeriesData tsd_eyBC; /* Element Y BC */
+    _TimeSeriesData tsd_eqBC; /* Element Q BC */
+    _TimeSeriesData tsd_ryBC;
+    _TimeSeriesData tsd_rqBC;
+    _TimeSeriesData tsd_lyBC;
+    _TimeSeriesData tsd_lqBC;
+    int ieBC1 = 0;
+    int ieBC2 = 0;
+    int irBC1 = 0;
+    int irBC2 = 0;
+    int ilBC1 = 0;
+    int ilBC2 = 0;
+    int ieSS = 0;
     
     globalCal gc;
     
@@ -98,6 +115,7 @@ public:
     double *qEleETloss;
     double *qEleNetPrep;    /* Net precep. on each elment */
     double *qEleInfil;    /* Variable infiltration rate */
+    double *qEleExfil;    /* Variable exfiltration rate */
     double *qEleRecharge;    /* Recharge rate to GW */
     double *yEleSnowGrnd;    /* Snow depth on ground element */
     double *yEleSnowCanopy;    /* Snow depth on canopy element */
@@ -114,6 +132,8 @@ public:
     double *yEleSurf;   // debug may not necessary
     double *yEleUnsat;   // debug may not necessary
     double *qEleETP;
+    double *iBeta;
+    double *iPC;
     double *qEleETA;
     double *yRivStg;   // debug may not necessary
     /* Lake variables */
@@ -169,7 +189,7 @@ public:
     void f_applyDY(double * DY, double t);
     void f_update(double * Y, double * DY, double t);
     
-    void updateWF(double dt);
+//    void updateWF(double dt);
     void CheckInputData();
     void InitFloodAlert(const char *fn);
     void updateRiverStage(N_Vector uY);
@@ -224,8 +244,14 @@ private:
     void read_rl(const char *fn);
     void read_lai(const char *fn);
     void read_mf(const char *fn);
-    void read_bcEle(const char *fn);
-    void read_bcRiv(const char *fn);
+    
+    void read_ssEle(const char *fn);
+    void read_bcEle1(const char *fn);
+    void read_bcEle2(const char *fn);
+    void read_bcRiv1(const char *fn);
+    void read_bcRiv2(const char *fn);
+    void read_bcLake1(const char *fn);
+    void read_bcLake2(const char *fn);
 //    void CorrectRiver(double eps);
     void rmSinks();
     
@@ -235,6 +261,7 @@ private:
     void f_Segement_sub(int iEle, int iRiv, int i);
     void f_Segement_update(int iEle, int iRiv, int i);
     void PassValue();
+    void applyBCSS(double *DY, int i);
     
     /* Methods for element calculation */
     void f_lateralFlux(int i, double t);

@@ -130,6 +130,7 @@ double dhdy(double *x, double *y, double *h){
      y[1] * (x[0] - x[2]) +
      y[0] * (x[2] - x[1]));
 }
+
 #endif /* functions_h */
 
 

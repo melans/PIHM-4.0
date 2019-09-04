@@ -83,9 +83,12 @@ void Model_Data::allocateMemory()
     qEleETP     = new double[NumEle];
     qEleETA     = new double[NumEle];
     qEleETloss  = new double[NumEle]; //10
+    iBeta     = new double[NumEle]; // 10.1
+    iPC     = new double[NumEle];
     
     qEleNetPrep = new double[NumEle];
     qEleInfil   = new double[NumEle];
+    qEleExfil   = new double[NumEle];
     qEleRecharge = new double[NumEle]; //13
     
     yEleIS      = new double[NumEle];

@@ -78,7 +78,7 @@ public:
 class Landcover {
 public:
     int index;    /* index */
-    double LAImax = NA_VALUE;    /* max LAI [m2/m2]*/
+    double LAImax = NA_VALUE;    /* max LAI [m2/m2]*/  // debug: MUST remove this one, dummy.
     double VegFrac = NA_VALUE;/* Vegetation fraction [m2/m2] */
     double Albedo = NA_VALUE;    /* Albedo [1]*/
     double Rs_ref = NA_VALUE;
@@ -115,6 +115,7 @@ public:
     double cAqD = 0; // +
     double cTemp = 0; // +
     
+    double cETP = 1;
     double cPrep = 1;
     double cEt0 = 1;
     double cEt1 = 1;

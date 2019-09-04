@@ -21,10 +21,19 @@
 
 //void is_sm_et(double t, double stepsize, void *DS, N_Vector VY);
 
-double Penman_Monteith(double T, double RH, double Vel,
-                       double P,double Rn, double rl,
-                       double windH, double Gamma,
-                       double R_ref, double lai);
+
+double Penman_Monteith(double Press, double T, double Rn, double G,
+                       double ed, double Delta, double r_a, double r_s,
+                       double Gamma);
+
+double Penman_Monteith(double RH,
+                       double T, double Vel, double Press,
+                       double Rn, double rl, double windH,
+                       double Gamma, double lai, double R_ref);
+
+double PlantCoeff(double Rs_ref, double Rmin, double LAI, double T, double r_a,
+                  double Rn, double es, double ea,
+                  double beta_s, double Gamma, double Delta);
 double SoilMoistureStress(double ThetaS, double ThetaR, double SatRatio);
 double Eact_Interception(double etp, double yis, double ymax);
 double Eact_Vegetation(double etp, double yis, double ymax);
@@ -32,9 +41,10 @@ double ActualEvaporation(double etp, double ThetaS, double ThetaR, double SatRat
 
 double VaporPressure_Sat(double T_in_C);
 double VaporPressure_Act(double esat, double rh);
-//double VaporPressure_Act(double rh, double T_C, double P);
-double AerodynamicResistance(double v, double rl, double height);
-double SlopeSatVaporPressure(double T);
+double AerodynamicResistance(double Uz, double hc, double Z_u, double Z_e);
+double SlopeSatVaporPressure(double T, double Es);
+double AirDensity(double T, double Es);
+
 double CanopyResistance(double rmin, double lai);
 double PsychrometricConstant(double Pressure);
 double PressureElevation(double z);
@@ -70,13 +80,8 @@ inline double PsychrometricConstant(double Pressure){
     /* Allen(1998) Eq(8) */
 }
 inline double VaporPressure_Sat(double T_in_C){
-    //    e°(T) saturation vapour pressure at the air temperature T [kPa],
-    //    T air temperature [°C],
-    //    exp[..] 2.7183 (base of natural logarithm) raised to the power [..].
-    //Zotarelli, L., & Dukes, M. (2010).
-    // Allen(1998) Eq (11)
-    return .61128 * exp( 17.27 * T_in_C / (T_in_C + 237.3));
-    //    http://www.fao.org/docrep/X0490E/x0490e07.htm
+    /* Eq 4.2.2 in David R Maidment, Handbook of Hydrology*/
+    return 0.6108 * exp( 17.27 * T_in_C / (T_in_C + 237.3));
 }
 inline double VaporPressure_Act(double esat, double rh){
     return esat * rh;
@@ -86,42 +91,43 @@ inline double VaporPressure_Act(double esat, double rh){
 //    double qv_sat = 0.622 * (VP / RH) / P;
 //    return qv_sat;
 //}
-inline double AerodynamicResistance(double Vel, double rl, double z){
+inline double AerodynamicResistance(double Uz, double hc, double Z_u, double Z_e){
     /* Allen, R. G., S, P. L., Raes, D., & Martin, S. (1998).
      Crop evapotranspiration : Guidelines for computing crop water requirements
      by Richard G. Allen ... [et al.].
      FAO irrigation and drainage paper: 56.
-     https://doi.org/10.1016/j.eja.2010.12.001 */
-    // Eq(4) in reference
-    //    ra aerodynamic resistance [s m-1],
-    //    zm height of wind measurements [m],
-    //    zh height of humidity measurements [m],
-    //    d zero plane displacement height [m],
-    //    zom roughness length governing momentum transfer [m],
-    //    zoh roughness length governing transfer of heat and vapour [m],
-    //    k von Karman's constant, 0.41 [-],
-    //    uz wind speed at height z [m s-1].
+     Eq(4) in reference
+        ra aerodynamic resistance [s m-1],
+        zm height of wind measurements [m],
+        zh height of humidity measurements [m],
+        d zero plane displacement height [m],
+        zom roughness length governing momentum transfer [m],
+        zoh roughness length governing transfer of heat and vapour [m],
+        k von Karman's constant, 0.41 [-],
+        uz wind speed at height z [m s-1].
+     Or:
+        Eq 4.2.25 in David R Maidment, Handbook of Hydrology
+     */
     //    r_a = 12 * 4.72 * log(Ele[i].windH / rl) / (0.54 * Vel / UNIT_C / 60 + 1) / UNIT_C / 60;    return r_a;
-    double  r_a;
-    double  zw, zp, rw, rp;
-    zw = z;
-    zp = 2.0;
-    rw = rl;
-    rp = rl * 0.1;
-    //    r_a = 12. * 4.72 * log(z / rl) / (0.54 * Vel);
-    r_a = log( zw / rw ) * log( zp / rp)
-    / (VON_KARMAN * VON_KARMAN* Vel); /* bug?? */
+    double  r_a, d, Z_om, Z_ov;
+    d = 0.67 * hc;
+    Z_om = 0.123 * hc;
+    Z_ov = 0.0123 * hc;
+    r_a = log( (Z_u - d) / Z_om ) * log( (Z_e - d) / (Z_ov))
+    / (VON_KARMAN * VON_KARMAN* Uz);
     return r_a;
 }
-
-inline double SlopeSatVaporPressure(double T){
-    //# Slope of saturation vapour pressure curve (D )
-    //# http://www.fao.org/docrep/X0490E/x0490e07.htm
-    //# D slope of saturation vapour pressure curve at air temperature T [kPa °C-1],
-    //# T air temperature [°C],
-    //# exp[..] 2.7183 (base of natural logarithm) raised to the power [..].
+inline double AirDensity (double P, double T){
+    /* Eq 4.2.4 in David R Maidment, Handbook of Hydrology*/
+    /*  P  in [kP]
+        T in [C]
+        rho  -- Density of Air. kg/m3
+     */
+    return 3.486 * P / (275 + T);
+}
+inline double SlopeSatVaporPressure(double T, double ES){
     double tt = (T + 237.3);
-    double delta = 4098. * ( 0.6108* exp(17.27 * T / tt )  ) /  ( tt * tt);
+    double delta = 4098. * ES /  ( tt * tt);
     return delta;
 }
 

@@ -192,6 +192,8 @@ void globalCal::push(const char *optstr, double val){
         cEt1 = val;
     else if (strcasecmp ("EDIR", optstr) == 0)
         cEt2 = val;
+    else if (strcasecmp ("ETP", optstr) == 0)
+        cETP = val;
     
     /*  Rivers */
     else if (strcasecmp ("RIV_ROUGH", optstr) == 0)
@@ -362,6 +364,7 @@ void globalCal::write(const char *fn){
     fprintf(fp, "AQUIFER\t%g\n", cAqD);
     fprintf(fp, "PRCP\t%g\n", cPrep);
     fprintf(fp, "SFCTMP\t%g\n", cTemp);
+    fprintf(fp, "ETP\t%g\n", cETP);
     fprintf(fp, "EC\t%g\n", cEt0);
     fprintf(fp, "ETT\t%g\n", cEt1);
     fprintf(fp, "EDIR\t%g\n", cEt2);
@@ -425,6 +428,7 @@ void globalCal::copy(globalCal *p){
     cTemp = p->cTemp ; // +
     
     cPrep = p->cPrep ;
+    cETP = p->cETP ;
     cEt0 = p->cEt0 ;
     cEt1 = p->cEt1 ;
     cEt2 = p->cEt2 ;

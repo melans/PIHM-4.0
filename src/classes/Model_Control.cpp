@@ -141,8 +141,8 @@ void Control_Data::read(const char *fn){
             Ascii=  val;
         else if (strcasecmp ("BINARY_OUTPUT", optstr) == 0)
             Binary =  val;
-//        else if (strcasecmp ("DEBUG", optstr) == 0)
-//            Debug =  val;
+        else if (strcasecmp ("SpinupDay", optstr) == 0)
+            Spinup =  val;
         else if (strcasecmp ("VERBOSE", optstr) == 0)
             Verbose =  val;
         else if (strcasecmp ("INIT_MODE", optstr) == 0)

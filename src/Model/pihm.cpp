@@ -75,10 +75,11 @@ double PIHM(FileIn *fin, FileOut *fout){
     MD->debugData(fout->outpath);
     MD->gc.write(fout->Calib_bak);
 
-    FILE *fid = fopen("DY_debug.dat", "wb");
-    fclose(fid);
+//    FILE *fid = fopen("DY_debug.dat", "wb");
+//    fclose(fid);
     
-    for (int i = 0; i < MD->CS.NumSteps && !ierr; i++) {        /* inner loops to next output points with ET step size control */
+    for (int i = 0; i < MD->CS.NumSteps && !ierr; i++) {
+        /* inner loops to next output points with ET step size control */
         while (t < tnext ) {
             if (t + MD->CS.ETStep >=tnext) {
                 tout = tnext;
@@ -92,6 +93,7 @@ double PIHM(FileIn *fin, FileOut *fout){
 //            MD->updateWF(dt);
 //            fSolver(MD, udata, t, tout);
             flag = CVode(mem, tout, udata, &t, CV_NORMAL);
+            t=tout;
             check_flag(&flag, "CVode", 1);
         }
         tnext += MD->CS.MaxStep;

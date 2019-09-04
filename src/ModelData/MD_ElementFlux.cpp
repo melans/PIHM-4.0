@@ -3,13 +3,14 @@ void Model_Data::f_InfilRecharge(int i, double t){
     Ele[i].Flux_InfiRech(uYsf[i] , uYus[i] , uYgw[i], qEleNetPrep[i]  );
     qEleInfil[i] = Ele[i].u_qi;
     qEleRecharge[i] = Ele[i].u_qr;
+    qEleExfil[i] = Ele[i].u_qex;
 }
 void Model_Data::f_lateralFlux(int i, double t){
     int j, inabr;
     double  Avg_Y_Surf, Dif_Y_Surf, Grad_Y_Surf, CrossA;
     double  Avg_Y_Sub, dy_sub, Avg_Ksat, Grad_Y_Sub, effK, effKnabr;
-    double isf, nsf; // Available Y in Surface of this/nabor element
-    isf = uYsf[i] - qEleInfil[i];
+    double isf, nsf; // Available Y in Surface of this/nabor element    
+    isf = uYsf[i] - qEleInfil[i] + qEleExfil[i];
     isf = isf < 0. ? 0. : isf;
     for (j = 0; j < 3; j++) {
         inabr = Ele[i].nabr[j] - 1;
@@ -37,17 +38,17 @@ void Model_Data::f_lateralFlux(int i, double t){
             /***************************************************************************/
             /* Surface Lateral Flux Calculation between Triangular elements Follows */
             /***************************************************************************/
-            nsf = uYsf[inabr] - qEleInfil[inabr];
+            nsf = uYsf[inabr] - qEleInfil[inabr] + qEleExfil[inabr];
             nsf = nsf < 0. ? 0. : nsf;
             Dif_Y_Surf = (isf + Ele[i].zmax) - (nsf + Ele[inabr].zmax);
             Avg_Y_Surf = avgY(Ele[i].zmax, isf, Ele[inabr].zmax, nsf, Ele[i].depression);
-            if(Avg_Y_Surf < 0){
+            if(Avg_Y_Surf < 0.){
                 QeleSurf[i][j] = 0.;
             }else{
                 Grad_Y_Surf = Dif_Y_Surf / Ele[i].Dist2Nabor[j];
                 CrossA = Avg_Y_Surf * Ele[i].edge[j];
                 QeleSurf[i][j] = ManningEquation(CrossA, Ele[i].avgRough[j], Avg_Y_Surf, Grad_Y_Surf);
-            } //end of ifelse Avg_Y_Surf < EPSilon
+            } //end of ifelse Avg_Y_Surf < 0.
         } else {
             QeleSurf[i][j] = 0;
             QeleSub[i][j] = 0;

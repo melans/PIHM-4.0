@@ -36,10 +36,7 @@
 
 /*========Misc constant===============*/
 #define MAXLEN 2048  /*Max Str Length*/
-#define MAXN  100000    /*MAX NUMBER OF CELLS or RIV, which used for temperary array allocation.*/
-#define MAXBUFFER 10000000 /* MAX BUFFER FOR READING DATA IN BINARY FORCING*/
 #define EPSILON 0.005
-#define EPS 0.05
 #define EPS_DOUBLE 1.0e-10 // precision of double type in 1.e-14.
 #define EPS_SLOPE   0.05e-6
 #define MINPSI -1000000
@@ -57,7 +54,6 @@
 /*========Physical Constant value===============*/
 #define MINRIVSLOPE 1e-4
 #define C_air 1004.0
-#define MINpsi	-5.
 #define THRESH 0.0
 
 #define GRAV 9.8		/* m/s^2 Note the dependence on physical units */

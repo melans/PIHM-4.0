@@ -46,7 +46,14 @@ public:
     int IC  = NA_VALUE;     /* initial condition type */
     int iForc = NA_VALUE;   /* precipitation (forcing) type */
     int iMF = NA_VALUE;     /* meltFactor */
-    int iBC = NA_VALUE;     /* boundary type. 0:natural bc (no flow); 1:Dirichlet BC; 2:Neumann BC */
+    int iSS = 0; /* Index of TS Source/Sink on LAND SURFACE only;
+                 0=No SS;
+                 BC>0 = SS for LANDSURFACE; such as irrigation. ;
+                 BC<0 = SS for Ground water; such as pumping. */
+    int iBC = 0; /* Index of TS Boundary Conditions;
+                 0 = No BC;
+                 BC>0 = Neumann / Fix head / ;
+                 BC<0 = Dirichlet /Fix Fluxes */
     void printHeader(FILE *fp);
     void printInfo(FILE *fp);
 };
@@ -78,11 +85,15 @@ public:
     double MacporeLevel = NA_VALUE; //Aquiferdepth - macD
     double avgRough[3];
     double depression = 0.0002; //Depression value. No overland flow before filling the depression. Default = 0.2 mm.
+    double yBC = 0; // Ground head in m
+    double QBC = 0; // Flux in m3/day
+    double QSS = 0; // Flux in m3/day
     
     int iupdGW[3] = {0,0,0}; /* whether the Groundwater Flux value on this J is update */
     int iupdSF[3] = {0,0,0};  /* whether the Surface Flux value on this J is update */
     /* Value must be updated each loop */
     double u_qi; /* infiltration from surface to unsat zone */
+    double u_qex; /* exfiltration from groundwater to surface */
     double u_qr; /* recharge into ground water */
     /* GW flow*/
     double u_effKH; /* Horizontal effective flow, for gw*/
@@ -91,17 +102,11 @@ public:
     double u_deficit; /* deficit. aquiferdepth - Ygw */
 private:
     /* Infiltration */
-    //    double u_Yus; /* Water hea\d of the unsat zone from zmin*/
     double u_phius; /* pressure head of the unsat zone from zmin*/
-    //    double u_Hus; /* Water head of the unsat zone from z = 0*/
     double u_Ginfi; /* Gradient to infiltration*/
     double u_satKr; /* ratio to effective Infiltration K */
     double u_effkInfi; /* Effective K for infiltration */
-    /* Recharge */
-//    double u_effkRech; /* Effective K for recharge */
-//    double u_Grech; /* Gradient for recharge */
-//    double u_ThetaFC; /* Field capacity */
-    double u_Theta; /* Soil Moisture Content */
+    double Kmax;
     
     /*==== Methods ===================*/
 public:
@@ -112,7 +117,7 @@ public:
     void applyGeometry(_Node *Node);
     void applyNabor(_Node *Node, _Element *Ele);
     void updateElement(double Ysurf, double Yunsat, double Ygw);
-    void updateWF(double dh, double dt);
+//    void updateWF(double dh, double dt);
     void Flux_InfiRech(double Ysurf, double Yunsat, double Ygw, double netprcp);
     void printHeader(FILE *fp);
     void printInfo(FILE *fp);

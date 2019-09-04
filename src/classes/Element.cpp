@@ -56,6 +56,7 @@ void AttriuteIndex::printInfo(FILE *fp){
     fprintf(fp, "%d\t", iForc);
     fprintf(fp, "%d\t", iMF);
     fprintf(fp, "%d\t", iBC);
+    fprintf(fp, "%d\t", iSS);
 }
 
 void _Element::applyGeometry(_Node *Node){
@@ -152,13 +153,18 @@ void _Element::applyNabor(_Node *Node, _Element *Ele){
 }
 void _Element::Flux_InfiRech(double Ysurf, double Yunsat, double Ygw, double netprcp){
     double ke=0.;
+    double grad;
     if(Ygw > AquiferDepth){
-        u_qi = (AquiferDepth - Ygw) / 1. * u_effkInfi;
-        u_qr = u_qi;
+        /* GW reach the surface */
+        u_qex = (Ygw - AquiferDepth) / 1. * Kmax;
+        u_qi = 0. ;
     }else{
+        u_qex = 0.;
+        Ysurf = max(Ysurf, 0.);
+        /* NORMAL GW level */
         u_qi = (Ysurf + infD - u_phius) / infD * u_effkInfi;
         if(u_qi > 0.){
-            if(Ysurf > EPSILON){
+            if(Ysurf > 0.){
                 u_qi = min(Ysurf, u_qi);
             }else{
                 u_qi = 0.;
@@ -166,29 +172,41 @@ void _Element::Flux_InfiRech(double Ysurf, double Yunsat, double Ygw, double net
         }else{
 //            u_qi = u_qi;
         }
-        ke = meanHarmonic(infKsatV, KsatV, 1, 1);
-        u_qr = (1. + u_phius * 2. / AquiferDepth) * ke;
-        if(u_qr > 0.){
-            u_qr = min(Yunsat, u_qr);
-        }else{
-            u_qr = 0.;
-        }
+    }
+    /* Recharge */
+    grad = (1. + u_phius * 2. / AquiferDepth);
+    ke = meanHarmonic(infKsatV * u_satKr, KsatV, u_deficit, Ygw);
+    if(grad >= 0){
+        u_qr = grad * ke;
+//        if(u_deficit > 0.){
+//            u_qr *= Yunsat / u_deficit;
+//        }
+        u_qr = min(Yunsat, u_qr);
+    }else{
+//        ke = KsatV;
+        u_qr = grad * ke;
+        u_qr = max(-1.*Ygw, u_qr);
     }
 }
 void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
     u_effKH = effKH(Ygw,  AquiferDepth,  macD,  macKsatH,  geo_vAreaF,  KsatH);
     u_deficit = AquiferDepth - Ygw;
+    Kmax = infKsatV * (1. - hAreaF) + macKsatV * hAreaF ;
+    u_qex = 0.;
+    u_qi = 0.;
+    u_qr = 0.;
     if(u_deficit <= 0. ){
         u_deficit = 0.;
         u_satn = 1.;
     }else{
-        u_satn = Yunsat / u_deficit;
+        u_satn = (Yunsat / u_deficit * ThetaS - ThetaR) / (ThetaS - ThetaR) ;
     }
-    if(u_satn > 0.9999 ){
+    if(u_satn > 0.99 ){
         u_satn = 1.0;
         u_satKr = 1.0;
         u_phius = 0.;
     }else if(u_satn <= EPS_DOUBLE){
+        u_satn = 0.;
         u_satKr = 0.;
         u_phius = MINPSI;
     }else{
@@ -196,9 +214,15 @@ void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
         u_phius = sat2psi(u_satn, Alpha, Beta);
         u_phius = max(MINPSI, u_phius);
     }
-//    u_ThetaFC = FieldCapacity(Alpha, Beta, u_deficit);
-    u_Theta = u_satn * ThetaS;
-    u_effkInfi = infKsatV * (1 - hAreaF) + hAreaF * u_satn * macKsatV;
+    u_effkInfi = u_satKr * infKsatV * (1 - hAreaF) + u_satn * macKsatV * hAreaF ;
+#ifdef _DEBUG
+    if (u_effkInfi < 0.){
+        printf("WARNING: Negative effective conductivity for infiltration.\n");
+    }
+    if (u_effKH < 0.000000001){
+        printf("WARNING: Negative effective conductivity for infiltration.\n");
+    }
+#endif
 }
 
 void _Element::copyGeol(Geol_Layer *g){
@@ -236,35 +260,35 @@ void _Element::copyLandc(Landcover *g){
     SoilDgrd = g[iLC - 1].SoilDgrd;
     ImpAF    = g[iLC - 1].ImpAF;
 }
-void _Element::updateWF(double qi, double dt){
-    double dh = 0.;
-    double grad;
-    double effk;
-    if( qi > 0. ){
-        /* Infiltration occur
-         wf increases, bottom loss
-         */
-        dh += qi;
-        if( u_wf > 0.){
-            /* available water in wf */
-            effk = u_satKr * infKsatV;
-            if(u_deficit - u_wf <= 0){
-                grad = 0;
-            }else{
-                grad = (u_deficit * 0.5 - u_phius) / ( 0.5 * (u_deficit - u_wf) );
-            }
-            dh += -effk * grad;
-        }
-        u_wf +=  dh * dt;
-        if(u_wf > 0.01){
-            dh = dh;
-        }
-    }else{
-        /* No infiltration: sat layer moves forward */
-        u_wf = infD;
-    }
-    CheckNA(u_wf, "Weting Front");
-}
+//void _Element::updateWF(double qi, double dt){
+//    double dh = 0.;
+//    double grad;
+//    double effk;
+//    if( qi > 0. ){
+//        /* Infiltration occur
+//         wf increases, bottom loss
+//         */
+//        dh += qi;
+//        if( u_wf > 0.){
+//            /* available water in wf */
+//            effk = u_satKr * infKsatV;
+//            if(u_deficit - u_wf <= 0){
+//                grad = 0;
+//            }else{
+//                grad = (u_deficit * 0.5 - u_phius) / ( 0.5 * (u_deficit - u_wf) );
+//            }
+//            dh += -effk * grad;
+//        }
+//        u_wf +=  dh * dt;
+//        if(u_wf > 0.01){
+//            dh = dh;
+//        }
+//    }else{
+//        /* No infiltration: sat layer moves forward */
+//        u_wf = infD;
+//    }
+//    CheckNA(u_wf, "Weting Front");
+//}
 void _Element::printHeader(FILE *fp){
     fprintf(fp, "%s\t", "index");
     AttriuteIndex::printHeader(fp);

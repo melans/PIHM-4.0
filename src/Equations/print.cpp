@@ -19,53 +19,6 @@
  *******************************************************************************/
 
 #include "print.hpp"
-void Model_Data::summary (N_Vector udata){
-    double  *Y;
-#ifdef _PIHMOMP
-    Y = NV_DATA_OMP(udata);
-#else
-    Y = NV_DATA_S(udata);
-#endif
-    for (int i = 0; i < NumEle; i++){
-        yEleSurf[i] = Y[iSF];
-        yEleUnsat[i] = Y[iUS];
-        yEleGW[i] = Y[iGW];
-        uYsf[i] = Y[iSF];
-        uYus[i] = Y[iUS];
-        uYgw[i] = Y[iGW];
-    }
-    for (int i = 0; i < NumRiv; i++){
-        yRivStg[i] = Y[iRIV];
-        uYriv[i] = Y[iRIV];
-    }
-}
-void Model_Data::summary (N_Vector udata1, N_Vector udata2){
-    double  *Y1, *Y2;
-#ifdef _PIHMOMP
-    Y1 = NV_DATA_OMP(udata1);
-    Y2 = NV_DATA_OMP(udata2);
-#else
-    Y1 = NV_DATA_S(udata1);
-    Y2 = NV_DATA_S(udata2);
-#endif
-    for (int i = 0; i < NumEle; i++){
-        yEleSurf[i] = Y1[iSF];
-        yEleUnsat[i] = Y1[iUS];
-        yEleGW[i] = Y1[iGW];
-        
-        uYsf[i] = Y1[iSF];
-        uYus[i] = Y1[iUS];
-        uYgw[i] = Y1[iGW];
-    }
-    for (int i = 0; i < NumRiv; i++){
-        yRivStg[i] = Y2[i];
-        if(Y2[i] < 0){
-            printf("Yriv[%d]=%f\n", i+1, Y2[i]);
-        }
-        uYriv[i] = Y2[i];
-    }
-}
-
 void PIHMlogo(void){
     printf ("\n");
     printf ("\t########  ####  ##     ##  ##     ##             #    \n");

@@ -33,12 +33,11 @@ void Model_Data::read_riv(const char *fn){
     NumRiv = tb.read(fp);
     Riv = new _River[NumRiv];
     
-    if(tb.ncol != 5){
+    if(tb.ncol != 6){
         printf("The column of RiverAtt should be: \n");
-        printf("%s\t%s\t%s\t%s\t%s\n", "index", "Down", "type", "Bedslope", "Length");
+        printf("%s\t%s\t%s\t%s\t%s\t%s\n", "index", "Down", "type", "Bedslope", "Length", "BC");
         printf("Actual column is:\n%s", tb.header);
         myexit(ERRFileIO);
-        
     }
     for (int i = 0; i < NumRiv; i++){
         Riv[i].index    = (int) tb.x[i][0];
@@ -46,8 +45,17 @@ void Model_Data::read_riv(const char *fn){
         Riv[i].type     = (int) tb.x[i][2];
         Riv[i].BedSlope = (double) tb.x[i][3];
         Riv[i].Length   = (double) tb.x[i][4];
+        Riv[i].BC   = (double) tb.x[i][5];
         if(Riv[i].down < 1){
             printf("\tThe downstream of RIV %d is negtive (Outlet )\n", i + 1 );
+        }
+        if(Riv[i].BC > 0){
+            printf("BC[%d] (Neumann Condition) applied to River %d\n", Riv[i].BC, i+1);
+            irBC1 = 1;
+        }
+        if(Riv[i].BC < 0){
+            printf("BC[%d] (Dirichlet Condition) applied to River %d\n", -Riv[i].BC, i+1);
+            irBC2 = 1;
         }
 //        printf("debug%d\t%d\t%d\t%d\t%f\t%f\n", i, Riv[i].index, Riv[i].down, Riv[i].type, Riv[i].BedSlope, Riv[i].Length );
     }
@@ -85,7 +93,9 @@ void Model_Data::read_mesh(const char *fn){
     NumEle = tb.read(fp, &ncol);
     if(tb.ncol != 8){
         printf("The column of Mesh in .mesh should be: \n");
-        printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "index", "Node1", "Node2", "Node3", "nabr1", "nabr2", "nabr3");
+        printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+               "index", "Node1", "Node2", "Node3",
+               "nabr1", "nabr2", "nabr3");
         printf("Actual column is:\n%s", tb.header);
         myexit(ERRFileIO);
     }
@@ -98,9 +108,6 @@ void Model_Data::read_mesh(const char *fn){
         Ele[i].nabr[0] = (int) tb.x[i][4];
         Ele[i].nabr[1] = (int) tb.x[i][5];
         Ele[i].nabr[2] = (int) tb.x[i][6];
-        if(ncol >= 8){
-            Ele[i].zcentroid = tb.x[i][7];
-        }
     }
     /* read in nodes information */
     NumNode = tb.read(fp);
@@ -129,9 +136,9 @@ void Model_Data::read_att(const char *fn){
         fprintf(stderr, "\nWARNING: number of rows (%d) in att DOSE NOT match the number of cell in .mesh file (%d).\n Press anykey to continue ...\n", nr, NumEle);
         getchar();
     }
-    if(tb.ncol != 7){
+    if(tb.ncol != 8){
         printf("The column of .mesh should be: \n");
-        printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "index", "iSoil", "iGeol", "iLC", "iForc", "iMF", "iBC");
+        printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", "index", "iSoil", "iGeol", "iLC", "iForc", "iMF", "iBC", "iSS");
         printf("Actual column is:\n%s", tb.header);
         myexit(ERRFileIO);
     }
@@ -143,7 +150,17 @@ void Model_Data::read_att(const char *fn){
         Ele[i].iForc    = (int) tb.x[i][4];
         Ele[i].iMF      = (int) tb.x[i][5];
         Ele[i].iBC      = (int) tb.x[i][6];
+        Ele[i].iSS      = (int) tb.x[i][7];
 //        printf("debug%d\t%d\t%d\t%d\t%d\t%d\t%d\n",i+1, Ele[i].iSoil, Ele[i].iGeol, Ele[i].iLC, Ele[i].iForc, Ele[i].iMF, Ele[i].iBC );
+        if(Ele[i].iBC > 0){
+            ieBC1 = 1;
+        }
+        if(Ele[i].iBC < 0){
+            ieBC2 = 1;
+        }
+        if(Ele[i].iSS != 0){
+            ieSS = 1;
+        }
     }
 }
 
@@ -231,8 +248,8 @@ void Model_Data::read_lc(const char *fn){
     for (int i=0; i<NumLC ; i++){
         LandC[i].index  = (int) tb.x[i][0];
         LandC[i].LAImax = (double) tb.x[i][1];
-        LandC[i].Rmin   = (double) tb.x[i][2] * 1440.; // [min / m]
-        LandC[i].Rs_ref = (double) tb.x[i][3] * 1440.; // [min / m]
+        LandC[i].Rmin   = (double) tb.x[i][2] / 1440.; // [min / m]
+        LandC[i].Rs_ref = (double) tb.x[i][3] / 1440.; // [min / m]
         LandC[i].Albedo = (double) tb.x[i][4];
         LandC[i].VegFrac = (double) tb.x[i][5];
         LandC[i].Rough  = (double) tb.x[i][6] * 1440.;
@@ -299,8 +316,8 @@ void Model_Data::loadinput(FileIn *fin){
     read_para(fin->file_para);
     if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_riv);
     read_riv(fin->file_riv);
-    if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_rivchn);
-    read_rivchn(fin->file_rivchn);
+    if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_rivseg);
+    read_rivchn(fin->file_rivseg);
     if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_mesh);
     read_mesh(fin->file_mesh);
     if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_att);
@@ -325,6 +342,30 @@ void Model_Data::loadinput(FileIn *fin){
     //    read_forc_binary(fin->file_forc);
     if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_calib);
     read_calib(fin->file_calib);
+    if(ieBC1){
+        if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_ebc1);
+        read_bcEle1(fin->file_ebc1);
+    }
+    if(ieBC2){
+        if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_ebc2);
+        read_bcEle2(fin->file_ebc2);
+    }
+    if(irBC1){
+        if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_rbc1);
+        read_bcRiv1(fin->file_rbc1);
+    }
+    if(irBC2){
+        if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_rbc2);
+        read_bcRiv2(fin->file_rbc2);
+    }
+    if(ilBC1){
+        if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_rbc2);
+        read_bcLake1(fin->file_lbc1);
+    }
+    if(ilBC2){
+        if(flag) fprintf(stdout,"%d \t Reading file: %s\n", nt++,fin->file_rbc2);
+        read_bcLake2(fin->file_lbc2);
+    }
     
     this->CS.num_threads = max(CS.num_threads,  fin->numthreads); /* Number of threads for OpenMP */
 }
@@ -345,15 +386,47 @@ void Model_Data::read_mf(const char *fn){
     NumMeltF = tsd_MF.get_Ncol();
     tsd_MF.read_csv();
 }
-void Model_Data::read_bcEle(const char *fn){
-    tsd_BCEle.fn = fn;
-    tsd_BCEle.readDimensions();
-    tsd_BCEle.read_csv();
+void Model_Data::read_ssEle(const char *fn){
+    tsd_eleSS.fn = fn;
+    tsd_eleSS.readDimensions();
+    NumSSEle = tsd_eleSS.get_Ncol();
+    tsd_eleSS.read_csv();
 }
-void Model_Data::read_bcRiv(const char *fn){
-    tsd_BCRiv.fn = fn;
-    tsd_BCRiv.readDimensions();
-    tsd_BCRiv.read_csv();
+void Model_Data::read_bcEle1(const char *fn){
+    tsd_eyBC.fn = fn;
+    tsd_eyBC.readDimensions();
+    NumBCEle1 = tsd_eyBC.get_Ncol();
+    tsd_eyBC.read_csv();
+}
+void Model_Data::read_bcEle2(const char *fn){
+    tsd_eqBC.fn = fn;
+    tsd_eqBC.readDimensions();
+    NumBCEle2 = tsd_eqBC.get_Ncol();
+    tsd_eqBC.read_csv();
+}
+void Model_Data::read_bcRiv1(const char *fn){
+    tsd_ryBC.fn = fn;
+    tsd_ryBC.readDimensions();
+    NumBCRiv1 = tsd_ryBC.get_Ncol();
+    tsd_ryBC.read_csv();
+}
+void Model_Data::read_bcRiv2(const char *fn){
+    tsd_rqBC.fn = fn;
+    tsd_rqBC.readDimensions();
+    NumBCRiv2 = tsd_rqBC.get_Ncol();
+    tsd_rqBC.read_csv();
+}
+void Model_Data::read_bcLake1(const char *fn){
+    tsd_lyBC.fn = fn;
+    tsd_lyBC.readDimensions();
+    NumBCLake1 = tsd_lqBC.get_Ncol();
+    tsd_lyBC.read_csv();
+}
+void Model_Data::read_bcLake2(const char *fn){
+    tsd_lqBC.fn = fn;
+    tsd_lqBC.readDimensions();
+    NumBCLake2 = tsd_lqBC.get_Ncol();
+    tsd_lqBC.read_csv();
 }
 void Model_Data::FreeData(){
     
@@ -378,9 +451,12 @@ void Model_Data::FreeData(){
     delete[]    qEleETP;
     delete[]    qEleETA;
     delete[]    qEleETloss; //10
+    delete[]    iBeta; // 10.1
+    delete[]    iPC;
     
     delete[]    qEleNetPrep;
     delete[]    qEleInfil;
+    delete[]    qEleExfil;
     delete[]    qEleRecharge; //13
     
     delete[]    yEleIS;

@@ -97,6 +97,7 @@ public:
     char ele_Q_surfTot[MAXLEN];
     char ele_Q_subTot[MAXLEN];
     char ele_q_infil[MAXLEN];
+    char ele_q_exfil[MAXLEN];
     char ele_q_rech[MAXLEN];
     
     //cell_wb

@@ -308,8 +308,6 @@ void Model_Data:: initialize_output (FileOut *fout){
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_y_surf, CS.dt_ye_surf, yEleSurf, 0);
     if (CS.dt_ye_unsat > 0)
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_y_unsat, CS.dt_ye_unsat, yEleUnsat, 0);
-    if (CS.dt_ye_unsat > 0)
-        CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_y_wetfrount, CS.dt_ye_unsat, yEleWetFront, 0);
     
     if (CS.dt_ye_gw > 0)
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_y_gw, CS.dt_ye_gw, yEleGW, 0);
@@ -328,8 +326,10 @@ void Model_Data:: initialize_output (FileOut *fout){
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_Q_subTot, CS.dt_Qe_sub, QeleSubTot, 1);
     if (CS.dt_Qe_surf > 0)
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_Q_surfTot, CS.dt_Qe_surf, QeleSurfTot, 1);
-    if (CS.dt_qe_infil > 0)
+    if (CS.dt_qe_infil > 0){
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_q_infil, CS.dt_qe_infil, qEleInfil, 1);
+        CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_q_exfil, CS.dt_qe_infil, qEleExfil, 1);
+    }
     
     /* ET  2d array */
     for (int i = 0; i < 3; i++){

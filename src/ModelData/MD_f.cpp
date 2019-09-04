@@ -70,9 +70,10 @@ void Model_Data::f_applyDY(double *DY, double t){
             QeleSurfTot[i] += QeleSurf[i][j];
             QeleSubTot[i] += QeleSub[i][j];
         }
-        DY[i] = qEleNetPrep[i] - qEleInfil[i] - QeleSurfTot[i] / area;
+        DY[i] = qEleNetPrep[i] - qEleInfil[i] + qEleExfil[i] - QeleSurfTot[i] / area;
         DY[iUS] = qEleInfil[i] - qEleRecharge[i];
-        DY[iGW] = qEleRecharge[i] - QeleSubTot[i] / area;
+        DY[iGW] = qEleRecharge[i] - qEleExfil[i] - QeleSubTot[i] / area;
+        
         if(uYsf[i] < EPSILON){ /* NO ponding water*/
             if (uYgw[i] < Ele[i].WetlandLevel){
                 /*Evaporate from unsat soil*/
@@ -90,6 +91,21 @@ void Model_Data::f_applyDY(double *DY, double t){
         } else {
             DY[iUS] += - qEleET[i][1];
         }
+        
+        /* Boundary condition and Source/Sink */
+        if(Ele[i].iBC > 0){ // Fix head of GW.
+            DY[iGW] = 0;
+        }else if(Ele[i].iBC < 0){ // Fix flux in GW
+            DY[iGW] += Ele[i].QBC / area;
+        }else{ /* Void */}
+        
+        if(Ele[i].iSS > 0){ // SS in Landusrface
+            DY[iSF] += Ele[i].QSS / area;
+        }else if(Ele[i].iSS < 0){ // SS in GW
+            DY[iGW] += Ele[i].QSS / area;
+        }else{}
+        
+        /* Convert with specific yield */
         DY[iUS] /= Ele[i].Sy;
         DY[iGW] /= Ele[i].Sy;
 //                DY[iSF] =0.0;  // debug only.
@@ -102,7 +118,12 @@ void Model_Data::f_applyDY(double *DY, double t){
 #endif
     }
     for (int i = 0; i < NumRiv; i++) {
-        DY[iRIV] = (- QrivUp[i] - QrivSurf[i] - QrivSub[i] - QrivDown[i]) / Riv[i].u_TopArea;
+        if(Riv[i].BC > 0){
+//            Newmann condition.
+            DY[iRIV] = 0.;
+        }else{
+            DY[iRIV] = (- QrivUp[i] - QrivSurf[i] - QrivSub[i] - QrivDown[i] + Riv[i].qBC) / Riv[i].u_TopArea;
+        }
 //        DY[iRIV] = 0.0;
 #ifdef _DEBUG
         CheckNANi(DY[i + 3 * NumEle], i, "DY[i] of river (Model_Data::f_applyDY)");
@@ -148,4 +169,18 @@ void Model_Data::PassValue(){
             QrivUp[iDownStrm] += - QrivDown[i];
         }
     }
+}
+
+void Model_Data::applyBCSS(double *DY, int i){
+    if(Ele[i].iBC > 0){ // Fix head of GW.
+        DY[iGW] = 0;
+    }else if(Ele[i].iBC < 0){ // Fix flux in GW
+        DY[iGW] += Ele[i].QBC / Ele[i].area;
+    }else{}
+    
+    if(Ele[i].iSS > 0){ // SS in Landusrface
+        DY[iSF] += Ele[i].QSS / Ele[i].area;
+    }else if(Ele[i].iSS < 0){ // SS in GW
+        DY[iGW] += Ele[i].QSS / Ele[i].area;
+    }else{}
 }

@@ -23,7 +23,7 @@ double flux_R2E_GW(double yr, double zr,
     he = ye + ze; //head of Ele GW
     hr = yr + zr; //head of river
     dh = hr - he;
-    if( dh > 0){
+    if( dh > EPS_DOUBLE){
         /* River to Element*/
         if( he > zr ){ // Element gw higher than river bed
             A = dh * L;
@@ -36,11 +36,13 @@ double flux_R2E_GW(double yr, double zr,
             g = dh / D_riv;
             Q = A * K * g;
         }
-    }else{
+    }else if (dh < -EPS_DOUBLE){
         /* Element to River */
         A = -1. * dh * L;
         g = dh / D_riv;
         Q = A * K * g;
+    }else{
+        Q = 0.;
     }
     return Q;
 }

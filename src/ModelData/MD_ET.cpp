@@ -27,24 +27,42 @@ void Model_Data::tReadForcing(double t, int i){
     t_wind[i] = (fabs(tsd_weather[Ele[i].iForc - 1].getX(t, i_wind) ) + 1); // +1 voids ZERO.
     t_rh[i] = tsd_weather[Ele[i].iForc - 1].getX(t, i_rh);
     t_rl[i] = tsd_RL.getX(t, Ele[i].iLC);
+    t_rl[i] = max(t_rl[i], 0.001); //0.001 is the minimum value for RL. [m]
     
-    t_rh[i] = min(max(t_rh[i], 0.01), 1.0);
+    t_rh[i] = min(max(t_rh[i], 0.01), 1.0); // [-]
     
-    t_prcp[i]   = t_prcp[i] / 1440.; // debug
+    t_prcp[i]   = t_prcp[i] / 1440.; // [m min-1]
     t_rn[i]     = t_rn[i] * 1.0e-6 / 1440.;  // J/m2/day to [MJ m-2 min-1]
-    t_wind[i]   = t_wind[i] / 1440. ; // Unit = m/s ; m/d to m/min
+    t_wind[i]   = t_wind[i] / 1440. ; // m/d =>> m/min  [m min-1]
     
     qElePrep[i] = t_prcp[i];
     
-    //    qEleETP[i] = Penman_Monteith(t_temp[i], t_rh[i], t_wind[i], Ele[i].FixPressure, t_rn[i], t_rl[i], Ele[i].windH);
-    qEleETP[i] = Penman_Monteith(t_temp[i], t_rh[i], t_wind[i],
-                                 Ele[i].FixPressure, t_rn[i], t_rl[i],
-                                 Ele[i].windH, Ele[i].FixGamma,
-                                 Ele[i].Rmin, t_lai[i]);
-    //    if(i==1){
-    //            printf("%.1f@%5d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", t, i+1, t_prcp[i], t_temp[i], t_rh[i], t_rn[i] , t_wind[i], t_lai[i] , t_rl[i], t_mf[i], qElePrep[i], qEleETP[i]);
-    //        printf("etp=%E\n", qEleETP[i]);
-    //    }
+    double es = VaporPressure_Sat(t_temp[i]);              // eq 4.2.2 [kpa]
+    double ea = es * t_rh[i];   // [kpa]
+    double ed = es - ea ;  // [kpa]
+    double Delta = SlopeSatVaporPressure(t_temp[i], es);        // eq 4.2.3 [kPa C-1]
+    double r_a   = AerodynamicResistance(t_wind[i], t_rl[i], Ele[i].windH, 2.);   // eq 4.2.25  [min m-1]
+    double r_s = 0.;    // (bulk) surface resistances. [min m-1]
+    if(t_lai[i] > 0.){
+        r_s = BulkSurfaceResistance(Ele[i].Rs_ref, t_lai[i]);
+    }
+    qEleETP[i] = gc.cETP * Penman_Monteith(Ele[i].FixPressure, t_temp[i], t_rn[i], 0.,
+                                 ed, Delta, r_a, r_s,
+                                 Ele[i].FixGamma);
+    iBeta[i] = SoilMoistureStress(Soil[(Ele[i].iSoil - 1)].ThetaS,
+                                  Soil[(Ele[i].iSoil - 1)].ThetaR,
+                                  Ele[i].u_satn);
+    if(t_lai[i] > 0.){
+        if(uYgw[i] > Ele[i].RootReachLevel){
+            iPC[i] = 1.;
+        }else{
+            iPC[i] = PlantCoeff(Ele[i].Rs_ref, Ele[i].Rmin, t_lai[i], t_temp[i],
+                                r_a, t_rn[i], es, ea,
+                                iBeta[i], Ele[i].FixGamma, Delta);
+        }
+    }else{
+        iPC[i] = 0.;
+    }
 }
 
 void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
@@ -115,8 +133,13 @@ void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
          */
         yEleISmax[i] = gc.cISmax * 0.0002 * LAI * Ele[i].VegFrac;
         /* Note the dependence on physical units */
-        yEleIS[i] = min(yEleIS[i], yEleISmax[i]);
-        r_ISMax = yEleIS[i] / yEleISmax[i];
+        if(yEleISmax[i] > 0.){
+            yEleIS[i] = min(yEleIS[i], yEleISmax[i]);
+            r_ISMax = yEleIS[i] / yEleISmax[i];
+        }else{
+            yEleISmax[i] = 0.;
+            r_ISMax = 0.;
+        }
         if (LAI > 0.0 && Ele[i].VegFrac > 0.0) {
             if(yEleIS[i] < 0){
                 qEleET[i][0] = 0.;
@@ -134,6 +157,7 @@ void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
             qEleET[i][0] = 0.0;
             qEleTF[i] = 0.0;
         }
+        if(yEleISmax[i] >0.){
         if (yEleIS[i] >= yEleISmax[i]) {
             if (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) >= qEleET[i][0] + qEleTF[i]) {
                 qEleETloss[i] = qEleET[i][0];
@@ -171,6 +195,10 @@ void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
             qEleETloss[i] = qEleET[i][0];
             ret = qEleTF[i];
         }
+        }else{
+            ret = 0.;
+            isval = 0.;
+        }
         qEleNetPrep[i] = (1 - Ele[i].VegFrac) * (1 - fracSnow) * qElePrep[i] + ret + MeltRateGrnd;
         qEleTF[i] = ret;
         yEleIS[i] = isval;
@@ -189,20 +217,15 @@ void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
 }
 
 void Model_Data::f_etFlux(int i, double t){
-    double  elemSatn, beta_s, LAI, ETp ;
-    double  Et, Ev;
+    double  elemSatn, LAI, ETp, Et = 0., Ev = 0.;
     ETp = qEleETP[i];
     LAI = t_lai[i];
     elemSatn = Ele[i].u_satn;
-    beta_s = SoilMoistureStress(Soil[(Ele[i].iSoil - 1)].ThetaS, Soil[(Ele[i].iSoil - 1)].ThetaR, elemSatn);
-    Ev = gc.cEt2 * (1 - Ele[i].VegFrac) * (1 - Ele[i].Landcover::ImpAF) * ETp * beta_s;
+    Ev = gc.cEt2 * (1 - Ele[i].VegFrac) * (1 - Ele[i].Landcover::ImpAF) * ETp * iBeta[i];
     Ev = max(0.0,  Ev);
     
     if(LAI > 0.){
-        if(uYgw[i] > Ele[i].RootReachLevel){
-            beta_s = 1.;
-        }
-        Et = gc.cEt2 * Ele[i].VegFrac * (1 - Ele[i].Landcover::ImpAF) * ETp * beta_s;
+        Et = gc.cEt1 * Ele[i].VegFrac * (1 - Ele[i].Landcover::ImpAF) * ETp * iPC[i];
     }else{
         Et = 0.;
     }

@@ -95,7 +95,7 @@ public:
     int Verbose = 0;
     int Ascii = 0;      /* Whether export result as ASCII File [bool]*/
     int Binary = 1;     /* Whether export result as Binary File [bool]*/
-    
+    int Spinup = 0;     /* Number of days for spinup */
     //    int Solver;    /* Solver type */
     unsigned long NumSteps;    /* Number of external time steps
                       * (when results can be printed) for

@@ -80,6 +80,8 @@ public:
     int NumEleBank;
     int NumRivIn;
     int NumRivOut;
+    int BC = 0; 
+    int SS = 0;
     int *iEleBank;
     int *iRivIn;
     int *iRivOut;
