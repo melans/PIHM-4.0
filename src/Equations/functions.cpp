@@ -113,7 +113,7 @@ double getSecond(void)
     return sec;
 }
 
-int ScreenPrint(double t, int dt, unsigned long it, unsigned long nt, unsigned long nfcall){
+int ScreenPrint(double t, int dt, unsigned long it, unsigned long nt, unsigned long nfcall, double intv){
     int flag = 0;
     static unsigned long ncall=0;
 #ifdef _DEBUG
@@ -123,7 +123,7 @@ int ScreenPrint(double t, int dt, unsigned long it, unsigned long nt, unsigned l
     static double tnext = t;
     if (t >= tnext) {
         printf("%.2f day \t %.2f%% \t %.2f sec \t %ld\n", t / 1440, 100.0 * it / nt, getSecond(), nfcall - ncall);
-        tnext += 1440.;
+        tnext += intv;
         ncall = nfcall;
         flag = 1;
     }

@@ -96,6 +96,7 @@ public:
     int Ascii = 0;      /* Whether export result as ASCII File [bool]*/
     int Binary = 1;     /* Whether export result as Binary File [bool]*/
     int Spinup = 0;     /* Number of days for spinup */
+    int screenIntv = 1440;
     //    int Solver;    /* Solver type */
     unsigned long NumSteps;    /* Number of external time steps
                       * (when results can be printed) for
@@ -105,8 +106,8 @@ public:
     
     double abstol = 1.0e-4;    /* absolute tolerance [-]*/
     double reltol = 1.0e-3;    /* relative tolerance [-]*/
-    double InitStep = 1.e-3;    /* initial step size [min]*/
-    double MaxStep = 60;       /* Maximum step size [min] */
+    double InitStep = 1.e-2;    /* initial step size [min]*/
+    double MaxStep = 30;       /* Maximum step size [min] */
     double ETStep = 60;         /* Step for et from interception [min]*/
     double StartTime = 0.;      /* Start time of simulation [min]*/
     double EndTime = 14400;     /* End time of simulation [min]*/

@@ -106,7 +106,7 @@ double PIHM(FileIn *fin, FileOut *fout){
 //        f(t, udata, du, MD);
         MD->CS.ExportResults(tnext);
 //        flag = ScreenPrint(t, MD->CS.ETStep, i, MD->CS.NumSteps);
-        flag = ScreenPrint(t, MD->CS.ETStep, i, MD->CS.NumSteps, MD->nFCall);
+        flag = ScreenPrint(t, MD->CS.ETStep, i, MD->CS.NumSteps, MD->nFCall, MD->CS.screenIntv);
         if (flag) {
             if (atInterval(t, 1440)) {
                 MD->PrintInit(fout->Init_update);

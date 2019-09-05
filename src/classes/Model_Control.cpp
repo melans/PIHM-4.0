@@ -138,17 +138,19 @@ void Control_Data::read(const char *fn){
         sscanf (str, "%s %lf", optstr, &val);
         /* Get Model Parameters */
         if (strcasecmp ("ASCII_OUTPUT", optstr) == 0)
-            Ascii=  val;
+            Ascii=  (int) val;
         else if (strcasecmp ("BINARY_OUTPUT", optstr) == 0)
-            Binary =  val;
+            Binary = (int)  val;
         else if (strcasecmp ("SpinupDay", optstr) == 0)
-            Spinup =  val;
+            Spinup =  (int) val;
+        else if (strcasecmp ("SCR_INTV", optstr) == 0)
+            screenIntv = (int)  val;
         else if (strcasecmp ("VERBOSE", optstr) == 0)
-            Verbose =  val;
+            Verbose = (int)  val;
         else if (strcasecmp ("INIT_MODE", optstr) == 0)
-            init_type =  val;
+            init_type = (int)  val;
         else if (strcasecmp ("NUM_OPENMP", optstr) == 0)
-            num_threads =  val;
+            num_threads = (int)  val;
         else if (strcasecmp ("ABSTOL", optstr) == 0)
             abstol =  val;
         else if (strcasecmp ("RELTOL", optstr) == 0)
@@ -157,7 +159,7 @@ void Control_Data::read(const char *fn){
             InitStep =  val;
         else if (strcasecmp ("MAX_SOLVER_STEP", optstr) == 0)
             MaxStep =  val;
-        else if (strcasecmp ("LSM_STEP", optstr) == 0)
+        else if (strcasecmp ("ET_STEP", optstr) == 0)
             ETStep =  val;
         else if (strcasecmp ("START", optstr) == 0)
             DayStart =  val;/* Convert days to Minutes */

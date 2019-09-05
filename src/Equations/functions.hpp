@@ -12,7 +12,7 @@
 double timeInterp(double t, double t0, double t1, double x0, double x1);
 
 /*==========Screen print function===============*/
-int    ScreenPrint(double t, int dt, unsigned long it, unsigned long nt, unsigned long nfcall);
+int    ScreenPrint(double t, int dt, unsigned long it, unsigned long nt, unsigned long nfcall, double intv);
 //int ScreenPrint(double t, int dt, unsigned long it, unsigned long nt, unsigned long  nf1, unsigned long  nf2);
 double getSecond(void);
 
