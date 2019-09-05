@@ -93,7 +93,6 @@ double PIHM(FileIn *fin, FileOut *fout){
 //            MD->updateWF(dt);
 //            fSolver(MD, udata, t, tout);
             flag = CVode(mem, tout, udata, &t, CV_NORMAL);
-            t=tout;
             check_flag(&flag, "CVode", 1);
         }
         tnext += MD->CS.MaxStep;

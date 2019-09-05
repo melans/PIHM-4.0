@@ -31,6 +31,8 @@ void Model_Data::f_update(double  *Y, double *DY, double t){
         }
         Qe2r_Surf[i] = 0.;
         Qe2r_Sub[i] = 0.;
+        qEleExfil[i] = 0.;
+        qEleInfil[i] = 0.;
 /********* Below are remove because the bass-balance issue. **********/
 //        for (int j = 0; j < 3; j++) {
 //            if(Ele[i].nabr[j] > 0){

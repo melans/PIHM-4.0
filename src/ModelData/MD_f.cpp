@@ -69,6 +69,8 @@ void Model_Data::f_applyDY(double *DY, double t){
         for (int j = 0; j < 3; j++) {
             QeleSurfTot[i] += QeleSurf[i][j];
             QeleSubTot[i] += QeleSub[i][j];
+//            CheckNANi(QeleSubTot[i], 1, "QeleSubTot[i]");
+//            CheckNANi(QeleSurfTot[i], 1, "QeleSurfTot[i]");
         }
         DY[i] = qEleNetPrep[i] - qEleInfil[i] + qEleExfil[i] - QeleSurfTot[i] / area;
         DY[iUS] = qEleInfil[i] - qEleRecharge[i];
@@ -111,6 +113,7 @@ void Model_Data::f_applyDY(double *DY, double t){
 //                DY[iSF] =0.0;  // debug only.
 //                DY[iUS] =0.0;
 //                DY[iGW] =0.0;
+//        printf("%d:%e\t%e\t%e\t%e\t%e\t%e\t%e\n", i+1, qEleNetPrep[i], qEleInfil[i], qEleExfil[i], QeleSurfTot[i] / area);
 #ifdef _DEBUG
         CheckNANi(DY[i], i, "DY[i] (Model_Data::f_applyDY)");
         CheckNANi(DY[iUS], i, "DY[iUS] (Model_Data::f_applyDY)");
@@ -136,6 +139,8 @@ void Model_Data::f_Segement_update(int iEle, int iRiv, int i){
     QrivSub[iRiv] += QsegSub[i];
     Qe2r_Surf[iEle] += -QsegSurf[i]; // Positive from Element to River
     Qe2r_Sub[iEle] += -QsegSub[i];
+    CheckNANi(QrivSub[i], i, "xxx");
+    CheckNANi(QrivSurf[i], i, "xxx");
 }
 void Model_Data::PassValue(){
     int i, j, inabr, jnabr, ie, ir;
