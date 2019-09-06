@@ -42,7 +42,8 @@ double sqpow2(double x, double y){
 }
 inline
 double meanHarmonic(double k1, double k2, double d1, double d2){
-    return (d1 + d2) / ( d1 / k1 + d2 / k2);
+//    return (d1 + d2) / ( d1 / k1 + d2 / k2);
+    return (k1 * k2) * (d1 + d2) / ( d1 * k2 + d2 * k1);
 }
 inline
 double meanArithmetic(double k1, double k2, double d1, double d2){

@@ -22,14 +22,14 @@
 //void is_sm_et(double t, double stepsize, void *DS, N_Vector VY);
 
 
-double Penman_Monteith(double Press, double T, double Rn, double G,
+double Penman_Monteith(double Press, double T, double Rn, double rho,
                        double ed, double Delta, double r_a, double r_s,
-                       double Gamma);
+                       double Gamma, double Lambda);
 
-double Penman_Monteith(double RH,
-                       double T, double Vel, double Press,
-                       double Rn, double rl, double windH,
-                       double Gamma, double lai, double R_ref);
+//double Penman_Monteith(double RH,
+//                       double T, double Vel, double Press,
+//                       double Rn, double rl, double windH,
+//                       double Gamma, double lai, double R_ref);
 
 double PlantCoeff(double Rs_ref, double Rmin, double LAI, double T, double r_a,
                   double Rn, double es, double ea,
@@ -63,10 +63,18 @@ inline double Eact_Vegetation(double etp, double yis, double ymax){
 inline double ActualEvaporation(double etp, double ThetaS, double ThetaR, double SatRatio){
     return SoilMoistureStress(ThetaS, ThetaR, SatRatio) * etp;
 }
-
+inline double LatentHeat(double Temp){
+    /* Eq 4.2.1 in David R Maidment, Handbook of Hydrology */
+    /* Temp in [C], lambda in [MJ/kg]*/
+    return 2.501 - 0.002361 * Temp;
+}
 inline double BulkSurfaceResistance(double R_ref, double lai){
     // R_ref     bulk stomatal resistance of the well-illuminated leaf [min m-1],
     return R_ref * 2. / lai; /* Allen(1998) */
+}
+inline double BulkSurfaceResistance(double lai){
+    /* Eq 4.2.22 in David R Maidment, Handbook of Hydrology */
+    return 200. / lai / 60.; /* Allen(1998) */
 }
 inline double PressureElevation(double z){
     return 101.325 * pow((293. - 0.0065 * z) / 293, 5.26); /*Pressure based on Elevation*/
@@ -74,10 +82,11 @@ inline double PressureElevation(double z){
     //    z elevation above sea level [m],
     /* Allen(1998) Eq(7) */
 }
-inline double PsychrometricConstant(double Pressure){
-    return 0.665e-3 * Pressure;
+inline double PsychrometricConstant(double Pressure, double lambda){
+    /* Eq 4.2.1 in David R Maidment, Handbook of Hydrology */
+    /* Presser in [kPa], lambda in [MJ/kg]. */
+    return 0.0016286 * Pressure / lambda;
     //    γ psychrometric constant [kPa °C-1],
-    /* Allen(1998) Eq(8) */
 }
 inline double VaporPressure_Sat(double T_in_C){
     /* Eq 4.2.2 in David R Maidment, Handbook of Hydrology*/
@@ -123,7 +132,7 @@ inline double AirDensity (double P, double T){
         T in [C]
         rho  -- Density of Air. kg/m3
      */
-    return 3.486 * P / (275 + T);
+    return 3.486 * P / (275. + T);
 }
 inline double SlopeSatVaporPressure(double T, double ES){
     double tt = (T + 237.3);

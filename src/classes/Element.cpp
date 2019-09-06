@@ -104,7 +104,7 @@ void _Element::InitElement(){
     WetlandLevel = AquiferDepth - infD;
     RootReachLevel = AquiferDepth - RzD;
     FixPressure = PressureElevation(zmax); // P atmospheric pressure [kPa]
-    FixGamma = PsychrometricConstant(FixPressure);
+//    FixGamma = PsychrometricConstant(FixPressure);
     MacporeLevel = AquiferDepth - macD;
     
     if (AquiferDepth < macD)
@@ -161,8 +161,9 @@ void _Element::Flux_InfiRech(double Ysurf, double Yunsat, double Ygw, double net
     }else{
         u_qex = 0.;
         Ysurf = max(Ysurf, 0.);
+        u_effkInfi = infKsatV * (1 - hAreaF) + hAreaF * macKsatV * u_satn;
         /* NORMAL GW level */
-        u_qi = (Ysurf + infD - u_phius) / infD * u_effkInfi;
+        u_qi = (Ysurf + infD) / infD * u_effkInfi;
         if(u_qi > 0.){
             if(Ysurf > 0.){
                 u_qi = min(Ysurf, u_qi);
@@ -170,23 +171,25 @@ void _Element::Flux_InfiRech(double Ysurf, double Yunsat, double Ygw, double net
                 u_qi = 0.;
             }
         }else{
-//            u_qi = u_qi;
+            /* void */
         }
     }
     /* Recharge */
-    grad = (1. + u_phius * 2. / AquiferDepth);
-    ke = meanHarmonic(infKsatV * u_satKr, KsatV, u_deficit, Ygw);
-    if(grad >= 0){
+//    grad = (1. + u_phius * 2. / AquiferDepth);
+    grad = Yunsat / AquiferDepth;
+    if(grad >= 0.){
+//        ke = meanHarmonic(infKsatV * u_satKr, KsatV, u_deficit, Ygw);
+        ke = meanArithmetic(infKsatV * u_satKr, KsatV, u_deficit, Ygw);
         u_qr = grad * ke;
-//        if(u_deficit > 0.){
-//            u_qr *= Yunsat / u_deficit;
-//        }
+        if(u_deficit > 0.){
+            u_qr *= Yunsat / u_deficit;
+        }
         u_qr = min(Yunsat, u_qr);
     }else{
-//        ke = KsatV;
-        u_qr = grad * ke;
-        u_qr = max(-1.*Ygw, u_qr);
+        u_qr = 0.;
+//        u_qr = max(-1.*Ygw, u_qr);
     }
+    CheckNANi(u_qi, 0, "u_qi");
 }
 void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
     u_effKH = effKH(Ygw,  AquiferDepth,  macD,  macKsatH,  geo_vAreaF,  KsatH);
@@ -214,7 +217,8 @@ void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
         u_phius = sat2psi(u_satn, Alpha, Beta);
         u_phius = max(MINPSI, u_phius);
     }
-    u_effkInfi = u_satKr * infKsatV * (1 - hAreaF) + u_satn * macKsatV * hAreaF ;
+    u_effkInfi = infKsatV * (1 - hAreaF) + u_satn * macKsatV * hAreaF ;
+    u_effkInfi *=  1. - u_satn;
 #ifdef _DEBUG
     if (u_effkInfi < 0.){
         printf("WARNING: Negative effective conductivity for infiltration.\n");
@@ -250,7 +254,7 @@ void _Element::copySoil(Soil_Layer *g){
     CheckNonZero(infD, index-1, "infD");
 }
 void _Element::copyLandc(Landcover *g){
-    LAImax   = g[iLC - 1].LAImax;
+//    LAImax   = g[iLC - 1].LAImax;
     VegFrac  = g[iLC - 1].VegFrac;
     Albedo   = g[iLC - 1].Albedo;
     Rs_ref   = g[iLC - 1].Rs_ref;

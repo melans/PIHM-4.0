@@ -189,6 +189,10 @@ public:
     void f_applyDY(double * DY, double t);
     void f_update(double * Y, double * DY, double t);
     
+    void f_loop_omp(double * Y, double * DY, double t);
+    void f_applyDY_omp(double * DY, double t);
+    void f_update_omp(double * Y, double * DY, double t);
+    
 //    void updateWF(double dt);
     void CheckInputData();
     void InitFloodAlert(const char *fn);

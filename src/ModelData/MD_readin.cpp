@@ -247,7 +247,7 @@ void Model_Data::read_lc(const char *fn){
     LandC = new Landcover[NumLC];
     for (int i=0; i<NumLC ; i++){
         LandC[i].index  = (int) tb.x[i][0];
-        LandC[i].LAImax = (double) tb.x[i][1];
+//        LandC[i].LAImax = (double) tb.x[i][1];
         LandC[i].Rmin   = (double) tb.x[i][2] / 1440.; // [min / m]
         LandC[i].Rs_ref = (double) tb.x[i][3] / 1440.; // [min / m]
         LandC[i].Albedo = (double) tb.x[i][4];

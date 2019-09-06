@@ -8,6 +8,9 @@
 
 #include "Model_Data.hpp"
 void Model_Data::updateforcing(double t){
+#ifdef _PIHMOMP
+#pragma omp for parallel default(shared) private(i) num_threads(CS.num_threads)
+#endif
     for (int i = 0; i < NumForc; i++){
         tsd_weather[i].movePointer(t);
     }
@@ -37,18 +40,22 @@ void Model_Data::tReadForcing(double t, int i){
     
     qElePrep[i] = t_prcp[i];
     
-    double es = VaporPressure_Sat(t_temp[i]);              // eq 4.2.2 [kpa]
-    double ea = es * t_rh[i];   // [kpa]
-    double ed = es - ea ;  // [kpa]
+    double lambda = LatentHeat(t_temp[i]);                      // eq 4.2.1  [MJ/kg]
+    double es = VaporPressure_Sat(t_temp[i]);                   // eq 4.2.2 [kpa]
+    double ea = es * t_rh[i];   // [kPa]
+    double ed = es - ea ;  // [kPa]
     double Delta = SlopeSatVaporPressure(t_temp[i], es);        // eq 4.2.3 [kPa C-1]
-    double r_a   = AerodynamicResistance(t_wind[i], t_rl[i], Ele[i].windH, 2.);   // eq 4.2.25  [min m-1]
-    double r_s = 0.;    // (bulk) surface resistances. [min m-1]
+    double rho = AirDensity(Ele[i].FixPressure, t_temp[i]);;    // eq 4.2.4 [kg m-3]
+    double r_s = 0.;                                            // (bulk) surface resistances. [min m-1]
     if(t_lai[i] > 0.){
-        r_s = BulkSurfaceResistance(Ele[i].Rs_ref, t_lai[i]);
+        r_s = BulkSurfaceResistance(t_lai[i]);                  // eq 4.2.22 [min m-1]
     }
-    qEleETP[i] = gc.cETP * Penman_Monteith(Ele[i].FixPressure, t_temp[i], t_rn[i], 0.,
+    double r_a   = AerodynamicResistance(t_wind[i], t_rl[i],
+                                         Ele[i].windH, 2.);     // eq 4.2.25  [min m-1]
+    double Gamma = PsychrometricConstant(Ele[i].FixPressure, lambda); // eq 4.2.28  [kPa C-1]
+    qEleETP[i] = gc.cETP * Penman_Monteith(Ele[i].FixPressure, t_temp[i], t_rn[i] - 0., rho, 
                                  ed, Delta, r_a, r_s,
-                                 Ele[i].FixGamma);
+                                 Gamma, lambda);                // eq 4.2.27
     iBeta[i] = SoilMoistureStress(Soil[(Ele[i].iSoil - 1)].ThetaS,
                                   Soil[(Ele[i].iSoil - 1)].ThetaR,
                                   Ele[i].u_satn);
@@ -58,7 +65,8 @@ void Model_Data::tReadForcing(double t, int i){
         }else{
             iPC[i] = PlantCoeff(Ele[i].Rs_ref, Ele[i].Rmin, t_lai[i], t_temp[i],
                                 r_a, t_rn[i], es, ea,
-                                iBeta[i], Ele[i].FixGamma, Delta);
+                                iBeta[i], Gamma, Delta);
+            iPC[i] *= iBeta[i]; /* If soil is dry, no Et*/
         }
     }else{
         iPC[i] = 0.;
@@ -78,7 +86,9 @@ void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
     MF=NA_VALUE,
     ret=NA_VALUE;
     DT_min = dt ; /* dt [min] */
-    
+#ifdef _PIHMOMP
+#pragma omp for parallel default(shared) private(i) num_threads(CS.num_threads)
+#endif
     for(int i = 0; i < NumEle; i++) {
         /* Note the dependence on physical units */
         T = t_temp[i];

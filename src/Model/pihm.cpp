@@ -19,7 +19,7 @@ double *uYsf;
 double *uYus;
 double *uYgw;
 double *uYriv;
-double *dy;
+double *deltaY;
 using namespace std;
 double PIHM(FileIn *fin, FileOut *fout){
     double ret = 0.;
@@ -40,7 +40,7 @@ double PIHM(FileIn *fin, FileOut *fout){
     MD->CheckInputData();
     fout->updateFilePath();
     NY = MD->NumY;
-    dy = new double[NY];
+    deltaY = new double[NY];
 #ifdef _PIHMOMP
     omp_set_num_threads(MD->CS.num_threads);
     screeninfo("\nopenMP enabled. No of Threads = %d\n", MD->CS.num_threads);
@@ -142,7 +142,7 @@ double PIHM(FileIn *fin, FileOut *fout){
 #endif
     
     delete MD;
-    delete dy;
+    delete deltaY;
     return ret;
 }
 

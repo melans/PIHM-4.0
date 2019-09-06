@@ -78,7 +78,7 @@ public:
     double Dist2Edge[3];
     double Dist2Nabor[3];
     double FixPressure = NA_VALUE;  /* Pressure [Pa]*/
-    double FixGamma = NA_VALUE;     /* Psychrometric Constant [kPa °C-1] */
+//    double FixGamma = NA_VALUE;     /* Psychrometric Constant [kPa °C-1] */
     double AquiferDepth = NA_VALUE; // Zmax - Zmin
     double WetlandLevel = NA_VALUE; // Aquiferdepth - infD
     double RootReachLevel = NA_VALUE; //Aquiferdepth - RzD

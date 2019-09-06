@@ -7,35 +7,17 @@
 //
 
 #include "MD_f.hpp"
-
 void Model_Data:: f_loop( double  *Y, double  *DY, double t){
     int i;
     tnow = t;
-#ifdef _PIHMOMP
-#pragma omp parallel  default(shared) private(i) num_threads(CS.num_threads)
-    {
-#pragma omp for
-        for (i = 0; i < NumEle; i++) {
-            /*DO INFILTRATION FRIST, then do LATERAL FLOW.*/
-            /*========ET Function==============*/
-            //        f_etFlux(i, t); // et is moved out of f_loop()
-            /*========infiltration/Recharge Function==============*/
-            Ele[i].updateElement(uYsf[i] , uYus[i] , uYgw[i] ); // step 1 update the kinf, kh, etc. for elements.
-            f_InfilRecharge(i, t); // step 2 calculate the infiltration and recharge.
-            /*========surf/gw flow Function==============*/
-            f_lateralFlux(i, t); // AFTER infiltration, do the lateral flux. ESP for overland flow.
-        } //end of for loop.
-#pragma omp for
-        for (i = 0; i < NumSegmt; i++) {
-            f_Segement_surface( RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
-            f_Segement_sub( RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
-        }
-#pragma omp for
-        for (i = 0; i < NumRiv; i++) {
-            Flux_RiverDown(t, i);
-        }
+    for (i = 0; i < NumEle; i++) {
+        /*DO INFILTRATION FRIST, then do LATERAL FLOW.*/
+        /*========ET Function==============*/
+        //        f_etFlux(i, t); // et is moved out of f_loop()
+        /*========infiltration/Recharge Function==============*/
+        Ele[i].updateElement(uYsf[i] , uYus[i] , uYgw[i] ); // step 1 update the kinf, kh, etc. for elements.
+        f_InfilRecharge(i, t); // step 2 calculate the infiltration and recharge.
     }
-#else
     for (i = 0; i < NumEle; i++) {
         /*DO INFILTRATION FRIST, then do LATERAL FLOW.*/
         /*========ET Function==============*/
@@ -55,8 +37,6 @@ void Model_Data:: f_loop( double  *Y, double  *DY, double t){
     for (i = 0; i < NumRiv; i++) {
         Flux_RiverDown(t, i);
     }
-#endif
-    
     /* Shared for both OpenMP and Serial, to update */
     PassValue();
 }

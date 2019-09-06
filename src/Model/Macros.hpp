@@ -74,8 +74,8 @@
 #define VON_KARMAN     0.4        /* Von Karman's constant */
 #define HeightWindMeasure   10  /* Height Wind/Relative Humidity Measure */
 #define Cp  1.013e-3    /* cp specific heat at constant pressure, 1.013E-3 [MJ kg-1 °C-1] Allen(1998) eq(8) */
-#define LAMBDA 2.45 /* λ latent heat of vaporization, 2.45 [MJ kg-1] Allen(1998) eq(8) */
-#define VAPRATIO 0.622 /* ε ratio molecular weight of water vapour/dry air = 0.622. Allen(1998) eq(8) */
+//#define LAMBDA 2.45 /* λ latent heat of vaporization, 2.45 [MJ kg-1] Allen(1998) eq(8) */
+//#define VAPRATIO 0.622 /* ε ratio molecular weight of water vapour/dry air = 0.622. Allen(1998) eq(8) */
 
 /*========ERROR CODE===============*/
 #define ERRSUCCESS  0
@@ -98,7 +98,7 @@ extern double *uYsf;
 extern double *uYus;
 extern double *uYgw;
 extern double *uYriv;
-extern double *dy;
+extern double *deltaY;
 //extern double *DY;
 
 

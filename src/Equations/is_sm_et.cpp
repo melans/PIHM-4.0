@@ -1,7 +1,7 @@
 #include "is_sm_et.hpp"
-double Penman_Monteith(double Press, double T, double Rn, double G,
+double Penman_Monteith(double Press, double T, double A, double rho,
                        double ed, double Delta, double r_a, double r_s,
-                       double Gamma){
+                       double Gamma, double lambda){
     /* http://www.fao.org/docrep/X0490E/x0490e06.htm#penman%20monteith%20equation
      Rn net radiation at the crop surface [MJ m-2 min-1],
      G soil heat flux density [MJ m-2 min-1],
@@ -13,16 +13,10 @@ double Penman_Monteith(double Press, double T, double Rn, double G,
      ∆ slope vapour pressure curve [kPa °C-1],
      γ psychrometric constant [kPa °C-1].
      */
-    double A;
     //    double    Gamma;  // psychrometric constant
     //    double    Delta;  // the slope of the saturation vapour pressure temperature relationship
-    double    ETp;    //
-    double  rho = 1.225;    // Air density at sea level at 15C.
-    rho = AirDensity(Press, T);                 // eq 4.2.4 [kg m-3]
-    A = Rn - G; // eq 4.2.16 [MJ m-2 min-1]
-    ETp = (Delta * A + rho * Cp * ed / r_a)
-    / (Delta + Gamma * (1 + r_s / r_a)); // eq 4.2.27 [ ]
-    ETp = ETp / LAMBDA * 0.001 ; // mm/min =>> m/min;   kg/m2/min = mm/min
+    double    ETp = (Delta * A + rho * Cp * ed / r_a) / (Delta + Gamma * (1 + r_s / r_a)); // eq 4.2.27 [ ]
+    ETp = ETp / lambda * 0.001 ; // mm/min =>> m/min;   kg/m2/min = mm/min
     return ETp;
 }
 //double Penman_Monteith(double RH,

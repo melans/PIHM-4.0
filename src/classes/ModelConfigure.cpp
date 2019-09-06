@@ -52,8 +52,8 @@ void Geol_Layer::printInfo(FILE *fp){
     fprintf(fp, "%g\t", macD);
 }
 void Landcover::printHeader(FILE *fp){
-    fprintf(fp, "%s\t", "LA_index");
-    fprintf(fp, "%s\t", "LAImax");
+    fprintf(fp, "%s\t", "LC_index");
+//    fprintf(fp, "%s\t", "LAImax");
     fprintf(fp, "%s\t", "VegFrac");
     fprintf(fp, "%s\t", "Albedo");
     fprintf(fp, "%s\t", "Rs_ref");
@@ -65,7 +65,7 @@ void Landcover::printHeader(FILE *fp){
 }
 void Landcover::printInfo(FILE *fp){
     fprintf(fp, "%d\t", index);
-    fprintf(fp, "%g\t", LAImax);
+//    fprintf(fp, "%g\t", LAImax);
     fprintf(fp, "%g\t", VegFrac);
     fprintf(fp, "%g\t", Albedo);
     fprintf(fp, "%g\t", Rs_ref);
@@ -110,7 +110,7 @@ void Geol_Layer::checkValue(){
     checkRange(geo_vAreaF, 0., 1., index - 1, "geo_vAreaF");
 }
 void Landcover::applyCalib(calib_landcover *g){
-    LAImax  *= 1.0;
+//    LAImax  *= 1.0;
     VegFrac *= g->VegFrac;
     Albedo *= g->Albedo;
     Rs_ref *= 1.0;
@@ -121,7 +121,7 @@ void Landcover::applyCalib(calib_landcover *g){
     ImpAF *= g->ImpAF;
 }
 void Landcover::checkValue(){
-    checkRange(LAImax, 0.0, 40., index - 1, "LAImax");
+//    checkRange(LAImax, 0.0, 40., index - 1, "LAImax");
     checkRange(VegFrac, 0.0, 1.0, index - 1, "VegFrac");
     checkRange(Albedo, 0.0, 1.0, index - 1, "Albedo");
     checkRange(Rough, 0.0, 1.0, index - 1, "Rough");
@@ -169,7 +169,7 @@ void globalCal::push(const char *optstr, double val){
     else if (strcasecmp ("ISMAX", optstr) == 0)
         clandc.cISmax = val;
     else if (strcasecmp ("LAI", optstr) == 0)
-        clandc.cLAIMax = val;
+        clandc.cLAI = val;
     else if (strcasecmp ("DROOT", optstr) == 0)
         clandc.RzD = val;
     else if (strcasecmp ("Soil_Dgd", optstr) == 0)
@@ -261,7 +261,7 @@ double globalCal::getValue(const char *optstr){
     else if (strcasecmp ("ISMAX", optstr) == 0)
         ret = clandc.cISmax;
     else if (strcasecmp ("LAI", optstr) == 0)
-        ret = clandc.cLAIMax;
+        ret = clandc.cLAI;
     else if (strcasecmp ("DROOT", optstr) == 0)
         ret = clandc.RzD;
     else if (strcasecmp ("Soil_Dgd", optstr) == 0)
@@ -346,7 +346,7 @@ void globalCal::write(const char *fn){
     fprintf(fp, "ALBEDO\t%g\n", clandc.Albedo);
     fprintf(fp, "ROUGH\t%g\n", clandc.Rough);
     fprintf(fp, "ISMAX\t%g\n", clandc.cISmax);
-    fprintf(fp, "LAI\t%g\n", clandc.cLAIMax);
+    fprintf(fp, "LAI\t%g\n", clandc.cLAI);
     fprintf(fp, "DROOT\t%g\n", clandc.RzD);
     fprintf(fp, "Soil_Dgd\t%g\n", clandc.SoilDgd);
     fprintf(fp, "ImpAF\t%g\n", clandc.ImpAF);
@@ -421,7 +421,7 @@ void globalCal::copy(globalCal *p){
     clandc.SoilDgd = p->clandc.SoilDgd;
     clandc.RzD = p->clandc.RzD;
     clandc.ImpAF = p->clandc.ImpAF;
-    clandc.cLAIMax = p->clandc.cLAIMax;
+    clandc.cLAI = p->clandc.cLAI;
     clandc.cISmax = p->clandc.cISmax;
     
     cAqD = p->cAqD ; // +
