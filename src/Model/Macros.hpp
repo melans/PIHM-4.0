@@ -31,6 +31,7 @@
 #define iUS     i + NumEle
 #define iGW     i + 2 * NumEle
 #define iRIV    i + 3 * NumEle
+#define iLAKE    i + 3 * NumEle + NumRiv
 #define iDownStrm Riv[i].down - 1
 
 
@@ -98,8 +99,9 @@ extern double *uYsf;
 extern double *uYus;
 extern double *uYgw;
 extern double *uYriv;
-extern double *deltaY;
+extern double *uYlake;
 //extern double *DY;
+extern double *globalY;
 
 
 #endif
