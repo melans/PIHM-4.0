@@ -1,6 +1,4 @@
 #include "f.hpp"
-extern int debug_mode;
-extern double *deltaY;
 int f(double t, N_Vector CV_Y, N_Vector CV_Ydot, void *DS){
     double       *Y, *DY;
     Model_Data      * MD;
