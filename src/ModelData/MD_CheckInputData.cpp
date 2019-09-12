@@ -1,5 +1,4 @@
-#include "MD_CheckInputData.hpp"
-
+#include "Model_Data.hpp"
 void Model_Data::CheckInputData(){
     CheckInput_att();
     CheckInput_mesh();
