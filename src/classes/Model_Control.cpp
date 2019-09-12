@@ -159,7 +159,7 @@ void Control_Data::read(const char *fn){
             InitStep =  val;
         else if (strcasecmp ("MAX_SOLVER_STEP", optstr) == 0)
             MaxStep =  val;
-        else if (strcasecmp ("ET_STEP", optstr) == 0)
+        else if (strcasecmp ("ET_STEP", optstr) == 0 || strcasecmp ("LSM_STEP", optstr) == 0)
             ETStep =  val;
         else if (strcasecmp ("START", optstr) == 0)
             DayStart =  val;/* Convert days to Minutes */
