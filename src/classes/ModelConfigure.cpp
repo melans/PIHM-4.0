@@ -130,69 +130,70 @@ void Landcover::checkValue(){
     checkRange(RzD, 0.0, 10., index - 1, "RzD");
 }
 void globalCal::push(const char *optstr, double val){
-    if (strcasecmp ("KSATH", optstr) == 0)
+    if (strcasecmp ("GEOL_KSATH", optstr) == 0)
         cgeol.KsatH = val;
-    else if (strcasecmp ("KSATV", optstr) == 0)
+    else if (strcasecmp ("GEOL_KSATV", optstr) == 0)
         cgeol.KsatV = val;
-    else if (strcasecmp ("KMACSATH", optstr) == 0)
+    else if (strcasecmp ("GEOL_KMACSATH", optstr) == 0)
         cgeol.macKsatH = val;
-    else if (strcasecmp ("DMAC", optstr) == 0)
+    else if (strcasecmp ("GEOL_DMAC", optstr) == 0)
         cgeol.macD = val;
-    else if (strcasecmp ("ThetaS", optstr) == 0)
+    else if (strcasecmp ("GEOL_ThetaS", optstr) == 0)
         cgeol.ThetaS = val;
-    else if (strcasecmp ("ThetaR", optstr) == 0)
+    else if (strcasecmp ("GEOL_ThetaR", optstr) == 0)
         cgeol.ThetaR = val;
-    else if (strcasecmp ("MACVF", optstr) == 0)
+    else if (strcasecmp ("GEOL_MACVF", optstr) == 0)
         cgeol.vAreaF = val;
     
     /*  Unsat soil layers */
-    else if (strcasecmp ("KINF", optstr) == 0)
+    else if (strcasecmp ("SOIL_KINF", optstr) == 0)
         csoil.infKsatV = val;
-    else if (strcasecmp ("KMACSATV", optstr) == 0)
+    else if (strcasecmp ("SOIL_KMACSATV", optstr) == 0)
         csoil.macKsatV = val;
-    else if (strcasecmp ("DINF", optstr) == 0)
+    else if (strcasecmp ("SOIL_DINF", optstr) == 0)
         csoil.infD = val;
-    else if (strcasecmp ("ALPHA", optstr) == 0)
+    else if (strcasecmp ("SOIL_ALPHA", optstr) == 0)
         csoil.Alpha = val;
-    else if (strcasecmp ("BETA", optstr) == 0)
+    else if (strcasecmp ("SOIL_BETA", optstr) == 0)
         csoil.Beta = val;
-    else if (strcasecmp ("MACHF", optstr) == 0)
+    else if (strcasecmp ("SOIL_MACHF", optstr) == 0)
         csoil.hAreaF = val;
     
     /*  Landcover layers */
-    else if (strcasecmp ("VEGFRAC", optstr) == 0)
+    else if (strcasecmp ("LC_VEGFRAC", optstr) == 0)
         clandc.VegFrac = val;
-    else if (strcasecmp ("ALBEDO", optstr) == 0)
+    else if (strcasecmp ("LC_ALBEDO", optstr) == 0)
         clandc.Albedo = val;
-    else if (strcasecmp ("ROUGH", optstr) == 0)
+    else if (strcasecmp ("LC_ROUGH", optstr) == 0)
         clandc.Rough = val;
-    else if (strcasecmp ("ISMAX", optstr) == 0)
+    else if (strcasecmp ("LC_ISMAX", optstr) == 0)
         clandc.cISmax = val;
-    else if (strcasecmp ("LAI", optstr) == 0)
-        clandc.cLAI = val;
-    else if (strcasecmp ("DROOT", optstr) == 0)
+    else if (strcasecmp ("LC_DROOT", optstr) == 0)
         clandc.RzD = val;
-    else if (strcasecmp ("Soil_Dgd", optstr) == 0)
+    else if (strcasecmp ("LC_SoilDgd", optstr) == 0)
         clandc.SoilDgd = val;
-    else if (strcasecmp ("ImpAF", optstr) == 0)
+    else if (strcasecmp ("LC_ImpAF", optstr) == 0)
         clandc.ImpAF = val;
     
     /*  Aquifer Depth */
-    else if (strcasecmp ("Aquifer", optstr) == 0)
+    else if (strcasecmp ("AQ_DEPTH+", optstr) == 0)
         cAqD = val;
     
-    /*  Forcing & ET */
-    else if (strcasecmp ("PRCP", optstr) == 0)
+    /*  Forcing */
+    else if (strcasecmp ("TS_PRCP", optstr) == 0)
         cPrep = val;
-    else if (strcasecmp ("SFCTMP", optstr) == 0)
+    else if (strcasecmp ("TS_SFCTMP+", optstr) == 0)
         cTemp = val;
-    else if (strcasecmp ("EC", optstr) == 0)
+    else if (strcasecmp ("TS_LAI", optstr) == 0)
+        cLAItsd = val;
+    /* ET */
+    else if (strcasecmp ("ET_IC", optstr) == 0)
         cEt0 = val;
-    else if (strcasecmp ("ETT", optstr) == 0)
+    else if (strcasecmp ("ET_TR", optstr) == 0)
         cEt1 = val;
-    else if (strcasecmp ("EDIR", optstr) == 0)
+    else if (strcasecmp ("ET_SOIL", optstr) == 0)
         cEt2 = val;
-    else if (strcasecmp ("ETP", optstr) == 0)
+    else if (strcasecmp ("ET_ETP", optstr) == 0)
         cETP = val;
     
     /*  Rivers */
@@ -202,16 +203,21 @@ void globalCal::push(const char *optstr, double val){
         criv.rivKsatH = val;
     else if (strcasecmp ("RIV_CWR", optstr) == 0)
         criv.rivCwr = val;
-    else if (strcasecmp ("RIV_DPTH", optstr) == 0)
+    else if (strcasecmp ("RIV_DPTH+", optstr) == 0)
         criv.rivDepth = val;
-    else if (strcasecmp ("RIV_WDTH", optstr) == 0)
+    else if (strcasecmp ("RIV_WDTH+", optstr) == 0)
         criv.rivWidth = val;
-    else if (strcasecmp ("RIV_BSLOPE", optstr) == 0)
+    else if (strcasecmp ("RIV_BSLOPE+", optstr) == 0)
         criv.rivBankSlope = val;
     else if (strcasecmp ("RIV_SINU", optstr) == 0)
         criv.rivSINU = val;
     else if (strcasecmp ("RIV_BEDTHICK", optstr) == 0)
         criv.rivBedThick = val;
+    /* Initial Conditions */
+    else if (strcasecmp ("IC_GW+", optstr) == 0)
+        c_ic_gw = val;
+    else if (strcasecmp ("IC_RIV+", optstr) == 0)
+        c_ic_riv = val;
     /* Unrecognized Parameter Flag */
     else{
         printf
@@ -222,67 +228,70 @@ void globalCal::push(const char *optstr, double val){
 }
 double globalCal::getValue(const char *optstr){
     double ret = 0.0;
-    if (strcasecmp ("KSATH", optstr) == 0)
+    if (strcasecmp ("GEOL_KSATH", optstr) == 0)
         ret = cgeol.KsatH;
-    else if (strcasecmp ("KSATV", optstr) == 0)
+    else if (strcasecmp ("GEOL_KSATV", optstr) == 0)
         ret = cgeol.KsatV;
-    else if (strcasecmp ("KMACSATH", optstr) == 0)
+    else if (strcasecmp ("GEOL_KMACSATH", optstr) == 0)
         ret = cgeol.macKsatH;
-    else if (strcasecmp ("DMAC", optstr) == 0)
+    else if (strcasecmp ("GEOL_DMAC", optstr) == 0)
         ret = cgeol.macD;
-    else if (strcasecmp ("THETAS", optstr) == 0)
+    else if (strcasecmp ("GEOL_THETAS", optstr) == 0)
         ret = cgeol.ThetaS;
-    else if (strcasecmp ("THETAR", optstr) == 0)
+    else if (strcasecmp ("GEOL_THETAR", optstr) == 0)
         ret = cgeol.ThetaR;
-    else if (strcasecmp ("MACVF", optstr) == 0)
+    else if (strcasecmp ("GEOL_MACVF", optstr) == 0)
         ret = cgeol.vAreaF;
     
     /*  Unsat soil layers */
-    else if (strcasecmp ("KINF", optstr) == 0)
+    else if (strcasecmp ("SOIL_KINF", optstr) == 0)
         ret = csoil.infKsatV;
-    else if (strcasecmp ("KMACSATV", optstr) == 0)
+    else if (strcasecmp ("SOIL_KMACSATV", optstr) == 0)
         ret = csoil.macKsatV;
-    else if (strcasecmp ("DINF", optstr) == 0)
+    else if (strcasecmp ("SOIL_DINF", optstr) == 0)
         ret = csoil.infD;
-    else if (strcasecmp ("ALPHA", optstr) == 0)
+    else if (strcasecmp ("SOIL_ALPHA", optstr) == 0)
         ret = csoil.Alpha;
-    else if (strcasecmp ("BETA", optstr) == 0)
+    else if (strcasecmp ("SOIL_BETA", optstr) == 0)
         ret = csoil.Beta;
-    else if (strcasecmp ("MACHF", optstr) == 0)
+    else if (strcasecmp ("SOIL_MACHF", optstr) == 0)
         ret = csoil.hAreaF;
     
     /*  Landcover layers */
-    else if (strcasecmp ("VEGFRAC", optstr) == 0)
+    else if (strcasecmp ("LC_VEGFRAC", optstr) == 0)
         ret = clandc.VegFrac;
-    else if (strcasecmp ("ALBEDO", optstr) == 0)
+    else if (strcasecmp ("LC_ALBEDO", optstr) == 0)
         ret = clandc.Albedo;
-    else if (strcasecmp ("ROUGH", optstr) == 0)
+    else if (strcasecmp ("LC_ROUGH", optstr) == 0)
         ret = clandc.Rough;
-    else if (strcasecmp ("ISMAX", optstr) == 0)
+    else if (strcasecmp ("LC_ISMAX", optstr) == 0)
         ret = clandc.cISmax;
-    else if (strcasecmp ("LAI", optstr) == 0)
-        ret = clandc.cLAI;
-    else if (strcasecmp ("DROOT", optstr) == 0)
+    else if (strcasecmp ("LC_DROOT", optstr) == 0)
         ret = clandc.RzD;
-    else if (strcasecmp ("Soil_Dgd", optstr) == 0)
+    else if (strcasecmp ("LC_SoilDgd", optstr) == 0)
         ret = clandc.SoilDgd;
-    else if (strcasecmp ("ImpAF", optstr) == 0)
+    else if (strcasecmp ("LC_ImpAF", optstr) == 0)
         ret = clandc.ImpAF;
     
     /*  Aquifer Depth */
-    else if (strcasecmp ("Aquifer", optstr) == 0)
+    else if (strcasecmp ("AQ_DEPTH+", optstr) == 0)
         ret = cAqD;
     
-    /*  Forcing & ET */
-    else if (strcasecmp ("PRCP", optstr) == 0)
+    /*  Forcing */
+    else if (strcasecmp ("TS_PRCP", optstr) == 0)
         ret = cPrep;
-    else if (strcasecmp ("SFCTMP", optstr) == 0)
+    else if (strcasecmp ("TS_SFCTMP+", optstr) == 0)
         ret = cTemp;
-    else if (strcasecmp ("EC", optstr) == 0)
+    else if (strcasecmp ("TS_LAI", optstr) == 0)
+        ret = cLAItsd;
+    /* ET */
+    else if (strcasecmp ("ET_ETP", optstr) == 0)
+        ret = cETP;
+    else if (strcasecmp ("ET_IC", optstr) == 0)
         ret = cEt0;
-    else if (strcasecmp ("ETT", optstr) == 0)
+    else if (strcasecmp ("ET_TR", optstr) == 0)
         ret = cEt1;
-    else if (strcasecmp ("EDIR", optstr) == 0)
+    else if (strcasecmp ("ET_SOIL", optstr) == 0)
         ret = cEt2;
     
     /*  Rivers */
@@ -292,16 +301,22 @@ double globalCal::getValue(const char *optstr){
         ret = criv.rivKsatH;
     else if (strcasecmp ("RIV_CWR", optstr) == 0)
         ret = criv.rivCwr;
-    else if (strcasecmp ("RIV_DPTH", optstr) == 0)
+    else if (strcasecmp ("RIV_DPTH+", optstr) == 0)
         ret = criv.rivDepth;
     else if (strcasecmp ("RIV_BSLOPE", optstr) == 0)
         ret = criv.rivBankSlope;
-    else if (strcasecmp ("RIV_WDTH", optstr) == 0)
+    else if (strcasecmp ("RIV_WDTH+", optstr) == 0)
         ret = criv.rivWidth;
     else if (strcasecmp ("RIV_SINU", optstr) == 0)
         ret = criv.rivSINU;
-    else if (strcasecmp ("RIV_BEDTHICK", optstr) == 0)
+    else if (strcasecmp ("RIV_BEDTHICK+", optstr) == 0)
         ret = criv.rivBedThick;
+    /* Initial condition */
+    else if (strcasecmp ("IC_GW+", optstr) == 0)
+        ret = c_ic_gw;
+    else if (strcasecmp ("IC_RIV+", optstr) == 0)
+        ret = c_ic_riv;
+
     /* Unrecognized Parameter Flag */
     else{
         printf
@@ -324,32 +339,32 @@ void globalCal::write(const char *fn){
     fp = fopen (fn, "w");
     CheckFile(fp, fn);
     fprintf(fp, "#%s\n", "Geology Layers");
-    fprintf(fp, "KSATH\t%g\n", cgeol.KsatH);
-    fprintf(fp, "KSATV\t%g\n", cgeol.KsatV);
-    fprintf(fp, "KMACSATH\t%g\n", cgeol.macKsatH);
-    fprintf(fp, "DMAC\t%g\n", cgeol.macD);
-    fprintf(fp, "THETAS\t%g\n", cgeol.ThetaS);
-    fprintf(fp, "THETAR\t%g\n", cgeol.ThetaR);
-    fprintf(fp, "MACVF\t%g\n", cgeol.vAreaF);
+    fprintf(fp, "GEOL_KSATH\t%g\n", cgeol.KsatH);
+    fprintf(fp, "GEOL_KSATV\t%g\n", cgeol.KsatV);
+    fprintf(fp, "GEOL_KMACSATH\t%g\n", cgeol.macKsatH);
+    fprintf(fp, "GEOL_DMAC\t%g\n", cgeol.macD);
+    fprintf(fp, "GEOL_THETAS\t%g\n", cgeol.ThetaS);
+    fprintf(fp, "GEOL_THETAR\t%g\n", cgeol.ThetaR);
+    fprintf(fp, "GEOL_MACVF\t%g\n", cgeol.vAreaF);
     
     fprintf(fp, "#%s\n", "Soil Layers");
-    fprintf(fp, "KINF\t%g\n", csoil.infKsatV);
-    fprintf(fp, "KMACSATV\t%g\n", csoil.macKsatV);
-    fprintf(fp, "DINF\t%g\n", csoil.infD);
-    fprintf(fp, "ALPHA\t%g\n", csoil.Alpha);
-    fprintf(fp, "BETA\t%g\n", csoil.Beta);
-    fprintf(fp, "MACHF\t%g\n", csoil.hAreaF);
-    fprintf(fp, "DINF\t%g\n", csoil.infD);
+    fprintf(fp, "SOIL_KINF\t%g\n", csoil.infKsatV);
+    fprintf(fp, "SOIL_KMACSATV\t%g\n", csoil.macKsatV);
+    fprintf(fp, "SOIL_DINF\t%g\n", csoil.infD);
+    fprintf(fp, "SOIL_ALPHA\t%g\n", csoil.Alpha);
+    fprintf(fp, "SOIL_BETA\t%g\n", csoil.Beta);
+    fprintf(fp, "SOIL_MACHF\t%g\n", csoil.hAreaF);
+    fprintf(fp, "SOIL_DINF\t%g\n", csoil.infD);
     
     fprintf(fp, "#%s\n", "Land use");
-    fprintf(fp, "VEGFRAC\t%g\n", clandc.VegFrac);
-    fprintf(fp, "ALBEDO\t%g\n", clandc.Albedo);
-    fprintf(fp, "ROUGH\t%g\n", clandc.Rough);
-    fprintf(fp, "ISMAX\t%g\n", clandc.cISmax);
-    fprintf(fp, "LAI\t%g\n", clandc.cLAI);
-    fprintf(fp, "DROOT\t%g\n", clandc.RzD);
-    fprintf(fp, "Soil_Dgd\t%g\n", clandc.SoilDgd);
-    fprintf(fp, "ImpAF\t%g\n", clandc.ImpAF);
+    fprintf(fp, "LC_VEGFRAC\t%g\n", clandc.VegFrac);
+    fprintf(fp, "LC_ALBEDO\t%g\n", clandc.Albedo);
+    fprintf(fp, "LC_ROUGH\t%g\n", clandc.Rough);
+    fprintf(fp, "LC_ISMAX\t%g\n", clandc.cISmax);
+//    fprintf(fp, "LC_LAI\t%g\n", clandc.cLAI);
+    fprintf(fp, "LC_DROOT\t%g\n", clandc.RzD);
+    fprintf(fp, "LC_Soil_Dgd\t%g\n", clandc.SoilDgd);
+    fprintf(fp, "LC_ImpAF\t%g\n", clandc.ImpAF);
     
     fprintf(fp, "#%s\n", "River stucture");
     fprintf(fp, "RIV_ROUGH\t%g\n", criv.rivRough);
@@ -421,7 +436,6 @@ void globalCal::copy(globalCal *p){
     clandc.SoilDgd = p->clandc.SoilDgd;
     clandc.RzD = p->clandc.RzD;
     clandc.ImpAF = p->clandc.ImpAF;
-    clandc.cLAI = p->clandc.cLAI;
     clandc.cISmax = p->clandc.cISmax;
     
     cAqD = p->cAqD ; // +

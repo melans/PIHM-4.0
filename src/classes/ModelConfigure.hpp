@@ -36,7 +36,7 @@ public:
     double SoilDgd = 1.0;
     double RzD = 1.0;
     double ImpAF = 1.0;
-    double cLAI = 1.0; /* TS LAI */
+//    double cLAI = 1.0; /* TS LAI */
     double cISmax = 1.0;
 };
 
@@ -114,6 +114,8 @@ public:
     
     double cAqD = 0; // +
     double cTemp = 0; // +
+    double c_ic_gw = 0;
+    double c_ic_riv = 0;
     
     double cETP = 1;
     double cPrep = 1;
