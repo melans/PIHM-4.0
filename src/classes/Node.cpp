@@ -18,6 +18,6 @@ void _Node::Init(double cAqD){
     if(AqD < 1.){
         fprintf(stderr, "WARNING:: Aqd of Node(%d) = %f\n",index, AqD);
         fprintf(stderr, "Press anykey to continue ...\n");
-        getchar();
+//        getchar();
     }
 }
