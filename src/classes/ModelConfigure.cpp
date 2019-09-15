@@ -309,7 +309,7 @@ double globalCal::getValue(const char *optstr){
         ret = criv.rivWidth;
     else if (strcasecmp ("RIV_SINU", optstr) == 0)
         ret = criv.rivSINU;
-    else if (strcasecmp ("RIV_BEDTHICK+", optstr) == 0)
+    else if (strcasecmp ("RIV_BEDTHICK", optstr) == 0)
         ret = criv.rivBedThick;
     /* Initial condition */
     else if (strcasecmp ("IC_GW+", optstr) == 0)
@@ -361,7 +361,6 @@ void globalCal::write(const char *fn){
     fprintf(fp, "LC_ALBEDO\t%g\n", clandc.Albedo);
     fprintf(fp, "LC_ROUGH\t%g\n", clandc.Rough);
     fprintf(fp, "LC_ISMAX\t%g\n", clandc.cISmax);
-//    fprintf(fp, "LC_LAI\t%g\n", clandc.cLAI);
     fprintf(fp, "LC_DROOT\t%g\n", clandc.RzD);
     fprintf(fp, "LC_Soil_Dgd\t%g\n", clandc.SoilDgd);
     fprintf(fp, "LC_ImpAF\t%g\n", clandc.ImpAF);
@@ -369,20 +368,21 @@ void globalCal::write(const char *fn){
     fprintf(fp, "#%s\n", "River stucture");
     fprintf(fp, "RIV_ROUGH\t%g\n", criv.rivRough);
     fprintf(fp, "RIV_KH\t%g\n", criv.rivKsatH);
-    fprintf(fp, "RIV_DPTH\t%g\n", criv.rivDepth);
-    fprintf(fp, "RIV_WDTH\t%g\n", criv.rivWidth);
+    fprintf(fp, "RIV_DPTH+\t%g\n", criv.rivDepth);
+    fprintf(fp, "RIV_WDTH+\t%g\n", criv.rivWidth);
     fprintf(fp, "RIV_SINU\t%g\n", criv.rivSINU);
     fprintf(fp, "RIV_CWR\t%g\n", criv.rivCwr);
     fprintf(fp, "RIV_BEDTHICK\t%g\n", criv.rivBedThick);
     
     fprintf(fp, "#%s\n", "Misc");
-    fprintf(fp, "AQUIFER\t%g\n", cAqD);
-    fprintf(fp, "PRCP\t%g\n", cPrep);
-    fprintf(fp, "SFCTMP\t%g\n", cTemp);
-    fprintf(fp, "ETP\t%g\n", cETP);
-    fprintf(fp, "EC\t%g\n", cEt0);
-    fprintf(fp, "ETT\t%g\n", cEt1);
-    fprintf(fp, "EDIR\t%g\n", cEt2);
+    fprintf(fp, "AQ_DEPTH+\t%g\n", cAqD);
+    fprintf(fp, "TS_PRCP\t%g\n", cPrep);
+    fprintf(fp, "TS_SFCTMP\t%g\n", cTemp);
+    fprintf(fp, "TS_LAI\t%g\n", cLAItsd);
+    fprintf(fp, "ET_ETP\t%g\n", cETP);
+    fprintf(fp, "ET_IC\t%g\n", cEt0);
+    fprintf(fp, "ET_TR\t%g\n", cEt1);
+    fprintf(fp, "ET_SOIL\t%g\n", cEt2);
     
     fclose(fp);
 }
