@@ -118,7 +118,6 @@ void _Element::InitElement(){
     for(int i = 0; i < 3; i++){
         CheckNonZero(edge[i], index-1, "edge");
     }
-    
 }
 void _Element::applyNabor(_Node *Node, _Element *Ele){
     int eNabor;
@@ -151,53 +150,47 @@ void _Element::applyNabor(_Node *Node, _Element *Ele){
     }
     
 }
-void _Element::Flux_InfiRech(double Ysurf, double Yunsat, double Ygw, double netprcp){
-    double ke=0.;
-    double grad;
+void _Element::Flux_Infiltration(double Ysurf, double Yunsat, double Ygw, double netprcp){
     if(Ygw > AquiferDepth){
         /* GW reach the surface */
-        u_qex = (Ygw - AquiferDepth) / 1. * Kmax;
+        u_qex = fabs(Ygw - AquiferDepth) / infD * Kmax; /* Exfiltration must be positive (upward). */
         u_qi = 0. ;
     }else{
         u_qex = 0.;
-        Ysurf = max(Ysurf, 0.);
-        u_effkInfi = infKsatV * (1 - hAreaF) + hAreaF * macKsatV * u_satn;
-        /* NORMAL GW level */
-        u_qi = (Ysurf + infD) / infD * u_effkInfi;
-        if(u_qi > 0.){
-            if(Ysurf > 0.){
-                u_qi = min(Ysurf, u_qi);
-            }else{
-                u_qi = 0.;
-            }
+        if(Ysurf > 0.){
+            u_effkInfi = infKsatV * (1 - hAreaF) + hAreaF * macKsatV * u_satn;
+            /* NORMAL GW level */
+            u_qi = (Ysurf + infD) / infD * u_effkInfi;
+//            u_qi = min(Ysurf, max(0., u_qi) );
         }else{
-            /* void */
+            u_qi = 0;
         }
     }
-    /* Recharge */
-//    grad = (1. + u_phius * 2. / AquiferDepth);
-    grad = Yunsat / AquiferDepth;
-    if(grad >= 0.){
-//        ke = meanHarmonic(infKsatV * u_satKr, KsatV, u_deficit, Ygw);
-        ke = meanArithmetic(infKsatV * u_satKr, KsatV, u_deficit, Ygw);
+//    CheckNANi(u_qi, 0, "u_qi");
+}
+void _Element::Flux_Recharge(double Yunsat, double Ygw){
+    double ke=0.;
+    double grad;
+    if(u_deficit > infD){
+        grad = Yunsat / u_deficit;
+    }else{
+        grad = 1.;
+    }
+    
+    if(grad > EPS_DOUBLE){
+//        ke = meanArithmetic(infKsatV * u_satKr, KsatV, u_deficit, Ygw);
+        ke = meanArithmetic(infKsatV * grad / .75, KsatV, u_deficit, Ygw); /* .75 is field capacity. */
         u_qr = grad * ke;
-        if(u_deficit > 0.){
-            u_qr *= Yunsat / u_deficit;
-        }
         u_qr = min(Yunsat, u_qr);
     }else{
         u_qr = 0.;
-//        u_qr = max(-1.*Ygw, u_qr);
     }
-    CheckNANi(u_qi, 0, "u_qi");
+//    CheckNANi(u_qr, 0, "u_qr");
 }
 void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
     u_effKH = effKH(Ygw,  AquiferDepth,  macD,  macKsatH,  geo_vAreaF,  KsatH);
     u_deficit = AquiferDepth - Ygw;
     Kmax = infKsatV * (1. - hAreaF) + macKsatV * hAreaF ;
-    u_qex = 0.;
-    u_qi = 0.;
-    u_qr = 0.;
     if(u_deficit <= 0. ){
         u_deficit = 0.;
         u_satn = 1.;
@@ -218,7 +211,6 @@ void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
         u_phius = max(MINPSI, u_phius);
     }
     u_effkInfi = infKsatV * (1 - hAreaF) + u_satn * macKsatV * hAreaF ;
-    u_effkInfi *=  1. - u_satn;
 #ifdef _DEBUG
     if (u_effkInfi < 0.){
         printf("WARNING: Negative effective conductivity for infiltration.\n");

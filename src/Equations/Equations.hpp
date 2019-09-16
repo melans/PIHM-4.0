@@ -13,7 +13,8 @@
 
 //double returnVal(double rArea, double rPerem, double eqWid, double ap_Bool);
 //double CS_AreaOrPerem(int rivOrder, double rivDepth, double rivCoeff, double a_pBool);
-double avgY(double z1, double y1, double z2, double y2, double threshold);
+double avgY_sf(double z1, double y1, double z2, double y2, double threshold);
+double avgY_gw(double z1, double y1, double z2, double y2, double threshold);
 double effKV(double ksatFunc, double gradY, double macKV, double KV, double areaF);
 double effKVnew(double ksatFunc, double macKV, double KV, double areaF, double y0);
 

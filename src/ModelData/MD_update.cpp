@@ -1,9 +1,66 @@
 #include "Model_Data.hpp"
-void Model_Data::f_update(double  *Y, double *DY, double t){
-    /* Initialization of temporary state variables */
-    for (int i = 0; i < NumY; i++) {
-        DY[i] = 0.;
+
+void Model_Data::f_updatei(double  *Y, double *DY, double t, int flag){
+    for (int i = 0; i < NumEle; i++) {
+        Qe2r_Surf[i] = 0.;
+        Qe2r_Sub[i] = 0.;
     }
+    switch (flag) {
+        case 1:
+            for (int i = 0; i < NumEle; i++) {
+                uYsf[i] = (Y[i] >= 0.) ? Y[i] : 0.;
+            }
+            break;
+        case 2:
+            for (int i = 0; i < NumEle; i++) {
+                uYus[i] = (Y[i] >= 0.) ? Y[i] : 0.;
+            }
+            break;
+        case 3:
+            for (int i = 0; i < NumEle; i++) {
+                uYgw[i] = (Y[i] >= 0.) ? Y[i] : 0.;
+                if(Ele[i].iBC == 0){ // NO BC
+                    uYgw[i] = max(0.0, Y[i]);
+                    Ele[i].QBC = 0.;
+                }else if(Ele[i].iBC > 0){ // BC fix head
+                    Ele[i].yBC = tsd_eyBC.getX(t, Ele[i].iBC);
+                    uYgw[i] = Ele[i].yBC;
+                    Ele[i].QBC = 0.;
+                }else{ // BC fix flux to GW
+                    Ele[i].QBC = tsd_eqBC.getX(t, -Ele[i].iBC);
+                }
+            }
+            break;
+        case 4:
+            for (int i = 0; i < NumRiv; i++) {
+                uYriv[i] = (Y[i] >= 0.) ? Y[i] : 0.;
+                QrivSurf[i] = 0.;
+                QrivSub[i] = 0.;
+                QrivUp[i] = 0.;
+                QrivDown[i] = 0.;
+                Riv[i].updateRiver(uYriv[i]);
+                /***** SS and BC *****/
+                Riv[i].qBC = 0.0;
+                if(Riv[i].BC == 0){
+                    /* Void */
+                }else if(Riv[i].BC < 0){ // Fixed Flux INTO river Reaches.
+                    Riv[i].qBC = tsd_rqBC.getX(t, -Riv[i].BC);
+                }else if (Riv[i].BC > 0){ // Fixed Stage of river reach.
+                    Riv[i].yBC = tsd_ryBC.getX(t, Riv[i].BC);
+                    uYriv[i] = Riv[i].yBC;
+                }
+            }
+            break;
+        case 5:
+            for (int i = 0; i < NumLake; i++) {
+                uYlake[i] = (Y[i] >= 0.) ? Y[i] : 0.;
+            }
+            break;
+        default:
+            break;
+    }
+}
+void Model_Data::f_update(double  *Y, double *DY, double t){
     for (int i = 0; i < NumEle; i++) {
         uYsf[i] = (Y[iSF] >= 0.) ? Y[iSF] : 0.;
         uYus[i] = (Y[iUS] >= 0.) ? Y[iUS] : 0.;
@@ -18,17 +75,13 @@ void Model_Data::f_update(double  *Y, double *DY, double t){
         }else{ // BC fix flux to GW
             Ele[i].QBC = tsd_eqBC.getX(t, -Ele[i].iBC);
         }
-        /***** SS and BC *****/
-        for(int j = 0; j<3;j++){
-            QeleSub[i][j] = 0.;
-            QeleSurf[i][j] = 0.;
-            Ele[i].iupdSF[j] = 0;
-            Ele[i].iupdGW[j] = 0;
-        }
-        Qe2r_Surf[i] = 0.;
-        Qe2r_Sub[i] = 0.;
         qEleExfil[i] = 0.;
         qEleInfil[i] = 0.;
+        /***** SS and BC *****/
+//        for(int j = 0; j<3;j++){
+//            Ele[i].iupdSF[j] = 0;
+//            Ele[i].iupdGW[j] = 0;
+//        }
 /********* Below are remove because the bass-balance issue. **********/
 //        for (int j = 0; j < 3; j++) {
 //            if(Ele[i].nabr[j] > 0){
@@ -46,10 +99,6 @@ void Model_Data::f_update(double  *Y, double *DY, double t){
         uYriv[i] = (Y[iRIV] >= 0.) ? Y[iRIV] : 0.;
         /* qrivsurf and qrivsub are calculated in Element fluxes.
          qrivDown and qrivUp are calculated in River fluxes. */
-        QrivSurf[i] = 0.;
-        QrivSub[i] = 0.;
-        QrivUp[i] = 0.;
-        QrivDown[i] = 0.;
         Riv[i].updateRiver(uYriv[i]);
         /***** SS and BC *****/
         Riv[i].qBC = 0.0;
@@ -61,10 +110,6 @@ void Model_Data::f_update(double  *Y, double *DY, double t){
             Riv[i].yBC = tsd_ryBC.getX(t, Riv[i].BC);
             uYriv[i] = Riv[i].yBC;
         }
-    }
-    for (int i = 0; i < NumSegmt; i++ ){
-        QsegSurf[i] = 0.;
-        QsegSub[i] = 0.;
     }
 }
 void Model_Data::summary (N_Vector udata){
@@ -94,25 +139,32 @@ void Model_Data::summary (N_Vector udata){
         }
     }
 }
-void Model_Data::summary (N_Vector udata1, N_Vector udata2){
-    double  *Y1, *Y2;
-#ifdef _PIHMOMP
-    Y1 = NV_DATA_OMP(udata1);
-    Y2 = NV_DATA_OMP(udata2);
-#else
-    Y1 = NV_DATA_S(udata1);
-    Y2 = NV_DATA_S(udata2);
-#endif
+void Model_Data::summary (N_Vector u1, N_Vector u2, N_Vector u3, N_Vector u4, N_Vector u5){
     for (int i = 0; i < NumEle; i++){
-        yEleSurf[i] = Y1[iSF];
-        yEleUnsat[i] = Y1[iUS];
-        yEleGW[i] = Y1[iGW];
-    }
-    for (int i = 0; i < NumRiv; i++){
-        yRivStg[i] = Y2[i];
-        if(Y2[i] < 0){
-            printf("Yriv[%d]=%f\n", i+1, Y2[i]);
+        yEleSurf[i] = NV_Ith_S(u1, i);
+        yEleUnsat[i] = NV_Ith_S(u2, i);
+        yEleGW[i] = NV_Ith_S(u3, i);
+        if(Ele[i].iBC > 0){
+            yEleGW[i] = Ele[i].yBC;
         }
     }
+    for (int i = 0; i < NumRiv; i++){
+        yRivStg[i] = NV_Ith_S(u4, i);
+        if(Riv[i].BC > 0){
+            yRivStg[i] = Riv[i].yBC;
+        }
+    }
+    for (int i = 0; i < NumLake; i++){
+        yLakeStg[i] = NV_Ith_S(u5, i);
+    }
+    Sub2Global(yEleSurf, yEleUnsat, yEleGW, yRivStg, yLakeStg, NumEle, NumRiv, NumLake);
+//    printVector(stdout, yEleSurf, 0, NumEle, 0);
+//    printVector(stdout, yEleUnsat, 0, NumEle, 0);
+//    printVector(stdout, yEleGW, 0, NumEle, 0);
+//    printVector(stdout, yRivStg, 0, NumRiv, 0);
+//
+//    printVector(stdout, globalY, 0, NumEle, 0);
+//    printVector(stdout, globalY, NumEle, NumEle, 0);
+//    printVector(stdout, globalY, NumEle*2, NumEle, 0);
+//    printVector(stdout, globalY, NumEle*3, NumRiv, 0);
 }
-

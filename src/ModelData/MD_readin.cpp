@@ -134,7 +134,7 @@ void Model_Data::read_att(const char *fn){
     nr = tb.read(fn);
     if( nr != NumEle){
         fprintf(stderr, "\nWARNING: number of rows (%d) in att DOSE NOT match the number of cell in .mesh file (%d).\n Press anykey to continue ...\n", nr, NumEle);
-        getchar();
+//        getchar();
     }
     if(tb.ncol != 8){
         printf("The column of .mesh should be: \n");
@@ -248,8 +248,8 @@ void Model_Data::read_lc(const char *fn){
     for (int i=0; i<NumLC ; i++){
         LandC[i].index  = (int) tb.x[i][0];
 //        LandC[i].LAImax = (double) tb.x[i][1];
-        LandC[i].Rmin   = (double) tb.x[i][2] / 1440.; // [min / m]
-        LandC[i].Rs_ref = (double) tb.x[i][3] / 1440.; // [min / m]
+        LandC[i].Rmin   = (double) tb.x[i][2] * 1440; // d/m  to min / m
+        LandC[i].Rs_ref = (double) tb.x[i][3] / 1440; // [min / m]
         LandC[i].Albedo = (double) tb.x[i][4];
         LandC[i].VegFrac = (double) tb.x[i][5];
         LandC[i].Rough  = (double) tb.x[i][6] * 1440.;
@@ -494,7 +494,9 @@ void Model_Data::FreeData(){
     delete[]    uYus; //35.
     delete[]    uYgw; //35.
     delete[]    uYriv; //35.1
-
+    delete[]    uYlake; //35.1
+    delete[]    globalY;
+    
     delete[]    t_prcp;
     delete[]    t_temp;
     delete[]    t_rh;

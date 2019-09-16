@@ -12,8 +12,6 @@
 double timeInterp(double t, double t0, double t1, double x0, double x1);
 
 /*==========Screen print function===============*/
-int    ScreenPrint(double t, int dt, unsigned long it, unsigned long nt, unsigned long nfcall, double intv);
-//int ScreenPrint(double t, int dt, unsigned long it, unsigned long nt, unsigned long  nf1, unsigned long  nf2);
 double getSecond(void);
 
 inline
@@ -36,6 +34,9 @@ double stddeviation(double x[], int n);
 //double polygonArea(double X[], double Y[], int n);/* Not ready yet.*/
 
 /*==========misc function===============*/
+void printVector(FILE *fid, double * x, int xstart, int n, double t);
+void printVectorBin(FILE *fid, double * x, int xstart, int n, double t);
+
 void CheckNonZero(double x, int i, const char *s);
 void CheckNonZero(int x, int i, const char *s);
 void CheckNonZero(double x, int i, int j, const char *s);
@@ -62,7 +63,42 @@ void screeninfo(const char *s, T x){
     fprintf(stdout, "%s", str);
 #endif
 }
+inline
+void setValue (double *x, double val, int start, int n){
+    for(int i = 0; i < n; i++){
+        x[i + start] = val;
+    }
+}
+inline
+void setValue (double *x, int xstart, double *val, int vstart, int n){
+    for(int i = 0; i < n; i++){
+        x[i + xstart] = val[i + vstart];
+    }
+}
+inline
+void Global2Sub(int n1, int n2, int n3){
+    setValue(uYsf,  0, globalY, n1 * 0, n1);
+    setValue(uYus,  0, globalY, n1 * 1, n1);
+    setValue(uYgw,  0, globalY, n1 * 2, n1);
+    setValue(uYriv, 0, globalY, n1 * 3, n2);
+    setValue(uYlake,0, globalY, n1 * 3 + n2, n3);
+}
 
+
+inline
+void Sub2Global(double *x1, double *x2, double *x3, double *x4, double *x5,
+                int n1, int n2, int n3){
+    setValue(globalY, n1 * 0, x1, 0, n1);
+    setValue(globalY, n1 * 1, x2, 0, n1);
+    setValue(globalY, n1 * 2, x3, 0, n1);
+    setValue(globalY, n1 * 3, x4, 0, n2);
+    setValue(globalY, n1 * 3 + n2, x5, 0, n3);
+}
+
+inline
+void Sub2Global(int n1, int n2, int n3){
+    Sub2Global(uYsf, uYus, uYgw, uYriv, uYlake, n1, n2, n3);
+}
 double Quadratic(double a, double b, double c);
 double fun_dAtodY(double dA, double w0, double s);
 

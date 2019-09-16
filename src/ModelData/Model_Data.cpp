@@ -132,6 +132,7 @@ void Model_Data::allocateMemory()
     if(NumRiv > 0){
         uYriv = new double[NumRiv];  // 35.1
     }
+    globalY = new double[NumY];
     
     for (int i = 0; i < NumEle; i++) {
         QeleSurf[i] = new double[3];
@@ -246,5 +247,51 @@ void Model_Data::RiverTable(const char *fn){
 void Model_Data::LakeTable(const char *fn){
     FILE *fp = fopen(fn, "w");
     fclose(fp);
+}
+
+int Model_Data::ScreenPrintu(double t, unsigned long it){
+    int flag = 0;
+    static unsigned long ncall1=0;
+    static unsigned long ncall2=0;
+    static unsigned long ncall3=0;
+    static unsigned long ncall4=0;
+    static unsigned long ncall5=0;
+#ifdef _DEBUG
+    printf("%.0f min ~ %.4f day\t %.2f%% \n", t, t / 1440., (double)it / nt * 100 );
+    flag = 1;
+#else
+    static double tnext = t;
+    if (t >= tnext) {
+        printf("%6.2f day \t %5.2f%% \t %6.2f sec \t %6ld %6ld %6ld %6ld %6ld\n",
+               t / 1440, 100.0 * it / CS.NumSteps, getSecond(),
+               nFCall1 - ncall1, nFCall2 - ncall2, nFCall3 - ncall3, nFCall4 - ncall4, nFCall5 - ncall5
+               );
+        tnext += CS.screenIntv;
+        ncall1 = nFCall1;
+        ncall2 = nFCall2;
+        ncall3 = nFCall3;
+        ncall4 = nFCall4;
+        ncall5 = nFCall5;
+        flag = 1;
+    }
+#endif
+    return flag;
+}
+int Model_Data::ScreenPrint(double t, unsigned long it){
+    int flag = 0;
+    static unsigned long ncall=0;
+#ifdef _DEBUG
+    printf("%.0f min ~ %.4f day\t %.2f%% \n", t, t / 1440., (double)it / nt * 100 );
+    flag = 1;
+#else
+    static double tnext = t;
+    if (t >= tnext) {
+        printf("%.2f day \t %.2f%% \t %.2f sec \t %ld \n", t / 1440, 100.0 * it / CS.NumSteps, getSecond(), nFCall - ncall);
+        tnext += CS.screenIntv;
+        ncall = nFCall;
+        flag = 1;
+    }
+#endif
+    return flag;
 }
 

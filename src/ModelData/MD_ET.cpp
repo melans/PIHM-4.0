@@ -18,6 +18,7 @@ void Model_Data::updateforcing(double t){
     tsd_LAI.movePointer(t);
     tsd_RL.movePointer(t);
     for(int i = 0; i < NumEle; i++){
+        Ele[i].updateElement(uYsf[i], uYus[i], uYgw[i]);
         tReadForcing(t,i);
     }
 }
@@ -35,7 +36,7 @@ void Model_Data::tReadForcing(double t, int i){
     t_rh[i] = min(max(t_rh[i], 0.01), 1.0); // [-]
     
     t_prcp[i]   = t_prcp[i] / 1440.; // [m min-1]
-    t_rn[i]     = t_rn[i] * 1.0e-6 / 1440.;  // J/m2/day to [MJ m-2 min-1]
+    t_rn[i]     = t_rn[i] / 1440.;  // J/m2/day to [MJ m-2 min-1]
     t_wind[i]   = t_wind[i] / 1440. ; // m/d =>> m/min  [m min-1]
     
     qElePrep[i] = t_prcp[i];
@@ -51,14 +52,18 @@ void Model_Data::tReadForcing(double t, int i){
         r_s = BulkSurfaceResistance(t_lai[i]);                  // eq 4.2.22 [min m-1]
     }
     double r_a   = AerodynamicResistance(t_wind[i], t_rl[i],
-                                         Ele[i].windH, 2.);     // eq 4.2.25  [min m-1]
+                                         Ele[i].windH, 10.);     // eq 4.2.25  [min m-1]
     double Gamma = PsychrometricConstant(Ele[i].FixPressure, lambda); // eq 4.2.28  [kPa C-1]
-    qEleETP[i] = gc.cETP * Penman_Monteith(Ele[i].FixPressure, t_temp[i], t_rn[i] - 0., rho, 
+    qEleETP[i] = gc.cETP * Penman_Monteith(Ele[i].FixPressure, (t_rn[i] - 0) * 1.0e-6, rho,
                                  ed, Delta, r_a, r_s,
                                  Gamma, lambda);                // eq 4.2.27
-    iBeta[i] = SoilMoistureStress(Soil[(Ele[i].iSoil - 1)].ThetaS,
+    if(uYgw[i] > Ele[i].WetlandLevel){
+        iBeta[i] = 1.;
+    }else{
+        iBeta[i] = SoilMoistureStress(Soil[(Ele[i].iSoil - 1)].ThetaS,
                                   Soil[(Ele[i].iSoil - 1)].ThetaR,
                                   Ele[i].u_satn);
+    }
     if(t_lai[i] > 0.){
         if(uYgw[i] > Ele[i].RootReachLevel){
             iPC[i] = 1.;
@@ -66,14 +71,14 @@ void Model_Data::tReadForcing(double t, int i){
             iPC[i] = PlantCoeff(Ele[i].Rs_ref, Ele[i].Rmin, t_lai[i], t_temp[i],
                                 r_a, t_rn[i], es, ea,
                                 iBeta[i], Gamma, Delta);
-            iPC[i] *= iBeta[i]; /* If soil is dry, no Et*/
+//            iPC[i] *= iBeta[i]; /* If soil is dry, no Et*/
         }
     }else{
         iPC[i] = 0.;
     }
 }
 
-void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
+void Model_Data::EvapoTranspiration(double t, double dt){
 //    double  Rn=NA_VALUE, Vel=NA_VALUE, RH=NA_VALUE, rl=NA_VALUE;
     double  T=NA_VALUE,  LAI=NA_VALUE;
     double  isval = 0.;// etval = 0;
@@ -118,8 +123,7 @@ void Model_Data::EvapoTranspiration(N_Vector uY, double t, double dt){
             yEleSnowCanopy[i] = yEleISsnowmax[i];
             yEleSnowGrnd[i] = yEleSnowGrnd[i] + yEleSnowCanopy[i] - yEleISsnowmax[i];
         }
-        MeltRateGrnd = MeltRateCanopy = (T > To ? (T - To) * MF : 0.);    /* Note the units for
-                                                                           * MF. */
+        MeltRateGrnd = MeltRateCanopy = (T > To ? (T - To) * MF : 0.);    /* eq. 7.3.14 in Maidment */
         if (yEleSnowGrnd[i] > MeltRateGrnd * DT_min) {
             yEleSnowGrnd[i] = yEleSnowGrnd[i] - MeltRateGrnd * DT_min;
         } else {

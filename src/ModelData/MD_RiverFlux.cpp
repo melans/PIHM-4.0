@@ -5,11 +5,12 @@
 void Model_Data::Flux_RiverDown(double t, int i){
     double  Distance, CSarea, Perem, R, s, n;
     double  sMean = 0.;
+    int id = Riv[i].down - 1;
     n = Riv[i].avgRough;
-    if (Riv[i].down > 0) {
-        sMean = (Riv[i].BedSlope + Riv[iDownStrm].BedSlope) * 0.5 ;
+    if (id >= 0) {
+        sMean = (Riv[i].BedSlope + Riv[id].BedSlope) * 0.5 ;
         Distance =  Riv[i].Dist2DownStream;
-        s = (uYriv[i] - uYriv[iDownStrm]) / Distance * 0.5 + sMean;
+        s = (uYriv[i] - uYriv[id]) / Distance + sMean;
 //        s = sMean;
 //        CSarea = 0.5 * (Riv[i].u_CSarea + Riv[iDownStrm].u_CSarea);
 //        Perem = 0.5 * (Riv[i].u_CSperem + Riv[iDownStrm].u_CSperem);
@@ -17,17 +18,9 @@ void Model_Data::Flux_RiverDown(double t, int i){
         Perem = Riv[i].u_CSperem;
         R = (Perem <= 0.) ? 0. : (CSarea / Perem);
         if(s > 0.){
-            if( uYriv[i] > 0.01 ){
-                QrivDown[i] = ManningEquation(CSarea, n, R, s);
-            }else{
-                QrivDown[i] = 0.;
-            }
+            QrivDown[i] = ManningEquation(CSarea, n, R, s);
         }else{
-            if( uYriv[iDownStrm] > 0.01 ){
-                QrivDown[i] = ManningEquation(CSarea, n, R, s);
-            }else{
-                QrivDown[i] = 0.;
-            }
+            QrivDown[i] = ManningEquation(CSarea, n, R, s);
         }
     } else {
         switch (Riv[i].down) {
@@ -39,8 +32,8 @@ void Model_Data::Flux_RiverDown(double t, int i){
             case -3:
                 /* zero-depth-gradient boundary conditions */
                 Perem = Riv[i].u_CSperem;
-//                Distance =  Riv[i].Dist2DownStream;
-                s = Riv[i].BedSlope;
+                s = Riv[i].BedSlope + uYriv[i] * 2. / Riv[i].Length;
+//                s = Riv[i].BedSlope;
                 CSarea = Riv[i].u_CSarea;
                 R = (Perem <= 0.) ? 0. : (CSarea / Perem);
                 QrivDown[i] = ManningEquation(CSarea, n, R, s);
@@ -72,7 +65,7 @@ double Model_Data::WeirFlow(double ze, double ye,
     if(dh > 0.){ // from River to Element. Q is Positive.
         y = dh;
         Q = 2. / 3. * cwr * sqrt(2. * GRAV * y) * rivLen * y* 60.; /* 60 is for m3/s  to m3/min, because GRAV is m/s2*/
-    }else{ // from Elevation to River. Q is Negative.
+    }else{ // from Element to River. Q is Negative.
         if( ye > threshold){
             if( hr > ze){
                 y = -dh;
@@ -87,27 +80,25 @@ double Model_Data::WeirFlow(double ze, double ye,
     return Q;
 }
 
-void Model_Data::f_Segement_surface(int iEle, int iRiv, int i){
+void Model_Data::fun_Seg_surface(int iEle, int iRiv, int i){
     //Surface Flux from River Segment to Element;
-    QsegSurf[i] = WeirFlow(Ele[iEle].zmax, uYsf[iEle],
+    double isf  = uYsf[iEle] - qEleInfil[iEle] + qEleExfil[iEle];
+    isf = max(0., isf);
+    QsegSurf[i] = WeirFlow(Ele[iEle].zmax, isf,
                            Ele[iEle].zmax - Riv[iRiv].depth, uYriv[iRiv],
                            Ele[iEle].zmax, RivSeg[i].Cwr, RivSeg[i].length, Ele[iEle].depression);
-    //    QrivSurf[iRiv] += Q; // Positive from River to Element
-    //    Qe2r_Surf[iEle] += -Q; // Positive from Element to River
+    
 #ifdef _DEBUG
-    CheckNANi(Q, i, "River Flux Surface (Functopm:f_Segement_surface)");
+    CheckNANi(QsegSurf[i], i, "River Flux Surface (Functopm:f_Segement_surface)");
 #endif
 }
-void Model_Data::f_Segement_sub( int iEle, int iRiv, int i){
+void Model_Data::fun_Seg_sub( int iEle, int iRiv, int i){
     //Subsurface Flux from River Segment to Element;
-    //    double  Q = 0.;
     QsegSub[i] = flux_R2E_GW(uYriv[iRiv], Ele[iEle].zmax - Riv[iRiv].depth,
                              uYgw[iEle], Ele[iEle].zmin,
-                             Ele[iEle].u_effKH, Riv[iRiv].KsatH,
+                             Ele[iEle].u_effKH, Riv[iRiv].KsatH,  
                              RivSeg[i].length,Riv[iRiv].BedThick);
-    //    QrivSub[iRiv] += Q;
-    //    Qe2r_Sub[iEle] += -Q;
 #ifdef _DEBUG
-    CheckNANi(Q, i, "River Flux Sub(Functopm:f_Segement_sub)");
+    CheckNANi(Q, i, "River Flux Sub(Functopm:fun_Seg_sub)");
 #endif
 }

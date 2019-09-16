@@ -5,11 +5,11 @@
 //
 
 #include "Equations.hpp"
-double avgY(double z1, double y1, double z2, double y2, double threshold){
+double avgY_sf(double z1, double y1, double z2, double y2, double threshold){
     double h1 = z1 + y1, h2 = z2 + y2;
     if (h1 > h2) {
         if (y1 > threshold) {
-            //return 0.5 * (yi + yinabr);
+//            return  y1 * 4 > y2 ? 0.5 * (y1 + y2) : y1; // VERY SLOW
             //return ((yinabr > yi) ? 0 : 1.0 * yi);
             /* Note the if-else TRUE case can be possible only for
              * Kinematic case */
@@ -19,10 +19,27 @@ double avgY(double z1, double y1, double z2, double y2, double threshold){
         }
     } else {
         if (y2 > threshold) {
+//            return  y2 * 4 > y1 ? 0.5 * (y1 + y2) : y2;// VERY SLOW
             //return 0.5 * (yi + yinabr);
             //return ((yi > yinabr) ? 0 : 1.0 * yinabr);
             /* Note the if-else TRUE case can be possible only for
              * Kinematic case */
+            return y2;
+        } else {
+            return 0.;
+        }
+    }
+}
+double avgY_gw(double z1, double y1, double z2, double y2, double threshold){
+    double h1 = z1 + y1, h2 = z2 + y2;
+    if (h1 > h2) {
+        if (y1 > threshold) {
+            return y1;
+        } else {
+            return 0.;
+        }
+    } else {
+        if (y2 > threshold) {
             return y2;
         } else {
             return 0.;

@@ -29,6 +29,13 @@ public:
 //    unsigned long nFCall1;
 //    unsigned long nFCall2;
     unsigned long nFCall = 0;
+    
+    unsigned long nFCall1 = 0;
+    unsigned long nFCall2 = 0;
+    unsigned long nFCall3 = 0;
+    unsigned long nFCall4 = 0;
+    unsigned long nFCall5 = 0;
+    
     double tic;
     int NumForc = 0;
     int NumEle = 0;            /* Number of Elements */
@@ -144,11 +151,6 @@ public:
     double *qLakeEvap;
     double *qLakePrcp;
     
-//    double *uYele;
-//    double *uYsf;
-//    double *uYus;
-//    double *uYgw;
-//    double *uYriv;
     
     int NumSegmt;
     RiverSegement *RivSeg;
@@ -175,19 +177,29 @@ public:
     void loadinput(FileIn * fin);
     void initialize();
     void initialize_output(FileOut * fout);
-    void InitialCondition(FileIn *fin, N_Vector CV_Y);
-    void InitialCondition(FileIn *fin, N_Vector udata1, N_Vector udata2);
+    void SetIC2Y(N_Vector udata1, N_Vector udata2, N_Vector udata3, N_Vector udata4, N_Vector udata5);
+    void SetIC2Y(N_Vector udata);
+    void LoadIC(FileIn *fin);
     /* screen print */
     void modelSummary(FileIn * fileIn, int end);
     void PrintInit(const char *fn);
     
-    void summary(N_Vector u1, N_Vector u2);
+    void summary(N_Vector u1, N_Vector u2, N_Vector u3, N_Vector u4, N_Vector u5);
     void summary(N_Vector u);
-    
+    int ScreenPrint(double t, unsigned long it);
+    int ScreenPrintu(double t, unsigned long it);
     /* methods in f function */
-    void f_loop(double * Y, double * DY, double t);
+    void f_loop(double t);
+    void f_loop1(double t);
+    void f_loop2(double t);
+    void f_loop3(double t);
+    void f_loop4(double t);
+    void f_loop5(double t);
+    
     void f_applyDY(double * DY, double t);
+    void f_applyDYi(double * DY, double t, int flag);
     void f_update(double * Y, double * DY, double t);
+    void f_updatei(double * Y, double * DY, double t, int flag);
     
     void f_loop_omp(double * Y, double * DY, double t);
     void f_applyDY_omp(double * DY, double t);
@@ -200,9 +212,10 @@ public:
     void debugData();
     void debugData(const char *fn);
     void f_etFlux(int i, double t);
-    void EvapoTranspiration(N_Vector uY, double t, double dt);
+    void EvapoTranspiration(double t, double dt);
     void updateforcing(double t);
     double getArea();
+    void PassValue();
 private:
     void fillpits(int i);
     
@@ -261,15 +274,16 @@ private:
     
     /* Physical processes */
     void Flux_RiverDown(double t, int i);
-    void f_Segement_surface(int iEle, int iRiv, int i);
-    void f_Segement_sub(int iEle, int iRiv, int i);
-    void f_Segement_update(int iEle, int iRiv, int i);
-    void PassValue();
     void applyBCSS(double *DY, int i);
     
     /* Methods for element calculation */
-    void f_lateralFlux(int i, double t);
-    void f_InfilRecharge(int i, double t);
+    void fun_Ele_sub(int i, double t);
+    void fun_Ele_surface(int i, double t);
+    void fun_Ele_Infiltraion(int i, double t);
+    void fun_Ele_Recharge(int i, double t);
+    void fun_Seg_surface(int iEle, int iRiv, int i);
+    void fun_Seg_sub(int iEle, int iRiv, int i);
+    
     /* Functions */
     void TimeSpent();
     double WeirFlow(double ze, double ye, double zr, double yr,

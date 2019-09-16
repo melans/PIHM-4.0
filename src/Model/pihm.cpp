@@ -19,7 +19,10 @@ double *uYsf;
 double *uYus;
 double *uYgw;
 double *uYriv;
-double *deltaY;
+double *uYlake;
+double *globalY;
+double timeNow;
+
 using namespace std;
 double PIHM(FileIn *fin, FileOut *fout){
     double ret = 0.;
@@ -40,7 +43,7 @@ double PIHM(FileIn *fin, FileOut *fout){
     MD->CheckInputData();
     fout->updateFilePath();
     NY = MD->NumY;
-    deltaY = new double[NY];
+    globalY = new double[NY];
 #ifdef _PIHMOMP
     omp_set_num_threads(MD->CS.num_threads);
     screeninfo("\nopenMP enabled. No of Threads = %d\n", MD->CS.num_threads);
@@ -51,7 +54,9 @@ double PIHM(FileIn *fin, FileOut *fout){
     udata = N_VNew_Serial(NY);
     du = N_VNew_Serial(NY);
 #endif
-    MD->InitialCondition(fin, udata);
+    MD->LoadIC(fin);
+    MD->SetIC2Y(udata);
+    
     
 #ifdef _CALIBMODE
     MD->CS.CV.readobs(fin->file_obs);
@@ -74,11 +79,11 @@ double PIHM(FileIn *fin, FileOut *fout){
     MD->modelSummary(fin, 0);
     MD->debugData(fout->outpath);
     MD->gc.write(fout->Calib_bak);
-
-//    FILE *fid = fopen("DY_debug.dat", "wb");
-//    fclose(fid);
-    
+    timeNow = t;
+    f(t, udata, du, MD); /* Initialized the status */
     for (int i = 0; i < MD->CS.NumSteps && !ierr; i++) {
+//        FILE *file_debug = fopen("DY_debug.dat", "wb");
+//        fclose(file_debug);
         /* inner loops to next output points with ET step size control */
         while (t < tnext ) {
             if (t + MD->CS.ETStep >=tnext) {
@@ -89,11 +94,10 @@ double PIHM(FileIn *fin, FileOut *fout){
             dt = tout - t;
             MD->updateforcing(t);
             /* calculate Interception Storage */
-            MD->EvapoTranspiration(udata, t, dt);
-//            MD->updateWF(dt);
-//            fSolver(MD, udata, t, tout);
+            MD->EvapoTranspiration(t, dt);
             flag = CVode(mem, tout, udata, &t, CV_NORMAL);
             check_flag(&flag, "CVode", 1);
+//            t = tout;  /* debug only. */
         }
         tnext += MD->CS.MaxStep;
         MD->summary(udata);
@@ -105,8 +109,7 @@ double PIHM(FileIn *fin, FileOut *fout){
 #else
 //        f(t, udata, du, MD);
         MD->CS.ExportResults(tnext);
-//        flag = ScreenPrint(t, MD->CS.ETStep, i, MD->CS.NumSteps);
-        flag = ScreenPrint(t, MD->CS.ETStep, i, MD->CS.NumSteps, MD->nFCall, MD->CS.screenIntv);
+        flag = MD->ScreenPrint(t, i);
         if (flag) {
             if (atInterval(t, 1440)) {
                 MD->PrintInit(fout->Init_update);
@@ -142,10 +145,184 @@ double PIHM(FileIn *fin, FileOut *fout){
 #endif
     
     delete MD;
-    delete deltaY;
     return ret;
 }
 
+
+double PIHM_uncouple(FileIn *fin, FileOut *fout){
+    double ret = 0.;
+    Model_Data  *MD;        /* Model Data                */
+    N_Vector    u1, u2, u3, u4, u5;
+    N_Vector    du1, du2, du3, du4, du5;
+    
+    void    *mem1 = NULL, *mem2 = NULL, *mem3 = NULL, *mem4 = NULL, *mem5 = NULL;
+    SUNLinearSolver LS1 = NULL, LS2 = NULL, LS3 = NULL, LS4 = NULL, LS5 = NULL;
+    int     flag;            /* flag to test return value */
+    double  t, dt, tout;    /* stress period & step size */
+    int NY = 0;
+    int N1, N2, N3, N4, N5;
+    int ierr = 0;
+    /* allocate memory for model data structure */
+    MD = new Model_Data();
+    MD->loadinput(fin);
+    MD->initialize();
+    MD->CheckInputData();
+    fout->updateFilePath();
+    NY = MD->NumY;
+    N1 = MD->NumEle;
+    N2 = MD->NumEle;
+    N3 = MD->NumEle;
+    N4 = MD->NumRiv;
+    N5 = MD->NumLake;
+#ifdef _PIHMOMP
+    omp_set_num_threads(MD->CS.num_threads);
+    screeninfo("\nopenMP enabled. No of Threads = %d\n", MD->CS.num_threads);
+    udata = N_VNew_OpenMP(NY, MD->CS.num_threads);
+    du = N_VNew_Serial(NY);
+#else
+    screeninfo("\nopenMP disabled\n");
+    u1 = N_VNew_Serial(N1);
+    u2 = N_VNew_Serial(N2);
+    u3 = N_VNew_Serial(N3);
+    u4 = N_VNew_Serial(N4);
+    u5 = N_VNew_Serial(N5);
+    du1 = N_VNew_Serial(N1);
+    du2 = N_VNew_Serial(N2);
+    du3 = N_VNew_Serial(N3);
+    du4 = N_VNew_Serial(N4);
+    du5 = N_VNew_Serial(N5);
+#endif
+    MD->LoadIC(fin);
+    MD->SetIC2Y(u1, u2, u3, u4, u5);
+    
+#ifdef _CALIBMODE
+    MD->CS.CV.readobs(fin->file_obs);
+    MD->CS.CV.Pointer2Sim(MD->QrivDown, 1, 0);
+    MD->CS.updateSimPeriod(MD->CS.CV.DayStart, MD->CS.CV.DayEnd);
+    MD->CS.calibmode(1440);
+#else
+    MD->initialize_output(fout);
+    MD->PrintInit(fout->Init_bak);
+    MD->InitFloodAlert(fout->floodout);
+#endif
+    SetCVODE(mem1, f_surf,  MD, u1, LS1);
+    SetCVODE(mem2, f_unsat, MD, u2, LS2);
+    SetCVODE(mem3, f_gw,    MD, u3, LS3);
+    SetCVODE(mem4, f_river, MD, u4, LS4);
+    SetCVODE(mem5, f_lake,  MD, u5, LS5);
+//    flag = CVodeSetMaxStep(mem1, max(MD->CS.MaxStep/4., 1.) );
+//    check_flag(&flag, "CVodeSetMaxStep", 1);
+    
+    /* set start time */
+    t = MD->CS.StartTime;
+    double tnext = t;
+    //CheckInput(MD, &CS);
+    /* start solver in loops */
+    getSecond();
+    MD->modelSummary(fin, 0);
+    MD->debugData(fout->outpath);
+    MD->gc.write(fout->Calib_bak);
+    
+    //    FILE *fid = fopen("DY_debug.dat", "wb");
+    //    fclose(fid);
+    FILE *fp1, *fp2, *fp3, *fp4;
+    fp1=fopen("y1.txt", "w");
+    fp2=fopen("y2.txt", "w");
+    fp3=fopen("y3.txt", "w");
+    fp4=fopen("y4.txt", "w");
+    double t0 = t, tnext_et = tnext;
+    for (int i = 0; i < MD->CS.NumSteps && !ierr; i++) {
+        /* inner loops to next output points with ET step size control */
+        while (t < tnext ) {
+            if (t + MD->CS.ETStep >=tnext) {
+                tout = tnext;
+            } else {
+                tout = t + MD->CS.ETStep;
+            }
+            dt = tout - t;
+            if(t > tnext_et){
+                MD->updateforcing(t);
+                /* calculate Interception Storage */
+                MD->EvapoTranspiration(t, dt);
+                tnext_et += MD->CS.ETStep;
+            }
+
+            t=t0;
+            Global2Sub(MD->NumEle, MD->NumRiv, MD->NumLake);
+            flag = CVode(mem1, tout, u1, &t, CV_NORMAL);
+            check_flag(&flag, "CVode1", 1);
+            
+            t=t0;
+            Global2Sub(MD->NumEle, MD->NumRiv, MD->NumLake);
+            flag = CVode(mem2, tout, u2, &t, CV_NORMAL);
+            check_flag(&flag, "CVode2", 1);
+            
+            t=t0;
+            Global2Sub(MD->NumEle, MD->NumRiv, MD->NumLake);
+            flag = CVode(mem3, tout, u3, &t, CV_NORMAL);
+            check_flag(&flag, "CVode3", 1);
+            
+            t=t0;
+            Global2Sub(MD->NumEle, MD->NumRiv, MD->NumLake);
+            flag = CVode(mem4, tout, u4, &t, CV_NORMAL);
+            check_flag(&flag, "CVode4", 1);
+            if(N5 > 0.){
+                t=t0;
+                Global2Sub(MD->NumEle, MD->NumRiv, MD->NumLake);
+                flag = CVode(mem5, tout, u2, &t, CV_NORMAL);
+                check_flag(&flag, "CVode5", 1);
+            }
+        }
+        t0 = t;
+        tnext += MD->CS.MaxStep;
+        MD->summary(u1, u2, u3, u4, u5);
+#ifdef _CALIBMODE
+        MD->CS.CV.pushsim(t);
+        if (atInterval(t, 1440 * 30)) {
+            MD->PrintInit(fout->Init_update);
+        }
+#else
+        //        f(t, udata, du, MD);
+        MD->CS.ExportResults(tnext);
+        flag = MD->ScreenPrintu(t, i);
+        if (flag) {
+            if (atInterval(t, 1440)) {
+                MD->PrintInit(fout->Init_update);
+            }
+        }
+        printVector(fp1, globalY, 0, N1, t);
+        printVector(fp2, globalY, N1, N2, t);
+        printVector(fp3, globalY, N1*2, N3, t);
+        printVector(fp4, globalY, N1*3, N4, t);
+        MD->flood->FloodWarning(t);
+#endif
+    }
+    fclose(fp1);
+    fclose(fp2);
+    fclose(fp3);
+    fclose(fp4);
+    MD->modelSummary(fin, 1);
+    /* Free memory */
+    N_VDestroy_Serial(u1);
+    N_VDestroy_Serial(u2);
+    N_VDestroy_Serial(u3);
+    N_VDestroy_Serial(u4);
+    N_VDestroy_Serial(u5);
+    
+    N_VDestroy_Serial(du1);
+    N_VDestroy_Serial(du2);
+    N_VDestroy_Serial(du3);
+    N_VDestroy_Serial(du4);
+    N_VDestroy_Serial(du5);
+    /* Free integrator memory */
+    CVodeFree(&mem1);
+    CVodeFree(&mem2);
+    CVodeFree(&mem3);
+    CVodeFree(&mem4);
+    CVodeFree(&mem5);
+    delete MD;
+    return ret;
+}
 
 int PIHM(int argc, char *argv[]){
     CommandIn CLI;
@@ -155,7 +332,7 @@ int PIHM(int argc, char *argv[]){
     CLI.setFileIO(fin, fout);
     
     PIHM(fin, fout);
-    
+//    PIHM_uncouple(fin, fout);
     delete fin;
     delete fout;
     return 0;

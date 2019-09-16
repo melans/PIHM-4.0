@@ -6,7 +6,7 @@
 #include "functions.hpp"
 #include "Model_Data.hpp"
 
-void Model_Data::InitialCondition(FileIn *fid, N_Vector CV_Y){
+void Model_Data::LoadIC(FileIn *fid){
     for (int i = 0; i < NumEle; i++) {
         yEleWetFront[i] = 0.;
     }
@@ -68,7 +68,7 @@ void Model_Data::InitialCondition(FileIn *fid, N_Vector CV_Y){
             int nr = tb.read(fp);
             if( nr != NumEle){
                 fprintf(stderr, "\nWARNING: number of rows (%d) in .ic DOSE NOT match the number of cell in .mesh file (%d).\n Press anykey to continue ...\n", nr, NumEle);
-                getchar();
+//                getchar();
             }
             for (int i = 0; i < NumEle; i++) {
                 yEleIS[i]   = tb.x[i][1];
@@ -81,7 +81,7 @@ void Model_Data::InitialCondition(FileIn *fid, N_Vector CV_Y){
             nr = tb.read(fp);
             if( nr != NumRiv){
                 fprintf(stderr, "\nWARNING: number of rows (%d) in .ic DOSE NOT match the number of cell in .riv file (%d).\n Press anykey to continue ...\n", nr, NumRiv);
-                getchar();
+//                getchar();
             }
             for (int i = 0; i < NumRiv; i++) {
                 yRivStg[i] = tb.x[i][1];
@@ -90,7 +90,7 @@ void Model_Data::InitialCondition(FileIn *fid, N_Vector CV_Y){
                 nr = tb.read(fp);
                 if(nr != NumLake){
                     fprintf(stderr, "\nWARNING: number of rows (%d) in .ic DOSE NOT match the number of cell in .riv file (%d).\n Press anykey to continue ...\n", nr, NumEle);
-                    getchar();
+//                    getchar();
                 }
                 for (int i = 0; i < NumLake; i++) {
                     yLakeStg[i] = tb.x[i][1];
@@ -104,135 +104,37 @@ void Model_Data::InitialCondition(FileIn *fid, N_Vector CV_Y){
         yEleSnowGrnd[i] = (1 - Ele[i].VegFrac) * yEleSnow[i];
         yEleSnowCanopy[i] = Ele[i].VegFrac * yEleSnow[i];
     }
-    
+    Sub2Global(yEleSurf, yEleUnsat, yEleGW, yRivStg, yLakeStg, NumEle, NumRiv, NumLake);
+}
+void Model_Data::SetIC2Y(N_Vector udata){
     /* PUT the values into CV_Y */
     for (int i = 0; i < NumEle; i++) {
-        SET_VALUE(CV_Y, iSF) = max(0.0, yEleSurf[i]);
-        SET_VALUE(CV_Y, iUS) = max(0.0, yEleUnsat[i]);
-        SET_VALUE(CV_Y, iGW) = max(0.0, yEleGW[i]);
+        SET_VALUE(udata, iSF) = globalY[iSF];
+        SET_VALUE(udata, iUS) = globalY[iUS];
+        SET_VALUE(udata, iGW) = globalY[iGW];
     }
     for (int i = 0; i < NumRiv; i++) {
-        SET_VALUE(CV_Y, iRIV) = max(0.0, yRivStg[i]);
+        SET_VALUE(udata, iRIV) = globalY[iRIV];
+    }
+    for (int i = 0; i < NumLake; i++) {
+        SET_VALUE(udata, iLAKE) = globalY[iLAKE];
     }
 }
-void Model_Data::InitialCondition(FileIn *fid, N_Vector udata1, N_Vector udata2){
-    for (int i = 0; i < NumEle; i++) {
-        yEleWetFront[i] = 0.;
-    }
-    switch (CS.init_type) {
-        case 0:
-            /* groundwater relief case */
-            for (int i = 0; i < NumEle; i++) {
-                yEleIS[i] = 0.;
-                yEleSnow[i] = 0.;
-                yEleSurf[i] = 0.;
-                yEleUnsat[i] = 0.;
-                yEleGW[i] = Ele[i].AquiferDepth;
-            }
-            for (int i = 0; i < NumRiv; i++) {
-                yRivStg[i] = 0.;
-            }
-            for (int i = 0; i < NumLake; i++) {
-                yLakeStg[i] = 0.;
-            }
-            break;
-        case 1:
-            /* Default case */
-            for (int i = 0; i < NumEle; i++) {
-                yEleIS[i] = 0.;
-                yEleSnow[i] = 0.;
-                yEleSurf[i] = 0.;
-                yEleUnsat[i] = 0.;
-                yEleGW[i] = 0.;
-            }
-            for (int i = 0; i < NumRiv; i++) {
-                yRivStg[i] = 0.;
-            }
-            for (int i = 0; i < NumLake; i++) {
-                yLakeStg[i] = 0.;
-            }
-            break;
-        case 2:
-            /* default guess case */
-            for (int i = 0; i < NumEle; i++) {
-                yEleIS[i] = 0.;
-                yEleSnow[i] = 0.;
-                yEleSurf[i] = 0.;
-                yEleUnsat[i] = 0.3 * Ele[i].AquiferDepth;
-                yEleGW[i] = 0.4 * Ele[i].AquiferDepth;
-            }
-            for (int i = 0; i < NumRiv; i++) {
-                yRivStg[i] = 0.1 * Riv[i].depth;
-            }
-            for (int i = 0; i < NumLake; i++) {
-                yLakeStg[i] = 0.;
-            }
-            break;
-        default:
-            /* reading from  */
-            FILE * fp =  fopen(fid->file_init, "r");
-            CheckFile(fp, fid->file_init);
-            
-            TabularData tb;
-            int nr = tb.read(fp);
-            if( nr != NumEle){
-                fprintf(stderr, "\nWARNING: number of rows (%d) in .ic DOSE NOT match the number of cell in .mesh file (%d).\n Press anykey to continue ...\n", nr, NumEle);
-                getchar();
-            }
-            for (int i = 0; i < NumEle; i++) {
-                yEleIS[i]   = tb.x[i][1];
-                yEleSnow[i] = tb.x[i][2];
-                yEleSurf[i] = tb.x[i][3];
-                yEleUnsat[i] = tb.x[i][4];
-                yEleGW[i]   = tb.x[i][5];
-            }
-            
-            nr = tb.read(fp);
-            if( nr != NumRiv){
-                fprintf(stderr, "\nWARNING: number of rows (%d) in .ic DOSE NOT match the number of cell in .riv file (%d).\n Press anykey to continue ...\n", nr, NumRiv);
-                getchar();
-            }
-            for (int i = 0; i < NumRiv; i++) {
-                yRivStg[i] = tb.x[i][1];
-            }
-            if (NumLake > 0){
-                nr = tb.read(fp);
-                if(nr != NumLake){
-                    fprintf(stderr, "\nWARNING: number of rows (%d) in .ic DOSE NOT match the number of cell in .riv file (%d).\n Press anykey to continue ...\n", nr, NumEle);
-                    getchar();
-                }
-                for (int i = 0; i < NumLake; i++) {
-                    yLakeStg[i] = tb.x[i][1];
-                }
-            }
-            fclose(fp);
-            break;
-    } /* End of Switch*/
-    
-    for (int i = 0; i < NumEle; i++) {
-        yEleSnowGrnd[i] = (1 - Ele[i].VegFrac) * yEleSnow[i];
-        yEleSnowCanopy[i] = Ele[i].VegFrac * yEleSnow[i];
-    }
-    for (int i = 0; i < NumEle; i++) {
-        uYsf[iSF] = max(0.0, yEleSurf[i]);
-        uYus[iUS] = max(0.0, yEleUnsat[i]);
-        uYgw[iGW] = max(0.0, yEleGW[i]);
-    }
-    for (int i = 0; i < NumRiv; i++) {
-        uYriv[i] = max(0.0, yRivStg[i]);
-        printf("%.2g\t", uYriv[i]);
-    }
-//    printf("\n");
+void Model_Data::SetIC2Y(N_Vector udata1, N_Vector udata2,
+                         N_Vector udata3, N_Vector udata4,
+                         N_Vector udata5){
     /* PUT the values into CV_Y */
     for (int i = 0; i < NumEle; i++) {
-        SET_VALUE(udata1, iSF) = yEleSurf[i];
-        SET_VALUE(udata1, iUS) = yEleUnsat[i];
-        SET_VALUE(udata1, iGW) = yEleGW[i];
+        SET_VALUE(udata1, i) = globalY[iSF];
+        SET_VALUE(udata2, i) = globalY[iUS];
+        SET_VALUE(udata3, i) = globalY[iGW];
     }
     for (int i = 0; i < NumRiv; i++) {
-        SET_VALUE(udata2, i) = yRivStg[i];
+        SET_VALUE(udata4, i) = globalY[iRIV];
     }
-    
+    for (int i = 0; i < NumLake; i++) {
+        SET_VALUE(udata5, i) = globalY[iLAKE];
+    }
 }
 
 void Model_Data:: initialize(){

@@ -1,5 +1,5 @@
 #include "is_sm_et.hpp"
-double Penman_Monteith(double Press, double T, double A, double rho,
+double Penman_Monteith(double Press, double A, double rho,
                        double ed, double Delta, double r_a, double r_s,
                        double Gamma, double lambda){
     /* http://www.fao.org/docrep/X0490E/x0490e06.htm#penman%20monteith%20equation
@@ -65,20 +65,22 @@ double Penman_Monteith(double Press, double T, double A, double rho,
 double PlantCoeff(double Rs_ref, double Rmin, double LAI, double T, double r_a,
                   double Rn, double es, double ea,
                   double beta_s, double Gamma, double Delta){
-    double Rmax = 5000.0 ; // [s m-1]
+    double Rmax = 5000.0 / 60. ; //s/m to min/m;  Rmin in min/m --convert in readin.
     double f_r, alpha_r, gamma_s, r_s, P_c, eta_s;
-    Rmax /= 60.;    //  =>> [min m-1]
     f_r = 1.1 * 1.5 * Rn / (Rs_ref * LAI);
     f_r = f_r < 0 ? 0 : f_r;
     alpha_r = (1 + f_r) / (f_r + Rmin / Rmax);
     alpha_r = min(alpha_r, 10000.);
     eta_s = 1. - 0.0016 * (24.85 - T) * (24.85 - T);
     eta_s = max(0.0001, eta_s);
-    gamma_s = 1. / (1. + 0.00025 * (es - es));
+    gamma_s = 1. / (1. + 0.00025 * (es - ea));
     gamma_s = max(0.01, gamma_s);
-    
-    r_s = Rmin * alpha_r / (beta_s * LAI * eta_s * gamma_s);
-    r_s = min(Rmax, r_s);
+    if(beta_s > 0){
+        r_s = Rmin * alpha_r / (beta_s * LAI * eta_s * gamma_s);
+        r_s = min(Rmax, r_s);
+    }else{
+        r_s = Rmax;
+    }
     P_c = (1. + Delta / Gamma) / (1. + r_s / r_a + Delta / Gamma);
     P_c = min(max(0., P_c), 1.);
     return P_c;

@@ -118,7 +118,8 @@ public:
     void applyNabor(_Node *Node, _Element *Ele);
     void updateElement(double Ysurf, double Yunsat, double Ygw);
 //    void updateWF(double dh, double dt);
-    void Flux_InfiRech(double Ysurf, double Yunsat, double Ygw, double netprcp);
+    void Flux_Infiltration(double Ysurf, double Yunsat, double Ygw, double netprcp);
+    void Flux_Recharge(double Yunsat, double Ygw);
     void printHeader(FILE *fp);
     void printInfo(FILE *fp);
 };

@@ -6,7 +6,7 @@
 //  Copyright © 2019 Lele Shu. All rights reserved.
 //
 
-#include "MD_f_omp.hpp"
+#include "Model_Data.hpp"
 
 void Model_Data::f_applyDY_omp(double *DY, double t){
     double area;
@@ -90,18 +90,22 @@ void Model_Data:: f_loop_omp( double  *Y, double  *DY, double t){
     {
 #pragma omp for
         for (i = 0; i < NumEle; i++) {
+            /*DO INFILTRATION FRIST, then do LATERAL FLOW.*/
+            /*========infiltration/Recharge Function==============*/
             Ele[i].updateElement(uYsf[i] , uYus[i] , uYgw[i] ); // step 1 update the kinf, kh, etc. for elements.
-            f_InfilRecharge(i, t); // step 2 calculate the infiltration and recharge.
+            fun_Ele_Infiltraion(i, t); // step 2 calculate the infiltration.
+            fun_Ele_Recharge(i, t); // step 3 calculate the recharge.
         }
 #pragma omp for
         for (i = 0; i < NumEle; i++) {
             /*========surf/gw flow Function==============*/
-            f_lateralFlux(i, t); // AFTER infiltration, do the lateral flux. ESP for overland flow.
+            fun_Ele_surface(i, t);  // AFTER infiltration, do the lateral flux. ESP for overland flow.
+            fun_Ele_sub(i, t);
         } //end of for loop.
 #pragma omp for
         for (i = 0; i < NumSegmt; i++) {
-            f_Segement_surface( RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
-            f_Segement_sub( RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
+            fun_Seg_surface( RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
+            fun_Seg_sub( RivSeg[i].iEle-1, RivSeg[i].iRiv-1, i);
         }
 #pragma omp for
         for (i = 0; i < NumRiv; i++) {
@@ -140,14 +144,12 @@ void Model_Data::f_update_omp(double  *Y, double *DY, double t){
                 Ele[i].QBC = tsd_eqBC.getX(t, -Ele[i].iBC);
             }
             /***** SS and BC *****/
-            for(int j = 0; j<3;j++){
-                QeleSub[i][j] = 0.;
-                QeleSurf[i][j] = 0.;
-                Ele[i].iupdSF[j] = 0;
-                Ele[i].iupdGW[j] = 0;
-            }
-            Qe2r_Surf[i] = 0.;
-            Qe2r_Sub[i] = 0.;
+//            for(int j = 0; j<3;j++){
+//                Ele[i].iupdSF[j] = 0;
+//                Ele[i].iupdGW[j] = 0;
+//            }
+//            Qe2r_Surf[i] = 0.;
+//            Qe2r_Sub[i] = 0.;
             qEleExfil[i] = 0.;
             qEleInfil[i] = 0.;
             /********* Below are remove because the bass-balance issue. **********/
@@ -168,10 +170,7 @@ void Model_Data::f_update_omp(double  *Y, double *DY, double t){
             uYriv[i] = (Y[iRIV] >= 0.) ? Y[iRIV] : 0.;
             /* qrivsurf and qrivsub are calculated in Element fluxes.
              qrivDown and qrivUp are calculated in River fluxes. */
-            QrivSurf[i] = 0.;
-            QrivSub[i] = 0.;
-            QrivUp[i] = 0.;
-            QrivDown[i] = 0.;
+//            QrivDown[i] = 0.;
             Riv[i].updateRiver(uYriv[i]);
             /***** SS and BC *****/
             Riv[i].qBC = 0.0;
@@ -183,11 +182,6 @@ void Model_Data::f_update_omp(double  *Y, double *DY, double t){
                 Riv[i].yBC = tsd_ryBC.getX(t, Riv[i].BC);
                 uYriv[i] = Riv[i].yBC;
             }
-        }
-#pragma omp for
-        for (int i = 0; i < NumSegmt; i++ ){
-            QsegSurf[i] = 0.;
-            QsegSub[i] = 0.;
         }
     } // end omp parallel.
 }
