@@ -18,7 +18,8 @@ double flux_R2E_GW(double yr, double zr,
     if(Kele < EPS_DOUBLE || Kriv < EPS_DOUBLE){
         return 0.;
     }else{
-        K = meanHarmonic(Kele, Kriv, 1., D_riv);
+//        K = meanHarmonic(Kele, Kriv, 1., D_riv);
+        K= 0.5 *(Kele + Kriv);
     }
     he = ye + ze; //head of Ele GW
     hr = yr + zr; //head of river
@@ -26,7 +27,7 @@ double flux_R2E_GW(double yr, double zr,
     if( dh > EPS_DOUBLE){
         /* River to Element*/
         if( he > zr ){ // Element gw higher than river bed
-            A = dh * L;
+            A = (yr + he - zr) * .5 * L;
         }else{
             A = yr * L;
         }
@@ -38,7 +39,7 @@ double flux_R2E_GW(double yr, double zr,
         }
     }else if (dh < -EPS_DOUBLE){
         /* Element to River */
-        A = -1. * dh * L;
+        A = (yr + he - zr) * .5 * L;  /* Mean of River stage and he-zr  */
         g = dh / D_riv;
         Q = A * K * g;
     }else{

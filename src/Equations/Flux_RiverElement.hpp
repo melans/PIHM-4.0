@@ -17,7 +17,7 @@ double flux_R2E_SF(double yr, double zr,
                    double rough, double Len, double dist, double threshold);
 double flux_R2E_GW(double yr, double zr,
                    double ye, double ze,
-                   double Kele, double Kriv,
+                   double Kele, double Kriv, 
                    double L, double D_riv);
 
 #endif /* Flux_Subsurface_hpp */
