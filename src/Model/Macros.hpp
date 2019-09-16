@@ -103,5 +103,6 @@ extern double *uYlake;
 //extern double *DY;
 extern double *globalY;
 
+extern double timeNow;
 
 #endif
