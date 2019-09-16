@@ -236,13 +236,13 @@ void Control_Data::read(const char *fn){
             printf
             ("\n  Parameter:%s cannot be recognized. Please see User's Manual for more details!\n",
              optstr);
-            printf("Continue? (y/N)\n");
-            char cc = getchar();
-            if(cc =='Y' || cc=='y' ){
-                /* Void */
-            }else{
-                myexit(ERRFileIO);
-            }
+//            printf("Continue? (y/N)\n");
+//            char cc = getchar();
+//            if(cc =='Y' || cc=='y' ){
+//                /* Void */
+//            }else{
+//                myexit(ERRFileIO);
+//            }
         }
     }
     fclose (fp);
