@@ -132,7 +132,7 @@ void _TimeSeriesData::movePointer(double t)
     }
     if (ts[iNext][0] < ts[iNow][0] && t - ts[iNow][0] > 1) {
         fprintf(stderr, "\n\nError: missing forcing data after t=%.3lf\n\n", ts[iNow][0] / 1440.);
-        myexit(ERRFileIO);
+//        myexit(ERRFileIO);
     }
 }
 
