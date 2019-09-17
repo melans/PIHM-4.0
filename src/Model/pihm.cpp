@@ -174,12 +174,7 @@ double PIHM_uncouple(FileIn *fin, FileOut *fout){
     N3 = MD->NumEle;
     N4 = MD->NumRiv;
     N5 = MD->NumLake;
-#ifdef _PIHMOMP
-    omp_set_num_threads(MD->CS.num_threads);
-    screeninfo("\nopenMP enabled. No of Threads = %d\n", MD->CS.num_threads);
-    udata = N_VNew_OpenMP(NY, MD->CS.num_threads);
-    du = N_VNew_Serial(NY);
-#else
+
     screeninfo("\nopenMP disabled\n");
     u1 = N_VNew_Serial(N1);
     u2 = N_VNew_Serial(N2);
@@ -191,7 +186,7 @@ double PIHM_uncouple(FileIn *fin, FileOut *fout){
     du3 = N_VNew_Serial(N3);
     du4 = N_VNew_Serial(N4);
     du5 = N_VNew_Serial(N5);
-#endif
+
     MD->LoadIC(fin);
     MD->SetIC2Y(u1, u2, u3, u4, u5);
     
