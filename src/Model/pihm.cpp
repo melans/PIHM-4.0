@@ -95,9 +95,9 @@ double PIHM(FileIn *fin, FileOut *fout){
             MD->updateforcing(t);
             /* calculate Interception Storage */
             MD->EvapoTranspiration(t, dt);
-//            flag = CVode(mem, tout, udata, &t, CV_NORMAL);
-//            check_flag(&flag, "CVode", 1);
-            t = tout;  /* debug only. */
+            flag = CVode(mem, tout, udata, &t, CV_NORMAL);
+            check_flag(&flag, "CVode", 1);
+//            t = tout;  /* debug only. */
         }
         tnext += MD->CS.MaxStep;
         MD->summary(udata);
