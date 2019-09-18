@@ -81,7 +81,7 @@ double PIHM(FileIn *fin, FileOut *fout){
     MD->gc.write(fout->Calib_bak);
     timeNow = t;
     f(t, udata, du, MD); /* Initialized the status */
-    for (int i = 0; i < MD->CS.NumSteps && !ierr; i++) {
+    for (int i = 0; i <= MD->CS.NumSteps && !ierr; i++) {
 //        FILE *file_debug = fopen("DY_debug.dat", "wb");
 //        fclose(file_debug);
         /* inner loops to next output points with ET step size control */
@@ -95,9 +95,9 @@ double PIHM(FileIn *fin, FileOut *fout){
             MD->updateforcing(t);
             /* calculate Interception Storage */
             MD->EvapoTranspiration(t, dt);
-            flag = CVode(mem, tout, udata, &t, CV_NORMAL);
-            check_flag(&flag, "CVode", 1);
-//            t = tout;  /* debug only. */
+//            flag = CVode(mem, tout, udata, &t, CV_NORMAL);
+//            check_flag(&flag, "CVode", 1);
+            t = tout;  /* debug only. */
         }
         tnext += MD->CS.MaxStep;
         MD->summary(udata);
