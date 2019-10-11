@@ -8,7 +8,7 @@
 
 #include "CommandIn.hpp"
 void CommandIn::PIHM_help(void ){
-    printf ("\n\nUsage: ./pihm [-p projectfile] [-o output_folder] [-n Num_Threads] <project name> \n\n");
+    printf ("\n\nUsage: ./pihm [-0 ][-p projectfile] [-o output_folder] [-n Num_Threads] <project name> \n\n");
     printf ("\t-o output folder. Default is output/projname.out\n");
     printf ("\t-p projectfile, which include the path for each input and output path.\n");
     printf ("\t-n Number of threads to run with OpenMP for pihm++ or calib_omp. \n");
@@ -19,8 +19,11 @@ void CommandIn::parse(int argc, char **argv){
         PIHM_help();
         myexit(ERRSUCCESS);
     }
-    while ((c = getopt (argc, argv, "c:e:n:o:p:")) != -1){
+    while ((c = getopt (argc, argv, "0c:e:n:o:p:")) != -1){
         switch (c){
+            case '0':
+                dummy_mode = 1;
+                break;
             case 'c':
                 strcpy(calibfile, optarg);
                 break;

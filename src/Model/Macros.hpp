@@ -89,6 +89,7 @@
 /*=======================*/
 #define ID 94 // debug only.
 extern int debug_mode;
+extern int dummy_mode;
 extern int verbose_mode;
 extern int sinks_remove;
 extern int smooth_river;

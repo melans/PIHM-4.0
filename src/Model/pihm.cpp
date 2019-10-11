@@ -22,7 +22,7 @@ double *uYriv;
 double *uYlake;
 double *globalY;
 double timeNow;
-
+int dummy_mode = 0;
 using namespace std;
 double PIHM(FileIn *fin, FileOut *fout){
     double ret = 0.;
