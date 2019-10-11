@@ -108,6 +108,7 @@ public:
     double reltol = 1.0e-3;    /* relative tolerance [-]*/
     double InitStep = 1.e-2;    /* initial step size [min]*/
     double MaxStep = 30;       /* Maximum step size [min] */
+    double SolverStep = 2;       /* Maximum step size [min] */
     double ETStep = 60;         /* Step for et from interception [min]*/
     double StartTime = 0.;      /* Start time of simulation [min]*/
     double EndTime = 14400;     /* End time of simulation [min]*/
