@@ -62,11 +62,14 @@ void Model_Data::f_updatei(double  *Y, double *DY, double t, int flag){
 }
 void Model_Data::f_update(double  *Y, double *DY, double t){
     for (int i = 0; i < NumEle; i++) {
-        uYsf[i] = (Y[iSF] >= 0.) ? Y[iSF] : 0.;
-        uYus[i] = (Y[iUS] >= 0.) ? Y[iUS] : 0.;
+//        uYsf[i] = (Y[iSF] >= 0.) ? Y[iSF] : 0.;
+//        uYus[i] = (Y[iUS] >= 0.) ? Y[iUS] : 0.;
         
+        uYsf[i] = Y[iSF];
+        uYus[i] = Y[iUS];
         if(Ele[i].iBC == 0){ // NO BC
-            uYgw[i] = max(0.0, Y[iGW]);
+//            uYgw[i] = max(0.0, Y[iGW]);
+            uYgw[i] = Y[iGW];
             Ele[i].QBC = 0.;
         }else if(Ele[i].iBC > 0){ // BC fix head
             Ele[i].yBC = tsd_eyBC.getX(t, Ele[i].iBC);
@@ -110,6 +113,16 @@ void Model_Data::f_update(double  *Y, double *DY, double t){
             Riv[i].yBC = tsd_ryBC.getX(t, Riv[i].BC);
             uYriv[i] = Riv[i].yBC;
         }
+    }
+    
+    for (int i = 0; i < NumRiv; i++) {
+        QrivSurf[i] = 0.;
+        QrivSub[i] = 0.;
+        QrivUp[i] = 0.;
+    }
+    for (int i = 0; i < NumEle; i++) {
+        Qe2r_Surf[i] = 0.;
+        Qe2r_Sub[i] = 0.;
     }
 }
 void Model_Data::summary (N_Vector udata){
