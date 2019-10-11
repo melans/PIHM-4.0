@@ -38,6 +38,7 @@ void Model_Data::modelSummary(FileIn * fileIn, int end){
     screeninfo("\tModel starts at: %.2f day\n", CS.StartTime / 1440);
     screeninfo("\tModel ends at: %.2f day\n", CS.EndTime / 1440);
     screeninfo("\tModel time step(max): %.2f minutes\n", CS.MaxStep);
+//    screeninfo("\tModel time step(normal): %.2f minutes\n", CS.SolverStep);
     screeninfo("\tModel total number of steps(minimum): %d \n", CS.NumSteps);
     sprintf(str,"\tSize of model: \tNcell = %d \tNriver = %d\t NSeg = %d", NumEle, NumRiv, NumSegmt);
     screeninfo(str);
@@ -199,11 +200,17 @@ void Model_Data::rmSinks(){
                 zmin = min(zmin, Ele[inabr].zmax);
             }
         }
-        if( zmin > z + Ele[i].AquiferDepth){
-            fprintf(stderr, "Warning: remove sink on %d, from %.2f to %.2f. dz = %.2f\n", i+1, z, zmin, zmin - z);
-            Ele[i].zmax = zmin;
-            Ele[i].zmin = zmin - Ele[i].AquiferDepth;
+        if( zmin > z){
+            if(Ele[i].RivID <= 0) {
+                fprintf(stderr, "Warning: remove sink on %d, from %.2f to %.2f. dz = %.2f\n", i+1, z, zmin, zmin - z);
+                Ele[i].zmax = zmin;
+                Ele[i].zmin = zmin - Ele[i].AquiferDepth;
+                
+            }else{
+                /* Void*/
+            }
         }
+        
     }
     
     for (int i = 0; i < NumEle; i++) {
