@@ -112,7 +112,7 @@ void Control_Data::updateSimPeriod(double day0, double day1){
     DayEnd = day1;
     StartTime = DayStart  * 1440;
     EndTime = (DayEnd) * 1440;
-    NumSteps = (unsigned long) (EndTime - StartTime) / MaxStep;
+    NumSteps = (unsigned long) (EndTime - StartTime) / SolverStep;
 }
 
 
@@ -245,6 +245,7 @@ void Control_Data::read(const char *fn){
 //            }
         }
     }
+    SolverStep = MaxStep; // Improve it in future for overcasting.
     fclose (fp);
     updateSimPeriod();
 }
