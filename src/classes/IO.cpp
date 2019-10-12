@@ -166,6 +166,8 @@ void FileOut::updateFilePath(){
     //    sprintf(ele_Q_sub, "%s/%s%s.eleqsub", outpath, projname);
     sprintf(ele_Q_subTot, "%s/%s%s.eleqsub", outpath, projectname, suffix);
     sprintf(ele_Q_surfTot, "%s/%s%s.eleqsurf", outpath, projectname, suffix);
+    sprintf(ele_Q_rsurf, "%s/%s%s.eleqrsurf", outpath, projectname, suffix);
+    sprintf(ele_Q_rsub, "%s/%s%s.eleqrsub", outpath, projectname, suffix);
     
     //cell_wb
     sprintf(ewb_q_in, "%s/%s%s.ewbqin", outpath, projectname, suffix);
@@ -316,6 +318,8 @@ void FileOut::copy(FileOut *p){
     strcpy(   ele_q_prcp, p->ele_q_prcp );
     strcpy(   ele_q_netprcp, p->ele_q_netprcp );
     strcpy(   ele_Q_surfTot, p->ele_Q_surfTot );
+    strcpy(   ele_Q_rsurf, p->ele_Q_rsurf );
+    strcpy(   ele_Q_rsub, p->ele_Q_rsub );
     strcpy(   ele_Q_subTot, p->ele_Q_subTot );
     strcpy(   ele_q_infil, p->ele_q_infil );
     strcpy(   ele_q_exfil, p->ele_q_exfil );
