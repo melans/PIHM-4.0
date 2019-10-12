@@ -201,6 +201,10 @@ void Control_Data::read(const char *fn){
             dt_Qe_sub =  val;
         else if (strcasecmp ("dt_Qe_surf", optstr) == 0)
             dt_Qe_surf =  val;
+        else if (strcasecmp ("dt_Qe_rsub", optstr) == 0)
+            dt_Qe_rsub =  val;
+        else if (strcasecmp ("dt_Qe_rsurf", optstr) == 0)
+            dt_Qe_rsurf =  val;
         
         /* River print out control */
         // y Riv
