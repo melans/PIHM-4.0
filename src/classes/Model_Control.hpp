@@ -63,6 +63,8 @@ public:
     /* Element volume Fluxes */
     int dt_Qe_sub = 0;
     int dt_Qe_surf = 0;
+    int dt_Qe_rsub = 0;
+    int dt_Qe_rsurf = 0;
     
     /* River Stage */
     int dt_yr_stage = 0;
