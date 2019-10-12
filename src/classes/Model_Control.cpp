@@ -159,6 +159,8 @@ void Control_Data::read(const char *fn){
             InitStep =  val;
         else if (strcasecmp ("MAX_SOLVER_STEP", optstr) == 0)
             MaxStep =  val;
+        else if (strcasecmp ("Update_IC_STEP", optstr) == 0)
+            UpdateICStep =  val;
         else if (strcasecmp ("ET_STEP", optstr) == 0 || strcasecmp ("LSM_STEP", optstr) == 0)
             ETStep =  val;
         else if (strcasecmp ("START", optstr) == 0)
@@ -371,10 +373,10 @@ void Print_Ctrl::PrintData(double dt, double t){
         }
         NumUpdate = 0;
         if(Ascii){
-            fun_printASCII(t, dt);
+            fun_printASCII(t-Interval, dt);
         }
         if(Binary){
-            fun_printBINARY(t, dt);
+            fun_printBINARY(t-Interval, dt);
         }
         for (int i = 0; i < NumVar; i++){
             buffer[i] = 0.;  /* Reset the buffer */
