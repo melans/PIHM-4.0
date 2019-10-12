@@ -67,6 +67,7 @@ public AttriuteIndex
 public:
     int index;    /* Element No. */
     int RivID = 0;
+    int RivSegID = 0;
     double windH = NA_VALUE;    /* wind measurement height */
     /* for calculation of dh/ds */
 //    double surfH[3];    /* Total head in neighboring cells */
@@ -119,7 +120,7 @@ public:
     void updateElement(double Ysurf, double Yunsat, double Ygw);
 //    void updateWF(double dh, double dt);
     void Flux_Infiltration(double Ysurf, double Yunsat, double Ygw, double netprcp);
-    void Flux_Recharge(double Yunsat, double Ygw);
+    double Flux_Recharge(double Yunsat, double Ygw);
     void printHeader(FILE *fp);
     void printInfo(FILE *fp);
 };
