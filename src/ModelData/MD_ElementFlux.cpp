@@ -1,7 +1,7 @@
 #include "Model_Data.hpp"
 void Model_Data::fun_Ele_Recharge(int i, double t){
-    Ele[i].Flux_Recharge(uYus[i] , uYgw[i]);
-    qEleRecharge[i] = Ele[i].u_qr;
+    qEleRecharge[i] = Ele[i].Flux_Recharge(uYus[i] , uYgw[i]);
+//    qEleRecharge[i] = Ele[i].u_qr;
 }
 
 void Model_Data::fun_Ele_Infiltraion(int i, double t){
