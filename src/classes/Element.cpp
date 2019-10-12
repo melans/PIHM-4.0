@@ -151,41 +151,65 @@ void _Element::applyNabor(_Node *Node, _Element *Ele){
     
 }
 void _Element::Flux_Infiltration(double Ysurf, double Yunsat, double Ygw, double netprcp){
+    double av = Ysurf + netprcp, grad;
     if(Ygw > AquiferDepth){
         /* GW reach the surface */
         u_qex = fabs(Ygw - AquiferDepth) / infD * Kmax; /* Exfiltration must be positive (upward). */
         u_qi = 0. ;
     }else{
+        /* GW level is lower than Surface */
         u_qex = 0.;
-        if(Ysurf > 0.){
-            u_effkInfi = infKsatV * (1 - hAreaF) + hAreaF * macKsatV * u_satn;
-            /* NORMAL GW level */
-            u_qi = (Ysurf + infD) / infD * u_effkInfi;
-//            u_qi = min(Ysurf, max(0., u_qi) );
+        if(av > 0.){
+            grad = 1. + av / infD;
+            if( av > Kmax){
+                /* Heavy rainfall, Macropore works */
+                u_effkInfi = u_satKr * infKsatV * (1 - hAreaF) + hAreaF * macKsatV * u_satn;
+            }else if( av > infKsatV ){
+                /* Medium rainfall, Macropore works */
+                u_effkInfi = u_satKr * infKsatV * (1 - hAreaF) + hAreaF * macKsatV * u_satn;
+            }else{
+                /* Light rainfall */
+                u_effkInfi = 1. * infKsatV * (1 - hAreaF);
+                grad = (av - u_phius) / infD;
+            }
+            u_qi = grad * u_effkInfi;
+//            if(u_qi > av){
+//                av=av;
+//            }
+            u_qi = min(av, max(0., u_qi) );
         }else{
             u_qi = 0;
         }
     }
 //    CheckNANi(u_qi, 0, "u_qi");
 }
-void _Element::Flux_Recharge(double Yunsat, double Ygw){
-    double ke=0.;
-    double grad;
+double _Element::Flux_Recharge(double Yunsat, double Ygw){
+    double ke=0., grad, ku;
+//    double qr;
     if(u_deficit > infD){
         grad = Yunsat / u_deficit;
+        if(grad < 0.1){ // immobile water
+            grad = 0;
+        }
     }else{
         grad = 1.;
     }
     
     if(grad > EPS_DOUBLE){
-//        ke = meanArithmetic(infKsatV * u_satKr, KsatV, u_deficit, Ygw);
-        ke = meanArithmetic(infKsatV * grad / .75, KsatV, u_deficit, Ygw); /* .75 is field capacity. */
+        ku = infKsatV * max(Yunsat / u_deficit, 0.);
+        ke = meanHarmonic(ku, KsatV, u_deficit, Ygw);
+//        ke = meanArithmetic(ku, KsatV, u_deficit, Ygw); /* .75 is field capacity. */
         u_qr = grad * ke;
-        u_qr = min(Yunsat, u_qr);
+        if(Yunsat > 0){
+            u_qr = min(Yunsat, u_qr);
+        }else{
+            u_qr = 0;
+        }
     }else{
         u_qr = 0.;
     }
 //    CheckNANi(u_qr, 0, "u_qr");
+    return u_qr;
 }
 void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
     u_effKH = effKH(Ygw,  AquiferDepth,  macD,  macKsatH,  geo_vAreaF,  KsatH);
