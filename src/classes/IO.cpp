@@ -182,7 +182,7 @@ void FileOut::updateFilePath(){
     sprintf(lake_q_evap, "%s/%s%s.lakvevap", outpath, projectname, suffix);
     sprintf(lake_q_prcp, "%s/%s%s.lakvprcp", outpath, projectname, suffix);
     
-    sprintf(Init_update, "%s/%s%s.update.ic", outpath, projectname, suffix);
+    sprintf(Init_update, "%s/%s%s.cfg.ic.update", outpath, projectname, suffix);
     sprintf(Init_bak, "%s/%s%s.cfg.ic.bak", outpath, projectname, suffix);
     
     sprintf(Calib_bak, "%s/%s%s.cfg.calib.bak", outpath, projectname, suffix);
