@@ -157,6 +157,10 @@ void Model_Data:: initialize(){
         Ele[i].macKsatV *= 1 - Ele[i].Landcover::SoilDgrd;
         Ele[i].VegFrac *= 1 - Ele[i].Landcover::ImpAF;
     }
+    for (int i = 0; i < NumSegmt; i++){
+        Ele[RivSeg[i].iEle - 1].RivID = RivSeg[i].iRiv;
+        Ele[RivSeg[i].iEle - 1].RivSegID = i + 1;
+    }
     rmSinks();
     for (int i = 0; i < NumEle; i++) {
         Ele[i].applyNabor(Node, Ele);
@@ -190,7 +194,6 @@ void Model_Data:: initialize(){
         RivSeg[i].Cwr = Riv_Type[Riv[RivSeg[i].iRiv - 1].type - 1 ].Cwr;
         RivSeg[i].KsatH = Riv_Type[Riv[RivSeg[i].iRiv - 1].type - 1 ].KsatH;
         RivSeg[i].eqDistance = Ele[RivSeg[i].iEle - 1].area / RivSeg[i].length * .5;
-        Ele[RivSeg[i].iEle - 1].RivID = RivSeg[i].iRiv;
         CheckNonZero(RivSeg[i].Cwr, i, "River Segment Cwr");
 //        CheckNonZero(RivSeg[i].KsatH, i, "River Segment KsatH");
     }
@@ -224,10 +227,18 @@ void Model_Data:: initialize_output (FileOut *fout){
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_q_ETA, CS.dt_qe_eta, qEleETA, 1);
     if (CS.dt_qe_rech > 0)
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_q_rech, CS.dt_qe_rech, qEleRecharge, 1);
-    if (CS.dt_Qe_sub > 0)
+    if (CS.dt_Qe_sub > 0){
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_Q_subTot, CS.dt_Qe_sub, QeleSubTot, 1);
-    if (CS.dt_Qe_surf > 0)
+    }
+    if (CS.dt_Qe_surf > 0){
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_Q_surfTot, CS.dt_Qe_surf, QeleSurfTot, 1);
+    }
+    if (CS.dt_Qe_rsub > 0){
+        CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_Q_rsub, CS.dt_Qe_rsub, Qe2r_Sub, 1);
+    }
+    if (CS.dt_Qe_rsurf > 0){
+        CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_Q_rsurf, CS.dt_Qe_rsurf, Qe2r_Surf, 1);
+    }
     if (CS.dt_qe_infil > 0){
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_q_infil, CS.dt_qe_infil, qEleInfil, 1);
         CS.PCtrl[ip++].Init(ForcStartTime, NumEle, fout->ele_q_exfil, CS.dt_qe_infil, qEleExfil, 1);
