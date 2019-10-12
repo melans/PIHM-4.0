@@ -96,8 +96,10 @@ public:
 //    char ele_Q_sub[MAXLEN];
     char ele_Q_surfTot[MAXLEN];
     char ele_Q_subTot[MAXLEN];
+    char ele_Q_rsurf[MAXLEN]; // Element to River via Surface
+    char ele_Q_rsub[MAXLEN]; // Element to River via Subsurface
     char ele_q_infil[MAXLEN];
-    char ele_q_exfil[MAXLEN];
+    char ele_q_exfil[MAXLEN]; // Exfiltration
     char ele_q_rech[MAXLEN];
     
     //cell_wb
