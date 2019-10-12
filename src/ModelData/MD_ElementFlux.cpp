@@ -25,12 +25,18 @@ void Model_Data::fun_Ele_surface(int i, double t){
             nsf = nsf < 0. ? 0. : nsf;
             Dif_Y_Surf = (isf + Ele[i].zmax) - (nsf + Ele[inabr].zmax);
             Avg_Y_Surf = avgY_sf(Ele[i].zmax, isf, Ele[inabr].zmax, nsf, Ele[i].depression);
-            if(Avg_Y_Surf < 0.){
+            if(Avg_Y_Surf <= 0.){
                 QeleSurf[i][j] = 0.;
             }else{
                 Grad_Y_Surf = Dif_Y_Surf / Ele[i].Dist2Nabor[j];
                 CrossA = Avg_Y_Surf * Ele[i].edge[j];
-                QeleSurf[i][j] = ManningEquation(CrossA, Ele[i].avgRough[j], Avg_Y_Surf, Grad_Y_Surf);
+                if(Grad_Y_Surf > 0 && isf <=0){
+                    QeleSurf[i][j] = 0.;
+                }else if(Grad_Y_Surf < 0 && nsf <=0){
+                    QeleSurf[i][j] = 0.;
+                }else{
+                    QeleSurf[i][j] = ManningEquation(CrossA, Ele[i].avgRough[j], Avg_Y_Surf, Grad_Y_Surf);
+                }
 //                CheckNANi(QeleSurf[i][j], i, "QeleSurf[i][j]");
             } //end of ifelse Avg_Y_Surf < 0.
         } else {
