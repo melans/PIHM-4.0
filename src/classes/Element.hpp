@@ -101,6 +101,7 @@ public:
     double u_satn; /* Saturation ratio */
     double u_wf = 0.;
     double u_deficit; /* deficit. aquiferdepth - Ygw */
+    double u_theta; /* Soil moisture content [m3/m3] */ 
 private:
     /* Infiltration */
     double u_phius; /* pressure head of the unsat zone from zmin*/
