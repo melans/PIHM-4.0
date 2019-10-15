@@ -47,6 +47,7 @@ public:
     double  infKsatV;    /* vertical saturated soil conductivity [m/day]*/
     double  ThetaS;    /* soil porosity [m3/m3] */
     double  ThetaR;    /* soil moisture residual [m3/m3] */
+    double  ThetaFC;    /* Field Capacity [m3/m3] */
     double  Alpha;    /* soil curve parameter 1 [1/m]*/
     double  Beta;    /* soil curve parameter 2 [-] */
     double  hAreaF;    /* macroporous area fraction on horizontal section [m2/m2]*/
