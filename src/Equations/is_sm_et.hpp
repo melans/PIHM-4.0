@@ -74,7 +74,7 @@ inline double BulkSurfaceResistance(double R_ref, double lai){
 }
 inline double BulkSurfaceResistance(double lai){
     /* Eq 4.2.22 in David R Maidment, Handbook of Hydrology */
-    return 200. / lai / 60.; /* Allen(1998) */
+    return 200. / 60. / lai;
 }
 inline double PressureElevation(double z){
     return 101.325 * pow((293. - 0.0065 * z) / 293, 5.26); /*Pressure based on Elevation*/

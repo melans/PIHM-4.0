@@ -27,7 +27,7 @@ double flux_R2E_GW(double yr, double zr,
     if( dh > EPS_DOUBLE){
         /* River to Element*/
         if( he > zr ){ // Element gw higher than river bed
-            A = (yr + he - zr) * .5 * L;
+            A = (yr + (he - zr) ) * .5 * L;
         }else{
             A = yr * L;
         }
@@ -39,9 +39,13 @@ double flux_R2E_GW(double yr, double zr,
         }
     }else if (dh < -EPS_DOUBLE){
         /* Element to River */
-        A = (yr + he - zr) * .5 * L;  /* Mean of River stage and he-zr  */
-        g = dh / D_riv;
-        Q = A * K * g;
+        if( ye > EPS_DOUBLE){
+            A = (yr + (he - zr) ) * .5 * L;  /* Mean of River stage and he-zr  */
+            g = dh / D_riv;
+            Q = A * K * g;
+        }else{
+            Q = 0.;
+        }
     }else{
         Q = 0.;
     }
