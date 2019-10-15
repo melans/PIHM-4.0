@@ -33,7 +33,7 @@ double PIHM(FileIn *fin, FileOut *fout){
     void    *mem = NULL;
     SUNLinearSolver LS = NULL;
     int     flag;            /* flag to test return value */
-    double  t, dt, tout;    /* stress period & step size */
+    double  t, tnext;    /* stress period & step size */
     int NY = 0;
     int ierr = 0;
     /* allocate memory for model data structure */
@@ -65,41 +65,38 @@ double PIHM(FileIn *fin, FileOut *fout){
     MD->CS.calibmode(1440);
 #else
     MD->initialize_output(fout);
-    MD->PrintInit(fout->Init_bak);
+    MD->PrintInit(fout->Init_bak, 0);
     MD->InitFloodAlert(fout->floodout);
 #endif
     SetCVODE(mem, f, MD, udata, LS);
     
     /* set start time */
     t = MD->CS.StartTime;
-    double tnext = t;
+    tnext = t;
     //CheckInput(MD, &CS);
     /* start solver in loops */
     getSecond();
     MD->modelSummary(fin, 0);
     MD->debugData(fout->outpath);
     MD->gc.write(fout->Calib_bak);
-    timeNow = t;
+    
     f(t, udata, du, MD); /* Initialized the status */
-    for (int i = 0; i <= MD->CS.NumSteps && !ierr; i++) {
-//        FILE *file_debug = fopen("DY_debug.dat", "wb");
-//        fclose(file_debug);
+    for (int i = 0; i < MD->CS.NumSteps && !ierr; i++) {
+        flag = MD->ScreenPrint(t, i);
+        MD->PrintInit(fout->Init_update, t);
         /* inner loops to next output points with ET step size control */
+        tnext += MD->CS.SolverStep;
         while (t < tnext ) {
-            if (t + MD->CS.ETStep >=tnext) {
-                tout = tnext;
-            } else {
-                tout = t + MD->CS.ETStep;
-            }
-            dt = tout - t;
             MD->updateforcing(t);
             /* calculate Interception Storage */
-            MD->EvapoTranspiration(t, dt);
-            flag = CVode(mem, tout, udata, &t, CV_NORMAL);
-            check_flag(&flag, "CVode", 1);
-//            t = tout;  /* debug only. */
+            MD->EvapoTranspiration(t, MD->CS.ETStep);
+            if(dummy_mode){
+                t = tnext;  /* dummy mode only. */
+            }else{
+                flag = CVode(mem, tnext, udata, &t, CV_NORMAL);
+                check_flag(&flag, "CVode", 1);
+            }
         }
-        tnext += MD->CS.MaxStep;
         MD->summary(udata);
 #ifdef _CALIBMODE
         MD->CS.CV.pushsim(t);
@@ -108,16 +105,12 @@ double PIHM(FileIn *fin, FileOut *fout){
         }
 #else
 //        f(t, udata, du, MD);
-        MD->CS.ExportResults(tnext);
-        flag = MD->ScreenPrint(t, i);
-        if (flag) {
-            if (atInterval(t, 1440)) {
-                MD->PrintInit(fout->Init_update);
-            }
-        }
+        MD->CS.ExportResults(t);
         MD->flood->FloodWarning(t);
 #endif
     }
+    MD->ScreenPrint(t, MD->CS.NumSteps);
+    MD->PrintInit(fout->Init_update, t);
 #ifndef _CALIBMODE
     PrintFinalStats(mem);
 #endif
@@ -197,7 +190,7 @@ double PIHM_uncouple(FileIn *fin, FileOut *fout){
     MD->CS.calibmode(1440);
 #else
     MD->initialize_output(fout);
-    MD->PrintInit(fout->Init_bak);
+    MD->PrintInit(fout->Init_bak, 0);
     MD->InitFloodAlert(fout->floodout);
 #endif
     SetCVODE(mem1, f_surf,  MD, u1, LS1);
@@ -228,6 +221,7 @@ double PIHM_uncouple(FileIn *fin, FileOut *fout){
     double t0 = t, tnext_et = tnext;
     for (int i = 0; i < MD->CS.NumSteps && !ierr; i++) {
         /* inner loops to next output points with ET step size control */
+        tnext += MD->CS.SolverStep;
         while (t < tnext ) {
             if (t + MD->CS.ETStep >=tnext) {
                 tout = tnext;
@@ -269,7 +263,6 @@ double PIHM_uncouple(FileIn *fin, FileOut *fout){
             }
         }
         t0 = t;
-        tnext += MD->CS.MaxStep;
         MD->summary(u1, u2, u3, u4, u5);
 #ifdef _CALIBMODE
         MD->CS.CV.pushsim(t);
@@ -280,11 +273,7 @@ double PIHM_uncouple(FileIn *fin, FileOut *fout){
         //        f(t, udata, du, MD);
         MD->CS.ExportResults(tnext);
         flag = MD->ScreenPrintu(t, i);
-        if (flag) {
-            if (atInterval(t, 1440)) {
-                MD->PrintInit(fout->Init_update);
-            }
-        }
+        MD->PrintInit(fout->Init_update, t);
         printVector(fp1, globalY, 0, N1, t);
         printVector(fp2, globalY, N1, N2, t);
         printVector(fp3, globalY, N1*2, N3, t);
