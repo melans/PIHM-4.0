@@ -138,6 +138,7 @@ public:
     double *yEleGW;   // debug may not necessary
     double *yEleSurf;   // debug may not necessary
     double *yEleUnsat;   // debug may not necessary
+//    double *yEleSM;   // Soil Moisture Ratio
     double *qEleETP;
     double *iBeta;
     double *iPC;
@@ -182,7 +183,7 @@ public:
     void LoadIC(FileIn *fin);
     /* screen print */
     void modelSummary(FileIn * fileIn, int end);
-    void PrintInit(const char *fn);
+    int PrintInit(const char *fn, double t);
     
     void summary(N_Vector u1, N_Vector u2, N_Vector u3, N_Vector u4, N_Vector u5);
     void summary(N_Vector u);
