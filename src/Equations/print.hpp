@@ -13,13 +13,7 @@
 #include "functions.hpp"
 #include "Model_Data.hpp"
 
-//void initialize_output(FileOut *fout, Model_Data * DS, Control_Data  *CS);
-//void fun_printASCII(Print_Ctrl PCtrl, double t, double dt);
-//void fun_printBINARY(Print_Ctrl PCtrl, double t, double dt);
-//void close_output(Control_Data *CS);
-
 void PrintDataNew (Print_Ctrl PCtrl, double tmpt, double dt, Control_Data *CS);
-void PrintInit (Model_Data * DS, char *fn);
 void PIHMlogo(void);
 
 #endif /* print_hpp */

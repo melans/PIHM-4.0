@@ -46,30 +46,3 @@ void PIHMlogo(void){
 }
 
 
-void Model_Data::PrintInit (const char *fn)
-{
-    FILE           *fp;
-    fp = fopen (fn, "w");
-    CheckFile(fp, fn);
-    
-    fprintf (fp, "%d\t%d\n", NumEle, 6);
-    fprintf (fp, "%s\t%s\t%s\t%s\t%s\t%s\n","Index",
-             "Canopy", "Snow", "Surface", "Unsat", "GW");
-    for (int i = 0; i < NumEle; i++){
-        fprintf (fp, "%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", i+1, yEleIS[i], yEleSnow[i], yEleSurf[i], yEleUnsat[i], yEleGW[i]);
-    }
-    fprintf (fp, "%d\t%d\n", NumRiv, 2);
-    fprintf (fp, "%s\t%s\n", "Index", "Stage");
-    for (int i = 0; i < NumRiv; i++){
-        fprintf (fp, "%d\t%lf\n", i+1, yRivStg[i]);
-    }
-    if(NumLake > 0){
-        fprintf (fp, "%d\t%d\n", NumLake, 2);
-        fprintf (fp, "%s\t%s\n", "Index", "LakeStage");
-        for (int i = 0; i < NumLake; i++){
-            fprintf (fp, "%d\t%lf\n", i+1,yLakeStg[i]);
-        }
-    }
-    fclose (fp);
-}
-
