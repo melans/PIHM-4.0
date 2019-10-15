@@ -173,9 +173,6 @@ void _Element::Flux_Infiltration(double Ysurf, double Yunsat, double Ygw, double
                 grad = (av - u_phius) / infD;
             }
             u_qi = grad * u_effkInfi;
-//            if(u_qi > av){
-//                av=av;
-//            }
             u_qi = min(av, max(0., u_qi) );
         }else{
             u_qi = 0;
@@ -185,28 +182,30 @@ void _Element::Flux_Infiltration(double Ysurf, double Yunsat, double Ygw, double
 }
 double _Element::Flux_Recharge(double Yunsat, double Ygw){
     double ke=0., grad, ku;
-//    double qr;
-    if(u_deficit > infD){
-        grad = Yunsat / u_deficit;
-        if(grad < 0.1){ // immobile water
-            grad = 0;
-        }
-    }else{
+    if( u_theta > ThetaFC){
+        /* WET condition. SM > FC. Free recharge */
         grad = 1.;
+    }else if (u_theta > ThetaR) {
+        grad = (u_theta - ThetaR) / (ThetaFC - ThetaR);
+    }else{
+        /* DRY condition. */
+        grad = 0;
     }
-    
-    if(grad > EPS_DOUBLE){
-        ku = infKsatV * max(Yunsat / u_deficit, 0.);
+    if( infKsatV <= 0. || KsatV <= 0.){
+        u_qr = 0.;
+    }else{
+        ku = infKsatV * u_satKr; //max(Yunsat / u_deficit, 0.);
         ke = meanHarmonic(ku, KsatV, u_deficit, Ygw);
-//        ke = meanArithmetic(ku, KsatV, u_deficit, Ygw); /* .75 is field capacity. */
+        //        ke = meanArithmetic(ku, KsatV, u_deficit, Ygw); /* .75 is field capacity. */
         u_qr = grad * ke;
         if(Yunsat > 0){
             u_qr = min(Yunsat, u_qr);
         }else{
             u_qr = 0;
         }
-    }else{
-        u_qr = 0.;
+        if(u_qr<0){
+            ke=ke;
+        }
     }
 //    CheckNANi(u_qr, 0, "u_qr");
     return u_qr;
@@ -218,17 +217,21 @@ void _Element::updateElement(double Ysurf, double Yunsat, double Ygw){
     if(u_deficit <= 0. ){
         u_deficit = 0.;
         u_satn = 1.;
+        u_theta = ThetaS;
     }else{
-        u_satn = (Yunsat / u_deficit * ThetaS - ThetaR) / (ThetaS - ThetaR) ;
+        u_theta = Yunsat / u_deficit * ThetaS;
+        u_satn = (u_theta - ThetaR) / (ThetaS - ThetaR) ;
     }
     if(u_satn > 0.99 ){
         u_satn = 1.0;
         u_satKr = 1.0;
         u_phius = 0.;
+        u_theta = ThetaS;
     }else if(u_satn <= EPS_DOUBLE){
         u_satn = 0.;
         u_satKr = 0.;
         u_phius = MINPSI;
+        u_theta = ThetaR;
     }else{
         u_satKr = satKfun(u_satn, Beta);
         u_phius = sat2psi(u_satn, Alpha, Beta);
@@ -258,6 +261,7 @@ void _Element::copyGeol(Geol_Layer *g){
 void _Element::copySoil(Soil_Layer *g){
     infKsatV = g[iSoil - 1].infKsatV;
     ThetaS = g[iSoil - 1].ThetaS;
+    ThetaFC = ThetaS * FieldCapacityRatio;
     ThetaR = g[iSoil - 1].ThetaR;
     Alpha = g[iSoil - 1].Alpha;
     Beta = g[iSoil - 1].Beta;
