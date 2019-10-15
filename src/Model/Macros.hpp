@@ -41,7 +41,7 @@
 #define EPS_DOUBLE 1.0e-10 // precision of double type in 1.e-14.
 #define EPS_SLOPE   0.05e-6
 #define MINPSI -1000000
-
+#define FieldCapacityRatio 0.75
 #define NUMRIVFLX 11
 #define NUMPRINTVAR 24
 #define MAXQUE 10000
