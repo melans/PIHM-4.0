@@ -60,18 +60,16 @@ void Model_Data::tReadForcing(double t, int i){
     if(uYgw[i] > Ele[i].WetlandLevel){
         iBeta[i] = 1.;
     }else{
-        iBeta[i] = SoilMoistureStress(Soil[(Ele[i].iSoil - 1)].ThetaS,
-                                  Soil[(Ele[i].iSoil - 1)].ThetaR,
-                                  Ele[i].u_satn);
+        iBeta[i] = SoilMoistureStress(Soil[(Ele[i].iSoil - 1)].ThetaS, Soil[(Ele[i].iSoil - 1)].ThetaR, Ele[i].u_satn);
     }
     if(t_lai[i] > 0.){
         if(uYgw[i] > Ele[i].RootReachLevel){
             iPC[i] = 1.;
         }else{
-            iPC[i] = PlantCoeff(Ele[i].Rs_ref, Ele[i].Rmin, t_lai[i], t_temp[i],
-                                r_a, t_rn[i], es, ea,
-                                iBeta[i], Gamma, Delta);
-//            iPC[i] *= iBeta[i]; /* If soil is dry, no Et*/
+            iPC[i] = PlantCoeff(Ele[i].Rs_ref, Ele[i].Rmin, t_lai[i], t_temp[i], r_a, t_rn[i], es, ea, iBeta[i], Gamma, Delta);
+            if(iBeta[i] <= 0){
+                iPC[i] = 0;
+            }
         }
     }else{
         iPC[i] = 0.;
@@ -79,7 +77,7 @@ void Model_Data::tReadForcing(double t, int i){
 }
 
 void Model_Data::EvapoTranspiration(double t, double dt){
-//    double  Rn=NA_VALUE, Vel=NA_VALUE, RH=NA_VALUE, rl=NA_VALUE;
+    //    double  Rn=NA_VALUE, Vel=NA_VALUE, RH=NA_VALUE, rl=NA_VALUE;
     double  T=NA_VALUE,  LAI=NA_VALUE;
     double  isval = 0.;// etval = 0;
     double  DT_min = NA_VALUE;
@@ -90,7 +88,7 @@ void Model_Data::EvapoTranspiration(double t, double dt){
     MeltRateCanopy=NA_VALUE,
     MF=NA_VALUE,
     ret=NA_VALUE;
-    DT_min = dt ; /* dt [min] */
+    DT_min =   1 ; /* dt [min] */
 #ifdef _PIHMOMP
 #pragma omp for parallel default(shared) private(i) num_threads(CS.num_threads)
 #endif
@@ -99,10 +97,10 @@ void Model_Data::EvapoTranspiration(double t, double dt){
         T = t_temp[i];
         LAI = t_lai[i];
         MF = t_mf[i];
-//        Rn = t_rn[i];
-//        Vel = t_wind[i];
-//        RH = t_rh[i];
-//        rl = t_rl[i];
+        //        Rn = t_rn[i];
+        //        Vel = t_wind[i];
+        //        RH = t_rh[i];
+        //        rl = t_rl[i];
         /* Snow Accumulation/Melt Calculation*/
         if( T < Ts){
             fracSnow = 1.;
@@ -172,48 +170,51 @@ void Model_Data::EvapoTranspiration(double t, double dt){
             qEleTF[i] = 0.0;
         }
         if(yEleISmax[i] >0.){
-        if (yEleIS[i] >= yEleISmax[i]) {
-            if (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) >= qEleET[i][0] + qEleTF[i]) {
+            if (yEleIS[i] >= yEleISmax[i]) {
+                if (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) >= qEleET[i][0] + qEleTF[i]) {
+                    qEleETloss[i] = qEleET[i][0];
+                    ret = qEleTF[i] + yEleIS[i] - yEleISmax[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - (qEleET[i][0] + qEleTF[i]));
+                    isval = yEleISmax[i];
+                    //EleIS[i] = yEleISmax[i];
+                } else if ((((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) < qEleET[i][0] + qEleTF[i]) && (yEleIS[i] + DT_min * ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy - qEleET[i][0] - qEleTF[i]) <= 0)) {
+                    qEleET[i][0] = (qEleET[i][0] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
+                    ret = (qEleTF[i] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
+                    //EleIS[i] = 0;
+                    isval = 0;
+                    qEleETloss[i] = qEleET[i][0];
+                } else {
+                    isval = yEleIS[i] + DT_min * (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]);
+                    //EleIS[i] = EleIS[i] + dt * (((1 - fracSnow) * ElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - EleET[i][0] - EleTF[i]);
+                    ret = qEleTF[i];
+                    qEleETloss[i] = qEleET[i][0];
+                }
+            } else if ((yEleIS[i] < yEleISmax[i]) && ((yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min) >= yEleISmax[i])) {
                 qEleETloss[i] = qEleET[i][0];
-                ret = qEleTF[i] + yEleIS[i] - yEleISmax[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - (qEleET[i][0] + qEleTF[i]));
                 isval = yEleISmax[i];
-                //EleIS[i] = yEleISmax[i];
-            } else if ((((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) < qEleET[i][0] + qEleTF[i]) && (yEleIS[i] + DT_min * ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy - qEleET[i][0] - qEleTF[i]) <= 0)) {
-                qEleET[i][0] = (qEleET[i][0] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
-                ret = (qEleTF[i] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
-                //EleIS[i] = 0;
+                ret = qEleTF[i] + ((yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min) - yEleISmax[i]);
+            } else if ((yEleIS[i] < yEleISmax[i]) && ((yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min) <= 0)) {
+                if ((qEleET[i][0] > 0) || (qEleTF[i] > 0)) {
+                    qEleET[i][0] = (qEleET[i][0] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
+                    ret = (qEleTF[i] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
+                } else {
+                    qEleET[i][0] = 0;
+                    ret = 0;
+                }
+                qEleETloss[i] = qEleET[i][0];
                 isval = 0;
-                qEleETloss[i] = qEleET[i][0];
             } else {
-                isval = yEleIS[i] + DT_min * (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]);
-                //EleIS[i] = EleIS[i] + dt * (((1 - fracSnow) * ElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - EleET[i][0] - EleTF[i]);
+                isval = yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min;
+                qEleETloss[i] = qEleET[i][0];
                 ret = qEleTF[i];
-                qEleETloss[i] = qEleET[i][0];
             }
-        } else if ((yEleIS[i] < yEleISmax[i]) && ((yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min) >= yEleISmax[i])) {
-            qEleETloss[i] = qEleET[i][0];
-            isval = yEleISmax[i];
-            ret = qEleTF[i] + ((yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min) - yEleISmax[i]);
-        } else if ((yEleIS[i] < yEleISmax[i]) && ((yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min) <= 0)) {
-            if ((qEleET[i][0] > 0) || (qEleTF[i] > 0)) {
-                qEleET[i][0] = (qEleET[i][0] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
-                ret = (qEleTF[i] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
-            } else {
-                qEleET[i][0] = 0;
-                ret = 0;
-            }
-            qEleETloss[i] = qEleET[i][0];
-            isval = 0;
-        } else {
-            isval = yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min;
-            qEleETloss[i] = qEleET[i][0];
-            ret = qEleTF[i];
-        }
         }else{
             ret = 0.;
             isval = 0.;
         }
         qEleNetPrep[i] = (1 - Ele[i].VegFrac) * (1 - fracSnow) * qElePrep[i] + ret + MeltRateGrnd;
+        if(qElePrep[i] < qEleNetPrep[i]){
+            i=i;
+        }
         qEleTF[i] = ret;
         yEleIS[i] = isval;
 #ifdef _DEBUG
@@ -229,6 +230,161 @@ void Model_Data::EvapoTranspiration(double t, double dt){
         f_etFlux(i, t);
     } // end of for i=1:NumEle
 }
+//
+//void Model_Data::EvapoTranspiration(double t, double dt){
+////    double  Rn=NA_VALUE, Vel=NA_VALUE, RH=NA_VALUE, rl=NA_VALUE;
+//    double  T=NA_VALUE,  LAI=NA_VALUE;
+//    double  isval = 0.;// etval = 0;
+//    double  DT_min = NA_VALUE;
+//    double  r_ISMax = 0.0;
+//    double  fracSnow = NA_VALUE,
+//    snowRate=NA_VALUE,
+//    MeltRateGrnd=NA_VALUE,
+//    MeltRateCanopy=NA_VALUE,
+//    MF=NA_VALUE,
+//    ret=NA_VALUE;
+//    DT_min = dt ; /* dt [min] */
+//#ifdef _PIHMOMP
+//#pragma omp for parallel default(shared) private(i) num_threads(CS.num_threads)
+//#endif
+//    for(int i = 0; i < NumEle; i++) {
+//        /* Note the dependence on physical units */
+//        T = t_temp[i];
+//        LAI = t_lai[i];
+//        MF = t_mf[i];
+////        Rn = t_rn[i];
+////        Vel = t_wind[i];
+////        RH = t_rh[i];
+////        rl = t_rl[i];
+//        /* Snow Accumulation/Melt Calculation*/
+//        if( T < Ts){
+//            fracSnow = 1.;
+//        }else if(T > Tr){
+//            fracSnow = 0.;
+//        }else{
+//            fracSnow = (Tr - T) / (Tr - Ts);
+//        }
+//        snowRate = fracSnow * qElePrep[i];
+//        /* EleSnowGrnd, yEleSnowCanopy, yEleISsnowmax,
+//         * MeltRateGrnd,MeltRateCanopy are the average value prorated
+//         * over the whole elemental area */
+//        yEleSnowGrnd[i] += (1 - Ele[i].VegFrac) * snowRate * DT_min;
+//        yEleSnowCanopy[i] += Ele[i].VegFrac * snowRate * DT_min;
+//        yEleISsnowmax[i] = yEleSnowCanopy[i] > 0 ? 0.003 * LAI * Ele[i].VegFrac : 0;
+//        yEleISsnowmax[i] = yEleISsnowmax[i];
+//        if (yEleSnowCanopy[i] > yEleISsnowmax[i]) {
+//            yEleSnowCanopy[i] = yEleISsnowmax[i];
+//            yEleSnowGrnd[i] = yEleSnowGrnd[i] + yEleSnowCanopy[i] - yEleISsnowmax[i];
+//        }
+//        MeltRateGrnd = MeltRateCanopy = (T > To ? (T - To) * MF : 0.);    /* eq. 7.3.14 in Maidment */
+//        if (yEleSnowGrnd[i] > MeltRateGrnd * DT_min) {
+//            yEleSnowGrnd[i] = yEleSnowGrnd[i] - MeltRateGrnd * DT_min;
+//        } else {
+//            MeltRateGrnd = yEleSnowGrnd[i] / DT_min;
+//            yEleSnowGrnd[i] = 0;
+//        }
+//        if (yEleSnowCanopy[i] > MeltRateCanopy * DT_min) {
+//            yEleSnowCanopy[i] = yEleSnowCanopy[i] - MeltRateCanopy * DT_min;
+//        } else {
+//            MeltRateCanopy = yEleSnowCanopy[i] / DT_min;
+//            yEleSnowCanopy[i] = 0;
+//        }
+//        yEleSnow[i] = yEleSnowCanopy[i] + yEleSnowGrnd[i];
+//        /************************************************************************/
+//        /* ThroughFall and Evaporation from canopy             */
+//        /************************************************************************/
+//        /*
+//         * EleIS, EleET[0] and ret are prorated for the whole
+//         * element. Logistics are simpler if assumed in volumetric
+//         * form by multiplication of Area on either side of equation
+//         */
+//        yEleISmax[i] = gc.cISmax * 0.0002 * LAI * Ele[i].VegFrac;
+//        /* Note the dependence on physical units */
+//        if(yEleISmax[i] > 0.){
+//            yEleIS[i] = min(yEleIS[i], yEleISmax[i]);
+//            r_ISMax = yEleIS[i] / yEleISmax[i];
+//        }else{
+//            yEleISmax[i] = 0.;
+//            r_ISMax = 0.;
+//        }
+//        if (LAI > 0.0 && Ele[i].VegFrac > 0.0) {
+//            if(yEleIS[i] < 0){
+//                qEleET[i][0] = 0.;
+//            }else{
+//                qEleET[i][0] = gc.cEt0 * Ele[i].VegFrac * sqrt(r_ISMax) * qEleETP[i];
+//            }
+//            qEleET[i][0] = qEleET[i][0] < 0 ? 0 : qEleET[i][0];
+//
+//            if(yEleIS[i] <= 0 ){
+//                qEleTF[i] = 0.;
+//            }else{
+//                qEleTF[i] = 0.0565 * yEleISmax[i] * exp(3.89 * r_ISMax);
+//            }
+//        } else {
+//            qEleET[i][0] = 0.0;
+//            qEleTF[i] = 0.0;
+//        }
+//        if(yEleISmax[i] >0.){
+//        if (yEleIS[i] >= yEleISmax[i]) {
+//            if (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) >= qEleET[i][0] + qEleTF[i]) {
+//                qEleETloss[i] = qEleET[i][0];
+//                ret = qEleTF[i] + yEleIS[i] - yEleISmax[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - (qEleET[i][0] + qEleTF[i]));
+//                isval = yEleISmax[i];
+//                //EleIS[i] = yEleISmax[i];
+//            } else if ((((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) < qEleET[i][0] + qEleTF[i]) && (yEleIS[i] + DT_min * ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy - qEleET[i][0] - qEleTF[i]) <= 0)) {
+//                qEleET[i][0] = (qEleET[i][0] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
+//                ret = (qEleTF[i] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
+//                //EleIS[i] = 0;
+//                isval = 0;
+//                qEleETloss[i] = qEleET[i][0];
+//            } else {
+//                isval = yEleIS[i] + DT_min * (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]);
+//                //EleIS[i] = EleIS[i] + dt * (((1 - fracSnow) * ElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - EleET[i][0] - EleTF[i]);
+//                ret = qEleTF[i];
+//                qEleETloss[i] = qEleET[i][0];
+//            }
+//        } else if ((yEleIS[i] < yEleISmax[i]) && ((yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min) >= yEleISmax[i])) {
+//            qEleETloss[i] = qEleET[i][0];
+//            isval = yEleISmax[i];
+//            ret = qEleTF[i] + ((yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min) - yEleISmax[i]);
+//        } else if ((yEleIS[i] < yEleISmax[i]) && ((yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min) <= 0)) {
+//            if ((qEleET[i][0] > 0) || (qEleTF[i] > 0)) {
+//                qEleET[i][0] = (qEleET[i][0] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
+//                ret = (qEleTF[i] / (qEleET[i][0] + qEleTF[i])) * (yEleIS[i] / DT_min + ((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy));
+//            } else {
+//                qEleET[i][0] = 0;
+//                ret = 0;
+//            }
+//            qEleETloss[i] = qEleET[i][0];
+//            isval = 0;
+//        } else {
+//            isval = yEleIS[i] + (((1 - fracSnow) * qElePrep[i] * Ele[i].VegFrac + MeltRateCanopy) - qEleET[i][0] - qEleTF[i]) * DT_min;
+//            qEleETloss[i] = qEleET[i][0];
+//            ret = qEleTF[i];
+//        }
+//        }else{
+//            ret = 0.;
+//            isval = 0.;
+//        }
+//        qEleNetPrep[i] = (1 - Ele[i].VegFrac) * (1 - fracSnow) * qElePrep[i] + ret + MeltRateGrnd;
+//        if(qElePrep[i] < qEleNetPrep[i]){
+//            i=i;
+//        }
+//        qEleTF[i] = ret;
+//        yEleIS[i] = isval;
+//#ifdef _DEBUG
+//        CheckNANi(qEleNetPrep[i], i, "qEleNetPrep[i]");
+//        CheckNANi(qElePrep[i], i, "qElePrep[i]");
+//        CheckNANi(qEleET[i][0], i, "qEleET[i][0]");
+//        CheckNANi(qEleET[i][1], i, "qEleET[i][1]");
+//        CheckNANi(qEleET[i][2], i, "qEleET[i][2]");
+//        CheckNANi(qEleTF[i], i, "qEleTF");
+//        CheckNANi(yEleIS[i], i, "yEleIS");
+//        CheckNANi(qEleETloss[i], i, "qEleETloss");
+//#endif
+//        f_etFlux(i, t);
+//    } // end of for i=1:NumEle
+//}
 
 void Model_Data::f_etFlux(int i, double t){
     double  elemSatn, LAI, ETp, Et = 0., Ev = 0.;
