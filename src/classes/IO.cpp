@@ -21,7 +21,7 @@ void mkdir_p( char *dir, int mode) {
 void FileIn::saveProject(){
     FILE *fp;
     char fn[MAXLEN];
-    sprintf(fn, "%s/%s.prj", outpath, projectname);
+    sprintf(fn, "%s/%s.pihm", outpath, projectname);
     fp = fopen(fn,"w");
     CheckFile(fp, fn);
     /*  */
