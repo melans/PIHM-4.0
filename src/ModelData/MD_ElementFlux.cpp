@@ -58,10 +58,8 @@ void Model_Data::fun_Ele_sub(int i, double t){
             /***************************************************************************/
             dy_sub = (uYgw[i] + Ele[i].zmin) - (uYgw[inabr] + Ele[inabr].zmin);
             if(dy_sub > 0. && uYgw[i] <=EPSILON){
-                dy_sub = 0;
                 QeleSub[i][j] = 0.;
             }else if(dy_sub < 0. && uYgw[inabr]<= EPSILON){
-                dy_sub = 0.;
                 QeleSub[i][j] = 0.;
             }else{
                 Avg_Y_Sub = avgY_gw(Ele[i].zmin, uYgw[i], Ele[inabr].zmin, uYgw[inabr], 0.002);  
