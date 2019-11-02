@@ -42,8 +42,6 @@
 #define EPS_SLOPE   0.05e-6
 #define MINPSI -1000000
 #define FieldCapacityRatio 0.75
-#define NUMRIVFLX 11
-#define NUMPRINTVAR 24
 #define MAXQUE 10000
 #define Nforc 5
 #define i_prcp 1
@@ -53,6 +51,7 @@
 #define i_rn 5
 
 /*========Physical Constant value===============*/
+#define PI 3.1415926
 #define MINRIVSLOPE 1e-4
 #define C_air 1004.0
 #define THRESH 0.0
