@@ -26,7 +26,7 @@ void Model_Data::tReadForcing(double t, int i){
     t_prcp[i] = tsd_weather[Ele[i].iForc - 1].getX(t, i_prcp) * gc.cPrep;
     t_temp[i] = tsd_weather[Ele[i].iForc - 1].getX(t, i_temp) +  gc.cTemp;
     t_lai[i] = tsd_LAI.getX(t, Ele[i].iLC) * gc.cLAItsd ;
-    t_mf[i] = tsd_MF.getX(t, Ele[i].iMF);
+    t_mf[i] = tsd_MF.getX(t, Ele[i].iMF) * gc.cMF;
     t_rn[i] = tsd_weather[Ele[i].iForc - 1].getX(t, i_rn) * (1 - Ele[i].Albedo);
     t_wind[i] = (fabs(tsd_weather[Ele[i].iForc - 1].getX(t, i_wind) ) + 1); // +1 voids ZERO.
     t_rh[i] = tsd_weather[Ele[i].iForc - 1].getX(t, i_rh);

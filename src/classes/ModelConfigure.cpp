@@ -186,6 +186,8 @@ void globalCal::push(const char *optstr, double val){
         cTemp = val;
     else if (strcasecmp ("TS_LAI", optstr) == 0)
         cLAItsd = val;
+    else if (strcasecmp ("TS_MF", optstr) == 0)
+        cMF = val;
     /* ET */
     else if (strcasecmp ("ET_IC", optstr) == 0)
         cEt0 = val;
@@ -284,6 +286,8 @@ double globalCal::getValue(const char *optstr){
         ret = cTemp;
     else if (strcasecmp ("TS_LAI", optstr) == 0)
         ret = cLAItsd;
+    else if (strcasecmp ("TS_MF", optstr) == 0)
+        ret = cMF;
     /* ET */
     else if (strcasecmp ("ET_ETP", optstr) == 0)
         ret = cETP;
@@ -379,6 +383,7 @@ void globalCal::write(const char *fn){
     fprintf(fp, "TS_PRCP\t%g\n", cPrep);
     fprintf(fp, "TS_SFCTMP\t%g\n", cTemp);
     fprintf(fp, "TS_LAI\t%g\n", cLAItsd);
+    fprintf(fp, "TS_LAI\t%g\n", cMF);
     fprintf(fp, "ET_ETP\t%g\n", cETP);
     fprintf(fp, "ET_IC\t%g\n", cEt0);
     fprintf(fp, "ET_TR\t%g\n", cEt1);
@@ -448,4 +453,5 @@ void globalCal::copy(globalCal *p){
     cEt2 = p->cEt2 ;
     cISmax = p->cISmax ;
     cLAItsd = p->cLAItsd ;
+    cMF = p->cMF ;
 }

@@ -125,6 +125,7 @@ public:
     double cEt2 = 1;
     double cISmax = 1; /* */
     double cLAItsd = 1;  /* LAI TSD */
+    double cMF = 1;  /* MF TSD */
     
     void copy(globalCal *p);
     void copy(const char **varname, int nvar,  double *x, int nx);
