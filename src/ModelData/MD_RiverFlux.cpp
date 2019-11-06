@@ -34,7 +34,7 @@ void Model_Data::Flux_RiverDown(double t, int i){
                 /* zero-depth-gradient boundary conditions */
                 Perem = Riv[i].u_CSperem;
                 s = Riv[i].BedSlope + uYriv[i] * 2. / Riv[i].Length;
-//                s = Riv[i].BedSlope;
+//                s = Riv[i].BedSlope; // DEBUG ?? WHICH ONE IS BETTER?
                 CSarea = Riv[i].u_CSarea;
                 R = (Perem <= 0.) ? 0. : (CSarea / Perem);
                 QrivDown[i] = ManningEquation(CSarea, n, R, s);
