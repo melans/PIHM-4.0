@@ -1,6 +1,4 @@
-//
 //  MD_uncouple.cpp
-//  pihm++
 //
 //  Created by Lele Shu on 9/6/19.
 //  Copyright © 2019 Lele Shu. All rights reserved.

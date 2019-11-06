@@ -1,6 +1,4 @@
-//
 //  MD_f_omp.cpp
-//  pihm_omp
 //
 //  Created by Lele Shu on 9/5/19.
 //  Copyright © 2019 Lele Shu. All rights reserved.

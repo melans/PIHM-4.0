@@ -1,4 +1,3 @@
-
 #include "Model_Data.hpp"
 #include "is_sm_et.hpp"
 
