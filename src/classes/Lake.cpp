@@ -1,10 +1,4 @@
-/*******************************************************************************
- * File        : Lake.cpp                                                      *
- * Version     : Jul, 2018 (PIHM++ 4.0)                                        *
- * Function    : PIHM (Penn State Integrated Hydrologic Model                  *
- * Developer of PIHM++ 3.0:     Lele Shu (lele.shu@gmail.com)                  *
- *-----------------------------------------------------------------------------*
- *******************************************************************************/
+
 #include "Lake.hpp"
 Orifice_Outlet::Orifice_Outlet(){}
 void Orifice_Outlet::init(double c0, double a){

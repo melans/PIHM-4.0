@@ -1,8 +1,7 @@
 /*******************************************************************************
  * File        : Lake.hpp                                                      *
- * Version     : Jul, 2018 (PIHM++ 3.0)                                        *
- * Function    : PIHM (Penn State Integrated Hydrologic Model                  *
- * Developer of PIHM++ 3.0:     Lele Shu (lele.shu@gmail.com)                  *
+ * Version     : Jul, 2018                                      *
+ * Developer   :     Lele Shu (lele.shu@gmail.com)                  *
  *-----------------------------------------------------------------------------*
  *******************************************************************************/
 #ifndef Lake_hpp
