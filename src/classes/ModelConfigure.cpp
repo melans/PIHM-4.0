@@ -1,6 +1,4 @@
-//
-//  ModelParameters.cpp
-//  PIHM++ (v 4.0)
+//  ModelConfigure.cpp
 //
 //  Created by Lele Shu on 9/18/18.
 //  Copyright © 2018 Lele Shu. All rights reserved.
