@@ -1,6 +1,4 @@
-//
 //  Macros.h
-//  PIHM++ (v 4.0)
 //
 //  Created by Lele Shu on 2/16/17.
 //  Copyright (c) 2017 Lele Shu. All rights reserved.
@@ -9,12 +7,6 @@
 #define PIHM3_0_Macros_h
 #include <math.h>
 #include <vector>
-/* SUNDIAL 3.0 and above*/
-//#include "sundials_types.h" /* realtype, integertype, boolean type definition */
-//#include "cvode.h" /* CVODE header file  */
-//#include "sundials_spgmr.h" /* CVSPGMR linear header file  */
-//#include "sundials_dense.h" /* use generic DENSE linear solver */
-//#include "sundials_math.h" /* contains UnitRoundoff, RSqrt, SQR functions */
 
 #ifdef _PIHMOMP
 #include "omp.h"
