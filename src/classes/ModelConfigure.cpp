@@ -87,8 +87,8 @@ void Soil_Layer::checkValue(){
     checkRange(Alpha, .05, 20., index - 1, "Alpha");
     checkRange(Beta, 1., 10., index - 1, "Beta");
     checkRange(infKsatV, 0., 1.0e3, index - 1, "infKsatV");
-    checkRange(infD, 0., 10., index - 1, "Alpha");
-    checkRange(hAreaF, 0., 100., index - 1, "Alpha");
+    checkRange(infD, 0., 10., index - 1, "infD");
+    checkRange(hAreaF, 0., 100., index - 1, "hAreaF");
     checkRange(ThetaS, 0.001, 1., index - 1, "ThetaS");
 }
 void Geol_Layer::applyCalib(calib_geol *g){
