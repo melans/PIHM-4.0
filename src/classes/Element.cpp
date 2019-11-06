@@ -60,44 +60,44 @@ void AttriuteIndex::printInfo(FILE *fp){
 }
 
 void _Element::applyGeometry(_Node *Node){
-    double  a_x, a_y, b_x, b_y, c_x, c_y;
-    double  a_zmin, a_zmax, b_zmin, b_zmax, c_zmin, c_zmax;
+    double  x1, y1, x2, y2, x3, y3;
+    double  zmin1, zmax1, zmin2, zmax2, zmin3, zmax3;
     double  aqd, z0;
-    a_x = Node[node[0] - 1].x;
-    b_x = Node[node[1] - 1].x;
-    c_x = Node[node[2] - 1].x;
-    a_y = Node[node[0] - 1].y;
-    b_y = Node[node[1] - 1].y;
-    c_y = Node[node[2] - 1].y;
+    x1 = Node[node[0] - 1].x;
+    x2 = Node[node[1] - 1].x;
+    x3 = Node[node[2] - 1].x;
+    y1 = Node[node[0] - 1].y;
+    y2 = Node[node[1] - 1].y;
+    y3 = Node[node[2] - 1].y;
     
-    a_zmin = Node[node[0] - 1].zmin;
-    b_zmin = Node[node[1] - 1].zmin;
-    c_zmin = Node[node[2] - 1].zmin;
-    a_zmax = Node[node[0] - 1].zmax;
-    b_zmax = Node[node[1] - 1].zmax;
-    c_zmax = Node[node[2] - 1].zmax;
+    zmin1 = Node[node[0] - 1].zmin;
+    zmin2 = Node[node[1] - 1].zmin;
+    zmin3 = Node[node[2] - 1].zmin;
+    zmax1 = Node[node[0] - 1].zmax;
+    zmax2 = Node[node[1] - 1].zmax;
+    zmax3 = Node[node[2] - 1].zmax;
     
-    area = 0.5 * ((b_x - a_x) * (c_y - a_y) - (b_y - a_y) * (c_x - a_x));
+    area = 0.5 * ((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1));
     
-    zmax = (a_zmax + b_zmax + c_zmax) / 3.0;
-    zmin = (a_zmin + b_zmin + c_zmin) / 3.0;
+    zmax = (zmax1 + zmax2 + zmax3) / 3.0;
+    zmin = (zmin1 + zmin2 + zmin3) / 3.0;
     if(zcentroid != NA_VALUE){
         z0 = zmax;
         aqd = zmax - zmin;
 //        zmax = (zmax+ zcentroid) * 0.5;
-        zmax = (a_zmax + b_zmax + c_zmax + zcentroid) / 4.0;
-//        zmax = (a_zmax + b_zmax + c_zmax) / 3.0;  // debug
+        zmax = (zmax1 + zmax2 + zmax3 + zcentroid) / 4.0;
+//        zmax = (zmax1 + zmax2 + zmax3) / 3.0;  // debug
         zmin = zmax - aqd;
         if(fabs(z0 - zmax) > 10.){
 //            printf("DZ(%d) = %f\n", index, z0 - zmax);
         }
     }
     /* calculate centroid of triangle */
-    x = (a_x + b_x + c_x) / 3.0;
-    y = (a_y + b_y + c_y) / 3.0;
-    edge[0] = Eudist(b_x, b_y, c_x, c_y);
-    edge[1] = Eudist(c_x, c_y, a_x, a_y);
-    edge[2] = Eudist(a_x, a_y, b_x, b_y);
+    x = (x1 + x2 + x3) / 3.0;
+    y = (y1 + y2 + y3) / 3.0;
+    edge[0] = Eudist(x2, y2, x3, y3);
+    edge[1] = Eudist(x3, y3, x1, y1);
+    edge[2] = Eudist(x1, y1, x2, y2);
 }
 void _Element::InitElement(){
     AquiferDepth = zmax - zmin;
