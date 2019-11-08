@@ -268,7 +268,7 @@ void _Element::copySoil(Soil_Layer *g){
     infD = g[iSoil - 1].infD;
     
     CheckNonZero(ThetaS, index-1, "ThetaS");
-    CheckNonZero(ThetaR, index-1, "ThetaR");
+    CheckNonNegative(ThetaR, index-1, "ThetaR");
     CheckNonZero(infD, index-1, "infD");
 }
 void _Element::copyLandc(Landcover *g){

@@ -113,7 +113,7 @@ double getSecond(void)
     return sec;
 }
 
-void CheckNonNegtive(double x, int i, const char *s)
+void CheckNonNegative(double x, int i, const char *s)
 {
     if (x < 0.0 || isnan(x) || isinf(x) || fabs(x - NA_VALUE) < EPS_DOUBLE) {
         printf("ERROR: Value %e for %s of Element %d is not allowed. Please check again.\n", x, s, i + 1);
