@@ -38,6 +38,7 @@ void printVector(FILE *fid, double * x, int xstart, int n, double t);
 void printVectorBin(FILE *fid, double * x, int xstart, int n, double t);
 
 void CheckNonZero(double x, int i, const char *s);
+void CheckNonNegative(double x, int i, const char *s);
 void CheckNonZero(int x, int i, const char *s);
 void CheckNonZero(double x, int i, int j, const char *s);
 void CheckNANi(double x, int i, const char *s);
