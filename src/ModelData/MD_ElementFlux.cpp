@@ -7,7 +7,7 @@ void Model_Data::fun_Ele_Recharge(int i, double t){
 void Model_Data::fun_Ele_Infiltraion(int i, double t){
     Ele[i].Flux_Infiltration(uYsf[i] , uYus[i] , uYgw[i], qEleNetPrep[i]  );
     qEleInfil[i] = Ele[i].u_qi;
-    qEleExfil[i] = Ele[i].u_qex;
+    qEleExfil[i] = Ele[i].u_qex * vExf;
 }
 void Model_Data::fun_Ele_surface(int i, double t){
     int j, inabr;
