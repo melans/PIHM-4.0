@@ -90,6 +90,7 @@ double SoilMoistureStress(double ThetaS, double ThetaR, double SatRatio){
     fc = ThetaS *0.75; /* Assumed field capacity 75% */
     beta_s = (SatRatio * (ThetaS - ThetaR) - ThetaR) / (fc - ThetaR);
     beta_s = min(max(0., beta_s), 1.);
+    beta_s = 0.5 * (1- cos(PI * beta_s));
     return beta_s;
 }
 

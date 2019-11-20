@@ -1,6 +1,4 @@
-//
 //  is_sm_et.h
-//  pihm2.2
 //
 //  Created by Lele Shu on 6/25/18.
 //  Copyright © 2018 Lele Shu. All rights reserved.
@@ -66,6 +64,7 @@ inline double ActualEvaporation(double etp, double ThetaS, double ThetaR, double
 inline double LatentHeat(double Temp){
     /* Eq 4.2.1 in David R Maidment, Handbook of Hydrology */
     /* Temp in [C], lambda in [MJ/kg]*/
+    /* Latent heat of vaporizatio */
     return 2.501 - 0.002361 * Temp;
 }
 inline double BulkSurfaceResistance(double R_ref, double lai){
