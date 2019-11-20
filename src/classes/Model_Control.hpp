@@ -118,6 +118,7 @@ public:
     double dt = 1;
     double *Tout;
     int NumPrint = 0;;
+    int exfiltration = 0;
     Print_Ctrl PCtrl[100];
 #ifdef _CALIBMODE
     ObsnSim CV;

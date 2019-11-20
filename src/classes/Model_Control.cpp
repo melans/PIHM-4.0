@@ -165,6 +165,8 @@ void Control_Data::read(const char *fn){
             DayStart =  val;/* Convert days to Minutes */
         else if (strcasecmp ("END", optstr) == 0)
             DayEnd =  val;    /* Convert days to Minutes */
+        else if (strcasecmp ("Exfiltration", optstr) == 0)
+            exfiltration =  val;/* Convert days to Minutes */
 //        else if (strcasecmp ("STEPSIZE_FACTOR", optstr) == 0)
 //            a =  val;
 //        else if (strcasecmp ("MODEL_STEPSIZE", optstr) == 0)
