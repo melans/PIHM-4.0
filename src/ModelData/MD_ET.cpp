@@ -23,6 +23,7 @@ void Model_Data::updateforcing(double t){
     }
 }
 void Model_Data::tReadForcing(double t, int i){
+    double tmpET;
     t_prcp[i] = tsd_weather[Ele[i].iForc - 1].getX(t, i_prcp) * gc.cPrep;
     t_temp[i] = tsd_weather[Ele[i].iForc - 1].getX(t, i_temp) +  gc.cTemp;
     t_lai[i] = tsd_LAI.getX(t, Ele[i].iLC) * gc.cLAItsd ;
@@ -55,25 +56,26 @@ void Model_Data::tReadForcing(double t, int i){
                                          Ele[i].windH, 10.);     // eq 4.2.25  [min m-1]
     double Gamma = PsychrometricConstant(Ele[i].FixPressure, lambda); // eq 4.2.28  [kPa C-1]
     qEleETP[i] = gc.cETP * Penman_Monteith(Ele[i].FixPressure, (t_rn[i] - 0) * 1.0e-6, rho,
-                                 ed, Delta, r_a, r_s,
+                                 ed, Delta, r_a, r_s * 0.,
                                  Gamma, lambda);                // eq 4.2.27
     if(uYgw[i] > Ele[i].WetlandLevel){
         iBeta[i] = 1.;
     }else{
         iBeta[i] = SoilMoistureStress(Soil[(Ele[i].iSoil - 1)].ThetaS, Soil[(Ele[i].iSoil - 1)].ThetaR, Ele[i].u_satn);
     }
-    if(t_lai[i] > 0.){
+    if(t_lai[i] > 0. && qEleETP[i] >0){
         if(uYgw[i] > Ele[i].RootReachLevel){
             iPC[i] = 1.;
         }else{
-            iPC[i] = PlantCoeff(Ele[i].Rs_ref, Ele[i].Rmin, t_lai[i], t_temp[i], r_a, t_rn[i], es, ea, iBeta[i], Gamma, Delta);
-            if(iBeta[i] <= 0){
-                iPC[i] = 0;
-            }
+            tmpET = iBeta[i] * gc.cETP *  Penman_Monteith(Ele[i].FixPressure, (t_rn[i] - 0) * 1.0e-6, rho,
+                                              ed, Delta, r_a, r_s,
+                                              Gamma, lambda);                // eq 4.2.27
+            iPC[i] = tmpET / qEleETP[i];
         }
     }else{
         iPC[i] = 0.;
     }
+//    CheckNANi(iPC[i] , i, "iPC[i]  (Model_Data::tReadForcing)");
 }
 
 void Model_Data::EvapoTranspiration(double t, double dt){
