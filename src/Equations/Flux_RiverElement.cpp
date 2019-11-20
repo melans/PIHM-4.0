@@ -18,8 +18,8 @@ double flux_R2E_GW(double yr, double zr,
     if(Kele < EPS_DOUBLE || Kriv < EPS_DOUBLE){
         return 0.;
     }else{
-//        K = meanHarmonic(Kele, Kriv, 1., D_riv);
-        K= 0.5 *(Kele + Kriv);
+        K = meanHarmonic(Kele, Kriv, 1., D_riv);
+//        K= 0.5 *(Kele + Kriv);
     }
     he = ye + ze; //head of Ele GW
     hr = yr + zr; //head of river
