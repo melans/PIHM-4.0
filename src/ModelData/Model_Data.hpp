@@ -80,6 +80,7 @@ public:
     int ieSS = 0;
     
     globalCal gc;
+    Control_Data CS;
     
     _Element *Ele;        /* Store Element Information */
     _Node *Node;        /* Store Node Information */
@@ -158,7 +159,6 @@ public:
     
     long ForcStartTime;
     
-    Control_Data CS;
 private:
     double *t_prcp;
     double *t_temp;
@@ -169,7 +169,7 @@ private:
     double *t_lai;
     double *t_mf;
     double *t_rl;
-    
+    double vExf = 0.;
 public:
     /* Methods: */
     Model_Data();
