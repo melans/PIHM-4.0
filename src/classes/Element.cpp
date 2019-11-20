@@ -180,30 +180,27 @@ void _Element::Flux_Infiltration(double Ysurf, double Yunsat, double Ygw, double
 }
 double _Element::Flux_Recharge(double Yunsat, double Ygw){
     double ke=0., grad, ku;
-    if( u_theta > ThetaFC){
-        /* WET condition. SM > FC. Free recharge */
-        grad = 1.;
-    }else if (u_theta > ThetaR) {
-        grad = (u_theta - ThetaR) / (ThetaFC - ThetaR);
+    if(Ygw > AquiferDepth - infD){
+        u_qr  =  0.;
+        return u_qr;
+    }
+    if (u_theta > ThetaR) {
+        if(Yunsat <= EPSILON){
+            grad = 0.;
+        }else{
+            grad = (u_theta - ThetaR) / (ThetaFC - ThetaR);
+        }
     }else{
         /* DRY condition. */
-        grad = 0;
+        grad = 0.;
     }
     if( infKsatV <= 0. || KsatV <= 0.){
         u_qr = 0.;
     }else{
         ku = infKsatV * u_satKr; //max(Yunsat / u_deficit, 0.);
         ke = meanHarmonic(ku, KsatV, u_deficit, Ygw);
-        //        ke = meanArithmetic(ku, KsatV, u_deficit, Ygw); /* .75 is field capacity. */
+//        ke = meanArithmetic(ku, KsatV, u_deficit, Ygw);
         u_qr = grad * ke;
-        if(Yunsat > 0){
-            u_qr = min(Yunsat, u_qr);
-        }else{
-            u_qr = 0;
-        }
-        if(u_qr<0){
-            ke=ke;
-        }
     }
 //    CheckNANi(u_qr, 0, "u_qr");
     return u_qr;
