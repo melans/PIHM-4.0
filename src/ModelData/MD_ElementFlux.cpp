@@ -70,6 +70,7 @@ void Model_Data::fun_Ele_sub(int i, double t){
                 /* It should be weighted average. However, there is an ambiguity about distance used */
                 Kmean = 0.5 * (Ele[i].u_effKH + Ele[inabr].u_effKH);
                 Q = Kmean * grad * Ymean * Ele[i].edge[j];
+//                CheckNA(Q, "Q in Model_Data::fun_Ele_sub");
             }
         } else {
             Q = 0;
