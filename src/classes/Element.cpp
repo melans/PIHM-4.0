@@ -157,7 +157,7 @@ void _Element::Flux_Infiltration(double Ysurf, double Yunsat, double Ygw, double
     }else{
         /* GW level is lower than Surface */
         u_qex = 0.;
-        if(av > 0.){
+        if(av > 0. && u_deficit > infD){
             grad = 1. + av / infD;
             if( av > Kmax){
                 /* Heavy rainfall, Macropore works */
@@ -168,7 +168,7 @@ void _Element::Flux_Infiltration(double Ysurf, double Yunsat, double Ygw, double
             }else{
                 /* Light rainfall */
                 u_effkInfi = 1. * infKsatV * (1 - hAreaF);
-                grad = (av - u_phius) / infD;
+//                grad = (av - u_phius) / infD;
             }
             u_qi = grad * u_effkInfi;
             u_qi = min(av, max(0., u_qi) );
