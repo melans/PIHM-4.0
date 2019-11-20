@@ -6,7 +6,7 @@
 # Programmer: Lele Shu (lele.shu@gmail.com)
 # -----------------------------------------------------------------
 #  Prerequisite:
-#  1 install sundials 3.0+ via https://computation.llnl.gov/projects/sundials/sundials-software.
+#  1 install sundials 5.0+ via https://computation.llnl.gov/projects/sundials/sundials-software.
 #  2 If parallel-computing is prefered, please install OpenMP.
 #	 For mac: 
 #	  		brew install llvm clang

@@ -1,12 +1,12 @@
 # -----------------------------------------------------------------
 # Version: 4.0
-# Date: July 2018 
+# Date: July 2018
 # Makefile for PIHM v4.0
 # -----------------------------------------------------------------
 # Programmer: Lele Shu (lele.shu@gmail.com)
 # -----------------------------------------------------------------
 #  Prerequisite:
-#  1 install sundials 3.0+ via https://computation.llnl.gov/projects/sundials/sundials-software.
+#  1 install sundials 5.0+ via https://computation.llnl.gov/projects/sundials/sundials-software.
 #  2 If parallel-computing is prefered, please install OpenMP.
 #	 For mac: 
 #	  		brew install llvm clang
