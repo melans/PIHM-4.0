@@ -191,16 +191,8 @@ public:
     int ScreenPrintu(double t, unsigned long it);
     /* methods in f function */
     void f_loop(double t);
-    void f_loop1(double t);
-    void f_loop2(double t);
-    void f_loop3(double t);
-    void f_loop4(double t);
-    void f_loop5(double t);
-    
     void f_applyDY(double * DY, double t);
-    void f_applyDYi(double * DY, double t, int flag);
     void f_update(double * Y, double * DY, double t);
-    void f_updatei(double * Y, double * DY, double t, int flag);
     
     void f_loop_omp(double * Y, double * DY, double t);
     void f_applyDY_omp(double * DY, double t);

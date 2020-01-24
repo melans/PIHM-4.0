@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------
 # Version: 4.0
-# Date: July 2018 
+# Date: Jan 2020
 # Makefile for PIHM v4.0
 # -----------------------------------------------------------------
 # Programmer: Lele Shu (lele.shu@gmail.com)
@@ -24,30 +24,25 @@
 # 3 Path of SRC_DIR, default is "SRC_DIR = ."
 # 4 Path of BUILT_DIR, default is "BUILT_DIR = ."
 # -----------------------------------------------------------------
-SUNDIALS_DIR = /usr/local/sundials
-# SUNDIALS_DIR = ~/sundials
-
+SUNDIALS_DIR = $(HOME)/sundials
 
 SHELL = /bin/sh
 BUILDDIR = .
 SRC_DIR = src
 
 LIB_SYS = /usr/local/lib/
-INC_OMP = /usr/local/opt/libomp/include
 LIB_OMP = /usr/local/opt/libomp/lib
+LIB_SUN = ${SUNDIALS_DIR}/lib
 
+INC_OMP = /usr/local/opt/libomp/include
 INC_MPI = /usr/local/opt/open-mpi
 
 TARGET_PIHM     = ${BUILDDIR}/pihm++
 TARGET_OMP      = ${BUILDDIR}/pihm_omp
-TARGET_CB_MPI   = ${BUILDDIR}/calib_mpi
-TARGET_CB_OMP   = ${BUILDDIR}/calib_omp
 TARGET_DEBUG    = ${BUILDDIR}/pihm_debug
 
 MAIN_PIHM 		= ${SRC_DIR}/PIHMmain.cpp
 MAIN_OMP 		= ${SRC_DIR}/PIHMmain.cpp
-MAIN_CB_MPI 	= ${SRC_DIR}/PIHMcalib_MPI.cpp
-MAIN_CB_OMP 	= ${SRC_DIR}/PIHMcalib_OpenMP.cpp
 MAIN_DEBUG 		= ${SRC_DIR}/PIHMmain.cpp
 
 # If compile on Cluster
@@ -59,7 +54,6 @@ MAIN_DEBUG 		= ${SRC_DIR}/PIHMmain.cpp
 CC       = /usr/bin/g++
 MPICC    = /usr/local/bin/mpic++
 CFLAGS   = -O3 -g  -std=c++11
-#STCFLAG     = -static
 LDFLAGS  = 
 LIBS     = -lm
 SRC    	= ${SRC_DIR}/classes/*.cpp \
@@ -89,16 +83,15 @@ SRC_CB_H = ${SRC_H} \
 			  ${SRC_DIR}/PIHMcalib/*.hpp
 INC_CB = ${INCLUDES} \
 		   -I ${SRC_DIR}/PIHMcalib
-		  
+
+RPATH = '-Wl,-rpath,${LIB_SUN}'
+
 LIBRARIES = -L ${LIB_OMP} \
 			-L ${SUNDIALS_DIR}/lib \
 			-L ${LIB_SYS}
 
 LK_FLAGS = -lm -lsundials_cvode -lsundials_nvecserial
 LK_OMP	= -Xpreprocessor -fopenmp -lomp -lsundials_nvecopenmp
-LK_CALIB = _CALIBMODE
-
-
 
 all:
 	@echo 
@@ -109,12 +102,6 @@ all:
 	@echo 'make pihm_omp'
 	make pihm_omp
 	@echo
-	@echo 'make calib_mpi'
-	make calib_mpi
-	@echo
-	
-	@echo 'make calib_omp'
-	make calib_omp
 	@echo
 	
 help:
@@ -123,18 +110,16 @@ help:
 	@(echo '       make all	    	- make both pihm and pihm_omp')
 	@(echo '       make pihm     	- make pihm executable')
 	@(echo '       make pihm_omp    - make pihm_omp with OpenMP support')
-	@(echo '       make calib_mpi   - make calib_mpi with OpenMPI support')
-	@(echo '       make calib_omp   - make calib_omp with OpenMP support')
 	@(echo)
 	@(echo '       make clean    	- remove all executable files')
 	@(echo)
 
 pihm: ${MAIN_PIHM} $(SRC) $(SRC_H)
 	@echo '...Compiling PIHM ...'
-	@echo $(CC) $(CFLAGS) ${STCFLAG} ${INCLUDES} ${LIBRARIES} -o ${TARGET_PIHM} ${MAIN_PIHM} $(SRC)  $(LK_FLAGS)
+	@echo $(CC) $(CFLAGS)  ${INCLUDES} ${LIBRARIES} ${RPATH} -o ${TARGET_PIHM} ${MAIN_PIHM} $(SRC)  $(LK_FLAGS)
 	@echo
 	@echo
-	$(CC) $(CFLAGS) ${INCLUDES} ${STCFLAG} ${LIBRARIES} -o ${TARGET_PIHM} ${MAIN_PIHM} $(SRC)  $(LK_FLAGS)
+	$(CC) $(CFLAGS) ${INCLUDES} ${LIBRARIES} ${RPATH} -o ${TARGET_PIHM} ${MAIN_PIHM} $(SRC)  $(LK_FLAGS)
 	@echo
 	@echo
 	@echo " ${TARGET_PIHM} is compiled successfully!"
@@ -151,27 +136,6 @@ pihm_omp: ${MAIN_OMP}  $(SRC) $(SRC_H)
 	@echo
 	@echo
 
-calib_mpi: ${MAIN_CB_MPI}  $(SRC_CB) $(SRC_CB_H)
-	@echo '...Compiling PIHM_Calib OpenMPI...'
-	@echo $(MPICC) $(CFLAGS) -D_CALIBMODE ${INC_CB} -I ${INC_MPI} ${LIBRARIES} -o ${TARGET_CB_MPI} ${MAIN_CB_MPI}  $(SRC_CB)  $(LK_FLAGS)
-	@echo
-	@echo
-	 $(MPICC) $(CFLAGS) -D_CALIBMODE ${INC_CB} -I ${INC_MPI} ${LIBRARIES} -o ${TARGET_CB_MPI} ${MAIN_CB_MPI}  $(SRC_CB)  $(LK_FLAGS)
-	@echo
-	@echo " ${TARGET_CB_MPI} is compiled successfully!"
-	@echo
-	@echo
-calib_omp: ${MAIN_CB_OMP}  $(SRC_CB) $(SRC_CB_H)
-	@echo '...Compiling PIHM_Calib OpenMP...'
-	@echo $(CC) $(CFLAGS) ${STCFLAG} -D_CALIBMODE ${INC_CB} -I ${INC_MPI} ${LIBRARIES} -o ${TARGET_CB_OMP} ${MAIN_CB_OMP}  $(SRC_CB)  $(LK_FLAGS) $(LK_OMP)
-	@echo
-	@echo
-	$(CC) $(CFLAGS) ${STCFLAG} -D_CALIBMODE ${INC_CB} -I ${INC_MPI} ${LIBRARIES} -o ${TARGET_CB_OMP} ${MAIN_CB_OMP}  $(SRC_CB)  $(LK_FLAGS) $(LK_OMP)
-	@echo
-	@echo " ${TARGET_CB_OMP} is compiled successfully!"
-	@echo
-	@echo
-
 
 clean:
 	@echo "Cleaning ... "
@@ -184,12 +148,6 @@ clean:
 	
 	@echo "  rm -f ${TARGET_OMP}"
 	@rm -f ${TARGET_OMP}
-	
-	@echo "  rm -f ${TARGET_CB_MPI}"
-	@rm -f ${TARGET_CB_MPI}
-	
-	@echo "  rm -f ${TARGET_CB_OMP}"
-	@rm -f ${TARGET_CB_OMP}
 	
 	@echo
 	@echo "Done."

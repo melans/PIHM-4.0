@@ -1,0 +1,14 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+DerivedData
+Index
+pihm++*
+Build
+Debug
+*.sh
+*.tar
+rcode
+src_*
+*.swp
